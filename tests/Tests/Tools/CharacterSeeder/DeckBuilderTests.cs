@@ -28,7 +28,7 @@ public class DeckBuilderTests
         await builder.LoadCardsAsync(_testCardsPath);
 
         // Building a deck should work without throwing
-        var deck = builder.BuildDeck(Suit.Fire, 1);
+        var deck = builder.BuildDeck(new[] { Suit.Fire }, 1);
         deck.Should().NotBeEmpty();
     }
 
@@ -53,7 +53,7 @@ public class DeckBuilderTests
         var builder = new DeckBuilder();
         await builder.LoadCardsAsync(_testCardsPath);
 
-        var deck = builder.BuildDeck(Suit.Fire, level);
+        var deck = builder.BuildDeck(new[] { Suit.Fire }, level);
 
         deck.Should().HaveCount(expectedSize);
     }
@@ -69,7 +69,7 @@ public class DeckBuilderTests
         var builder = new DeckBuilder();
         await builder.LoadCardsAsync(_testCardsPath);
 
-        var deck = builder.BuildDeck(Suit.Fire, 5);
+        var deck = builder.BuildDeck(new[] { Suit.Fire }, 5);
 
         // All cards should be from Fire or Basic suits
         deck.All(id => id.StartsWith("fire_") || id.StartsWith("basic_")).Should().BeTrue();
@@ -97,7 +97,7 @@ public class DeckBuilderTests
         var builder = new DeckBuilder();
         await builder.LoadCardsAsync(_testCardsPath);
 
-        var deck = builder.BuildDeck(suit, 5);
+        var deck = builder.BuildDeck(new[] { suit }, 5);
 
         deck.Should().NotBeEmpty();
     }
@@ -107,7 +107,7 @@ public class DeckBuilderTests
     {
         var builder = new DeckBuilder();
 
-        var action = () => builder.BuildDeck(Suit.Fire, 1);
+        var action = () => builder.BuildDeck(new[] { Suit.Fire }, 1);
 
         action.Should().Throw<InvalidOperationException>();
     }

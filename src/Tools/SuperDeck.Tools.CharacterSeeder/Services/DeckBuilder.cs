@@ -31,16 +31,18 @@ public class DeckBuilder
         }
     }
 
-    public List<string> BuildDeck(Suit suit, int level)
+    public List<string> BuildDeck(Suit[] suits, int level)
     {
         var deckConfig = GetDeckConfig(level);
+        var suitSet = new HashSet<Suit>(suits) { Suit.Basic };
         var availableCards = _cards
-            .Where(c => c.Suit == suit || c.Suit == Suit.Basic)
+            .Where(c => suitSet.Contains(c.Suit))
             .ToList();
 
         if (availableCards.Count == 0)
         {
-            throw new InvalidOperationException($"No cards found for suit {suit} or Basic");
+            var suitNames = string.Join(", ", suits);
+            throw new InvalidOperationException($"No cards found for suits {suitNames} or Basic");
         }
 
         var deck = new List<string>();

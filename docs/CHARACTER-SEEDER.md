@@ -2,7 +2,7 @@
 
 Command-line tool that generates ghost characters (AI opponents) and seeds them into the database. Ghost characters provide offline opponents at various difficulty levels with suit-appropriate decks and plausible stats.
 
-Supports both SQLite (offline mode) and MariaDB (online mode).
+Supports both SQLite (offline mode) and MariaDB (online mode). Characters can have one or multiple suits.
 
 ## Table of Contents
 
@@ -28,7 +28,7 @@ dotnet run --project src/Tools/SuperDeck.Tools.CharacterSeeder -- --name <name> 
 | Option | Required | Default | Description |
 |--------|----------|---------|-------------|
 | `--name` | Yes | | Base character name (e.g., "Blaze") |
-| `--suit` | Yes | | Character suit (case-insensitive) |
+| `--suit` | Yes | | Character suit(s) — repeat for multiple (e.g., `--suit Fire --suit Berserker`) |
 | `--provider` | No | `sqlite` | Database provider: `sqlite` or `mariadb` |
 | `--database` | No | `superdeck.db` | SQLite database path (used when provider is sqlite) |
 | `--connection-string` | No | | MariaDB connection string (required when provider is mariadb) |
@@ -46,7 +46,7 @@ Basic suit is not allowed.
 
 ## Examples
 
-### SQLite (default)
+### Single Suit
 
 Generate all levels (1-10) for a Fire character:
 
@@ -60,6 +60,23 @@ Generate a single level 5 Berserker:
 ```bash
 dotnet run --project src/Tools/SuperDeck.Tools.CharacterSeeder -- \
   --name Warrior --suit Berserker --level 5 --database src/Server/superdeck.db
+```
+
+### Multiple Suits
+
+Generate a character with Fire and Berserker suits (deck draws from both suits plus Basic):
+
+```bash
+dotnet run --project src/Tools/SuperDeck.Tools.CharacterSeeder -- \
+  --name Inferno --suit Fire --suit Berserker --database src/Server/superdeck.db
+```
+
+Three-suit character:
+
+```bash
+dotnet run --project src/Tools/SuperDeck.Tools.CharacterSeeder -- \
+  --name Tempest --suit Speedster --suit Electricity --suit Magic \
+  --database src/Server/superdeck.db
 ```
 
 ### MariaDB
@@ -108,6 +125,13 @@ Each suit has a stat distribution profile that determines how points are allocat
 
 Total stat points per level: `(level x 2) + 5`
 
+### Multi-Suit Stat Averaging
+
+When a character has multiple suits, stat profiles are averaged. For example, a Fire + Magic character:
+- Fire: 50% ATK / 10% DEF / 40% SPD
+- Magic: 20% ATK / 50% DEF / 30% SPD
+- **Average: 35% ATK / 30% DEF / 35% SPD** (balanced)
+
 ---
 
 ## Deck Configuration
@@ -121,7 +145,7 @@ Deck size and rarity distribution scale with level:
 | 7-9 | 13 | 30% | 35% | 25% | 10% | - |
 | 10 | 15 | 20% | 30% | 30% | 15% | 5% |
 
-Cards are selected from the specified suit plus Basic suit.
+Cards are selected from all specified suits plus Basic suit. Multi-suit characters have a larger card pool to draw from.
 
 ---
 
@@ -130,10 +154,12 @@ Cards are selected from the specified suit plus Basic suit.
 ### Character ID Format
 
 ```
-ghost_{name}_{suit}_lv{level}
+ghost_{name}_{suits}_lv{level}
 ```
 
-All lowercase. Example: `ghost_blaze_fire_lv5`
+All lowercase, suits sorted alphabetically. Examples:
+- Single suit: `ghost_blaze_fire_lv5`
+- Multiple suits: `ghost_inferno_berserker_fire_lv5`
 
 Running the tool again with the same name/suit/level updates the existing character (upsert).
 

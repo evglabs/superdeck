@@ -7,9 +7,9 @@ var nameOption = new Option<string>(
     name: "--name",
     description: "Base character name (e.g., 'Blaze')") { IsRequired = true };
 
-var suitOption = new Option<string>(
+var suitOption = new Option<string[]>(
     name: "--suit",
-    description: "Character suit (e.g., 'Fire', 'Berserker')") { IsRequired = true };
+    description: "Character suit(s) — repeat for multiple (e.g., --suit Fire --suit Berserker)") { IsRequired = true, AllowMultipleArgumentsPerToken = true };
 
 var databaseOption = new Option<string>(
     name: "--database",
@@ -51,21 +51,27 @@ var rootCommand = new RootCommand("Ghost Character Seeder - generates level-scal
     connectionStringOption
 };
 
-rootCommand.SetHandler(async (name, suitStr, database, level, verbose, cardsPath, provider, connectionString) =>
+rootCommand.SetHandler(async (name, suitStrs, database, level, verbose, cardsPath, provider, connectionString) =>
 {
-    if (!Enum.TryParse<Suit>(suitStr, ignoreCase: true, out var suit))
+    var suits = new List<Suit>();
+    foreach (var suitStr in suitStrs)
     {
-        Console.Error.WriteLine($"Invalid suit: {suitStr}");
-        Console.Error.WriteLine($"Valid suits: {string.Join(", ", Enum.GetNames<Suit>())}");
-        Environment.Exit(1);
-        return;
-    }
+        if (!Enum.TryParse<Suit>(suitStr, ignoreCase: true, out var suit))
+        {
+            Console.Error.WriteLine($"Invalid suit: {suitStr}");
+            Console.Error.WriteLine($"Valid suits: {string.Join(", ", Enum.GetNames<Suit>())}");
+            Environment.Exit(1);
+            return;
+        }
 
-    if (suit == Suit.Basic)
-    {
-        Console.Error.WriteLine("Cannot create ghost characters for Basic suit");
-        Environment.Exit(1);
-        return;
+        if (suit == Suit.Basic)
+        {
+            Console.Error.WriteLine("Cannot create ghost characters for Basic suit");
+            Environment.Exit(1);
+            return;
+        }
+
+        suits.Add(suit);
     }
 
     var normalizedProvider = provider.ToLowerInvariant();
@@ -87,7 +93,7 @@ rootCommand.SetHandler(async (name, suitStr, database, level, verbose, cardsPath
     var options = new SeedOptions
     {
         Name = name,
-        Suit = suitStr,
+        Suits = suitStrs,
         Database = database,
         Level = level,
         Verbose = verbose,
@@ -96,13 +102,13 @@ rootCommand.SetHandler(async (name, suitStr, database, level, verbose, cardsPath
         ConnectionString = connectionString
     };
 
-    await RunSeeder(options, suit);
+    await RunSeeder(options, suits.ToArray());
 },
 nameOption, suitOption, databaseOption, levelOption, verboseOption, cardsPathOption, providerOption, connectionStringOption);
 
 return await rootCommand.InvokeAsync(args);
 
-async Task RunSeeder(SeedOptions options, Suit suit)
+async Task RunSeeder(SeedOptions options, Suit[] suits)
 {
     var generator = new CharacterGenerator();
     var deckBuilder = new DeckBuilder();
@@ -125,9 +131,11 @@ async Task RunSeeder(SeedOptions options, Suit suit)
         ? new[] { options.Level.Value }
         : Enumerable.Range(1, 10).ToArray();
 
+    var suitNames = string.Join(", ", suits.Select(s => s.ToString()));
+
     if (options.Verbose)
     {
-        Console.WriteLine($"Generating ghost characters for {options.Name} ({suit})");
+        Console.WriteLine($"Generating ghost characters for {options.Name} ({suitNames})");
         Console.WriteLine($"Levels: {string.Join(", ", levels)}");
         if (options.Provider == "sqlite")
             Console.WriteLine($"Database: {options.Database}");
@@ -138,8 +146,8 @@ async Task RunSeeder(SeedOptions options, Suit suit)
 
     foreach (var level in levels)
     {
-        var deck = deckBuilder.BuildDeck(suit, level);
-        var character = generator.Generate(options.Name, suit, level, deck);
+        var deck = deckBuilder.BuildDeck(suits, level);
+        var character = generator.Generate(options.Name, suits, level, deck);
 
         await seeder.UpsertGhostAsync(character);
 
@@ -160,5 +168,5 @@ async Task RunSeeder(SeedOptions options, Suit suit)
         }
     }
 
-    Console.WriteLine($"Successfully seeded {levels.Length} ghost character(s) for {options.Name} ({suit})");
+    Console.WriteLine($"Successfully seeded {levels.Length} ghost(s) for {options.Name} ({suitNames})");
 }

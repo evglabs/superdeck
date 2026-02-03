@@ -7,19 +7,21 @@ public class CharacterGenerator
 {
     private readonly Random _random = new();
 
-    public Character Generate(string name, Suit suit, int level, List<string> deckCardIds)
+    public Character Generate(string name, Suit[] suits, int level, List<string> deckCardIds)
     {
-        var profile = GetStatProfile(suit);
+        var profile = GetCombinedStatProfile(suits);
         var totalStatPoints = (level * 2) + 5;
 
         var (attack, defense, speed) = DistributeStats(totalStatPoints, profile);
         var mmr = CalculateMMR(level);
         var (wins, losses) = GeneratePlausibleRecord(level, mmr);
 
+        var suitKey = string.Join("_", suits.Select(s => s.ToString().ToLowerInvariant()).OrderBy(s => s));
+
         return new Character
         {
-            Id = $"ghost_{name.ToLowerInvariant()}_{suit.ToString().ToLowerInvariant()}_lv{level}",
-            Name = $"{name} Lv{level}",
+            Id = $"ghost_{name.ToLowerInvariant()}_{suitKey}_lv{level}",
+            Name = name,
             Level = level,
             XP = 0,
             Attack = attack,
@@ -35,6 +37,16 @@ public class CharacterGenerator
             CreatedAt = DateTime.UtcNow,
             LastModified = DateTime.UtcNow
         };
+    }
+
+    private StatProfile GetCombinedStatProfile(Suit[] suits)
+    {
+        var profiles = suits.Select(GetStatProfile).ToArray();
+        return new StatProfile(
+            profiles.Average(p => p.AttackRatio),
+            profiles.Average(p => p.DefenseRatio),
+            profiles.Average(p => p.SpeedRatio)
+        );
     }
 
     private StatProfile GetStatProfile(Suit suit)

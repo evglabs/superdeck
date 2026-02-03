@@ -15,7 +15,7 @@ public class CharacterGeneratorTests
     public void Generate_ShouldCreateCharacterWithCorrectLevel(int level)
     {
         var deck = new List<string> { "card1", "card2" };
-        var character = _generator.Generate("Test", Suit.Fire, level, deck);
+        var character = _generator.Generate("Test", new[] { Suit.Fire }, level, deck);
 
         character.Level.Should().Be(level);
     }
@@ -24,7 +24,7 @@ public class CharacterGeneratorTests
     public void Generate_ShouldCreateCharacterWithCorrectId()
     {
         var deck = new List<string> { "card1" };
-        var character = _generator.Generate("Blaze", Suit.Fire, 5, deck);
+        var character = _generator.Generate("Blaze", new[] { Suit.Fire }, 5, deck);
 
         character.Id.Should().Be("ghost_blaze_fire_lv5");
     }
@@ -33,7 +33,7 @@ public class CharacterGeneratorTests
     public void Generate_ShouldSetIsGhostToTrue()
     {
         var deck = new List<string> { "card1" };
-        var character = _generator.Generate("Test", Suit.Berserker, 1, deck);
+        var character = _generator.Generate("Test", new[] { Suit.Berserker }, 1, deck);
 
         character.IsGhost.Should().BeTrue();
     }
@@ -45,7 +45,7 @@ public class CharacterGeneratorTests
     public void Generate_ShouldDistributeStatPointsReasonably(int level)
     {
         var deck = new List<string> { "card1" };
-        var character = _generator.Generate("Test", Suit.Fire, level, deck);
+        var character = _generator.Generate("Test", new[] { Suit.Fire }, level, deck);
 
         var totalStats = character.Attack + character.Defense + character.Speed;
         // Total stat points = (level * 2) + 5, but rounding may cause +/-1 variance
@@ -64,7 +64,7 @@ public class CharacterGeneratorTests
         // Run multiple times to account for randomness
         for (var i = 0; i < 100; i++)
         {
-            var character = _generator.Generate("Test", Suit.Fire, level, deck);
+            var character = _generator.Generate("Test", new[] { Suit.Fire }, level, deck);
             character.MMR.Should().BeInRange(minMMR, maxMMR);
         }
     }
@@ -76,7 +76,7 @@ public class CharacterGeneratorTests
     public void Generate_AggressiveSuits_ShouldHaveHigherAttack(Suit suit)
     {
         var deck = new List<string> { "card1" };
-        var character = _generator.Generate("Test", suit, 10, deck);
+        var character = _generator.Generate("Test", new[] { suit }, 10, deck);
 
         // Aggressive profile: 50% attack, 10% defense, 40% speed
         // With 25 total points: ~12-13 attack, ~2-3 defense, ~10 speed
@@ -89,7 +89,7 @@ public class CharacterGeneratorTests
     public void Generate_DefensiveSuits_ShouldHaveHigherDefense(Suit suit)
     {
         var deck = new List<string> { "card1" };
-        var character = _generator.Generate("Test", suit, 10, deck);
+        var character = _generator.Generate("Test", new[] { suit }, 10, deck);
 
         // Defensive profile: 20% attack, 50% defense, 30% speed
         character.Defense.Should().BeGreaterThan(character.Attack);
@@ -101,7 +101,7 @@ public class CharacterGeneratorTests
     public void Generate_SpeedsterSuits_ShouldHaveHighestSpeed(Suit suit)
     {
         var deck = new List<string> { "card1" };
-        var character = _generator.Generate("Test", suit, 10, deck);
+        var character = _generator.Generate("Test", new[] { suit }, 10, deck);
 
         // Speedster profile: 30% attack, 10% defense, 60% speed
         character.Speed.Should().BeGreaterThan(character.Attack);
@@ -112,7 +112,7 @@ public class CharacterGeneratorTests
     public void Generate_ShouldAssignDeckCardIds()
     {
         var deck = new List<string> { "card1", "card2", "card3" };
-        var character = _generator.Generate("Test", Suit.Fire, 1, deck);
+        var character = _generator.Generate("Test", new[] { Suit.Fire }, 1, deck);
 
         character.DeckCardIds.Should().BeEquivalentTo(deck);
     }
@@ -121,7 +121,7 @@ public class CharacterGeneratorTests
     public void Generate_ShouldHavePlausibleWinLossRecord()
     {
         var deck = new List<string> { "card1" };
-        var character = _generator.Generate("Test", Suit.Fire, 5, deck);
+        var character = _generator.Generate("Test", new[] { Suit.Fire }, 5, deck);
 
         character.Wins.Should().BeGreaterOrEqualTo(0);
         character.Losses.Should().BeGreaterOrEqualTo(0);
@@ -132,8 +132,35 @@ public class CharacterGeneratorTests
     public void Generate_ShouldSetCorrectName()
     {
         var deck = new List<string> { "card1" };
-        var character = _generator.Generate("Blaze", Suit.Fire, 5, deck);
+        var character = _generator.Generate("Blaze", new[] { Suit.Fire }, 5, deck);
 
-        character.Name.Should().Be("Blaze Lv5");
+        character.Name.Should().Be("Blaze");
+    }
+
+    [Fact]
+    public void Generate_MultipleSuits_ShouldCreateCorrectId()
+    {
+        var deck = new List<string> { "card1" };
+        var character = _generator.Generate("Blaze", new[] { Suit.Fire, Suit.Berserker }, 5, deck);
+
+        // Suits are sorted alphabetically in the ID
+        character.Id.Should().Be("ghost_blaze_berserker_fire_lv5");
+    }
+
+    [Fact]
+    public void Generate_MultipleSuits_ShouldAverageStatProfiles()
+    {
+        var deck = new List<string> { "card1" };
+        // Fire (aggressive: 50/10/40) + Magic (defensive: 20/50/30)
+        // Average: 35/30/35 (balanced)
+        var character = _generator.Generate("Test", new[] { Suit.Fire, Suit.Magic }, 10, deck);
+
+        var totalStats = character.Attack + character.Defense + character.Speed;
+        var expectedBase = (10 * 2) + 5;
+        totalStats.Should().BeInRange(expectedBase - 1, expectedBase + 1);
+
+        // With averaged profiles, stats should be more balanced than a single aggressive suit
+        // Attack and defense should be closer together than with Fire alone
+        Math.Abs(character.Attack - character.Defense).Should().BeLessThan(10);
     }
 }
