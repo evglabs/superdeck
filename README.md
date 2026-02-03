@@ -77,6 +77,7 @@ Each battle round consists of:
 | [Architecture](docs/ARCHITECTURE.md) | Technical system design |
 | [API Reference](docs/API.md) | REST API documentation |
 | [File Locations](docs/FILES.md) | Where data is stored |
+| [Client Setup](docs/CLIENT-SETUP.md) | Dedicated client machine setup |
 
 ## Project Structure
 
