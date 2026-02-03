@@ -715,7 +715,7 @@ public class GameRunner
         }
 
         const int maxActions = 3;
-        var cardsToAdd = new List<Card>();
+        var cardsToAdd = new List<(int packIndex, Card card)>();
         var cardsToRemove = new List<string>();
 
         int ActionsUsed() => cardsToAdd.Count + cardsToRemove.Count;
@@ -745,7 +745,7 @@ public class GameRunner
             {
                 var rarityColor = GetRarityColor(card.Rarity);
                 var typeColor = GetTypeColor(card.Type);
-                var isSelected = cardsToAdd.Any(c => c.Id == card.Id);
+                var isSelected = cardsToAdd.Any(c => c.packIndex == index - 1);
 
                 var desc = card.Description ?? "";
                 if (desc.Length > 40) desc = desc[..37] + "...";
@@ -772,7 +772,7 @@ public class GameRunner
             {
                 AnsiConsole.WriteLine();
                 AnsiConsole.MarkupLine("[yellow]Pending actions:[/]");
-                foreach (var card in cardsToAdd)
+                foreach (var (_, card) in cardsToAdd)
                 {
                     var rarityColor = GetRarityColor(card.Rarity);
                     AnsiConsole.MarkupLine($"  [green]+ADD[/] [{rarityColor}]{Markup.Escape(card.Name)}[/]");
@@ -823,7 +823,12 @@ public class GameRunner
 
             if (action == "Add Card from Pack")
             {
-                var availableCards = sortedCards.Where(c => !cardsToAdd.Any(s => s.Id == c.Id)).ToList();
+                var selectedIndices = cardsToAdd.Select(c => c.packIndex).ToHashSet();
+                var availableCards = sortedCards
+                    .Select((card, i) => (packIndex: i, card))
+                    .Where(x => !selectedIndices.Contains(x.packIndex))
+                    .ToList();
+
                 if (!availableCards.Any())
                 {
                     AnsiConsole.MarkupLine("[yellow]No more cards available to add.[/]");
@@ -832,14 +837,14 @@ public class GameRunner
                 }
 
                 var cardToAdd = AnsiConsole.Prompt(
-                    new SelectionPrompt<Card>()
+                    new SelectionPrompt<(int packIndex, Card card)>()
                         .Title("[yellow]Select a card to add:[/]")
                         .HighlightStyle(new Style(Color.Gold1))
-                        .UseConverter(c =>
+                        .UseConverter(x =>
                         {
-                            var rarityColor = GetRarityColor(c.Rarity);
-                            var typeColor = GetTypeColor(c.Type);
-                            return $"[{rarityColor}]{Markup.Escape(c.Name)}[/] [{typeColor}]({c.Type})[/] - {c.Suit}";
+                            var rarityColor = GetRarityColor(x.card.Rarity);
+                            var typeColor = GetTypeColor(x.card.Type);
+                            return $"#{x.packIndex + 1} [{rarityColor}]{Markup.Escape(x.card.Name)}[/] [{typeColor}]({x.card.Type})[/] - {x.card.Suit}";
                         })
                         .AddChoices(availableCards));
 
@@ -852,10 +857,10 @@ public class GameRunner
             else if (action == "Undo Add")
             {
                 var cardToUndo = AnsiConsole.Prompt(
-                    new SelectionPrompt<Card>()
+                    new SelectionPrompt<(int packIndex, Card card)>()
                         .Title("[yellow]Select card to undo:[/]")
                         .HighlightStyle(new Style(Color.Gold1))
-                        .UseConverter(c => $"{Markup.Escape(c.Name)} ({c.Suit})")
+                        .UseConverter(x => $"#{x.packIndex + 1} {Markup.Escape(x.card.Name)} ({x.card.Suit})")
                         .AddChoices(cardsToAdd));
 
                 cardsToAdd.Remove(cardToUndo);
@@ -881,15 +886,16 @@ public class GameRunner
             }
             else if (action == "View Card Details")
             {
+                var indexedCards = sortedCards.Select((card, i) => (packIndex: i, card)).ToList();
                 var cardToView = AnsiConsole.Prompt(
-                    new SelectionPrompt<Card>()
+                    new SelectionPrompt<(int packIndex, Card card)>()
                         .Title("[yellow]Select a card to view:[/]")
                         .HighlightStyle(new Style(Color.Gold1))
-                        .UseConverter(c => $"{Markup.Escape(c.Name)} ({c.Suit} - {c.Rarity})")
-                        .AddChoices(sortedCards));
+                        .UseConverter(x => $"#{x.packIndex + 1} {Markup.Escape(x.card.Name)} ({x.card.Suit} - {x.card.Rarity})")
+                        .AddChoices(indexedCards));
 
                 AnsiConsole.Clear();
-                DisplayCardDetails(cardToView);
+                DisplayCardDetails(cardToView.card);
                 AnsiConsole.MarkupLine("\n[grey]Press any key to continue...[/]");
                 Console.ReadKey(true);
             }
@@ -912,7 +918,7 @@ public class GameRunner
 
         if (cardsToAdd.Any())
         {
-            var cardIds = cardsToAdd.Select(c => c.Id).ToList();
+            var cardIds = cardsToAdd.Select(c => c.card.Id).ToList();
             await _apiClient.AddCardsToDeckAsync(_currentCharacter!.Id, cardIds);
             AnsiConsole.MarkupLine($"[green]Added {cardsToAdd.Count} card(s) to deck![/]");
         }
