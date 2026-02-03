@@ -149,14 +149,28 @@ public class BattleService
 
     private Character CreateDefaultOpponent(int level)
     {
+        var totalStatPoints = (level - 1) * _settings.Character.StatPointsPerLevel;
+        var rng = new Random();
+        int atk = 0, def = 0, spd = 0;
+
+        for (int i = 0; i < totalStatPoints; i++)
+        {
+            switch (rng.Next(3))
+            {
+                case 0: atk++; break;
+                case 1: def++; break;
+                case 2: spd++; break;
+            }
+        }
+
         var opponent = new Character
         {
             Id = Guid.NewGuid().ToString(),
             Name = "Training Dummy",
             Level = level,
-            Attack = level,
-            Defense = level,
-            Speed = level,
+            Attack = atk,
+            Defense = def,
+            Speed = spd,
             MMR = _settings.MMR.StartingMMR,
             IsGhost = true
         };
