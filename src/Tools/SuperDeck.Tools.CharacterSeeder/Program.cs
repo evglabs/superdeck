@@ -141,7 +141,7 @@ async Task RunSeeder(SeedOptions options, Suit suit)
         var deck = deckBuilder.BuildDeck(suit, level);
         var character = generator.Generate(options.Name, suit, level, deck);
 
-        await seeder.UpsertCharacterAsync(character);
+        await seeder.UpsertGhostAsync(character);
 
         if (options.Verbose)
         {

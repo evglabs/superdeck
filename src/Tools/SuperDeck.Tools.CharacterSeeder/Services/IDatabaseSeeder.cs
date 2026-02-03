@@ -4,5 +4,5 @@ namespace SuperDeck.Tools.CharacterSeeder.Services;
 
 public interface IDatabaseSeeder
 {
-    Task UpsertCharacterAsync(Character character);
+    Task UpsertGhostAsync(Character character);
 }

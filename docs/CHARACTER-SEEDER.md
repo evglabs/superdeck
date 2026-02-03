@@ -157,8 +157,9 @@ Generated to look plausible based on MMR:
 
 ### Database
 
+- Writes to the **GhostSnapshots** table (the table matchmaking queries for opponents)
+- Each character is serialized to JSON and stored as `SerializedCharacterState`
 - Supports SQLite (`--provider sqlite`) and MariaDB (`--provider mariadb`)
-- Auto-creates the Characters table and indexes if missing
+- Auto-creates the GhostSnapshots table and indexes if missing
 - Uses upsert: re-running with the same name/suit safely updates existing records
-- Deck is stored as a JSON array of card IDs
-- MariaDB schema matches the server's schema (VARCHAR types, TINYINT booleans, DATETIME timestamps)
+- Schemas match the server's own GhostSnapshots schemas

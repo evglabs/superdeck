@@ -21,116 +21,94 @@ public class MariaDbDatabaseSeeder : IDatabaseSeeder
         connection.Open();
 
         connection.Execute(@"
-            CREATE TABLE IF NOT EXISTS Characters (
+            CREATE TABLE IF NOT EXISTS GhostSnapshots (
                 Id VARCHAR(36) PRIMARY KEY,
-                Name VARCHAR(100) NOT NULL,
-                Level INT DEFAULT 1,
-                XP INT DEFAULT 0,
-                Attack INT DEFAULT 0,
-                Defense INT DEFAULT 0,
-                Speed INT DEFAULT 0,
-                DeckCardIds TEXT,
+                SourceCharacterId VARCHAR(36) NOT NULL,
+                SerializedCharacterState TEXT NOT NULL,
+                GhostMMR INT DEFAULT 1000,
                 Wins INT DEFAULT 0,
                 Losses INT DEFAULT 0,
-                MMR INT DEFAULT 1000,
-                IsGhost TINYINT(1) DEFAULT 0,
-                IsPublished TINYINT(1) DEFAULT 0,
-                OwnerPlayerId VARCHAR(36),
+                TimesUsed INT DEFAULT 0,
+                AIProfileId VARCHAR(36) NOT NULL,
+                DownloadedAt DATETIME,
                 CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
-                LastModified DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX idx_characters_mmr (MMR),
-                INDEX idx_characters_player (OwnerPlayerId)
+                INDEX idx_ghosts_mmr (GhostMMR)
             )
         ");
     }
 
-    private async Task<bool> CharacterExistsAsync(string characterId)
+    private async Task<bool> GhostExistsAsync(string ghostId)
     {
         await using var connection = new MySqlConnection(_connectionString);
         var count = await connection.ExecuteScalarAsync<int>(
-            "SELECT COUNT(*) FROM Characters WHERE Id = @Id",
-            new { Id = characterId });
+            "SELECT COUNT(*) FROM GhostSnapshots WHERE Id = @Id",
+            new { Id = ghostId });
         return count > 0;
     }
 
-    private async Task InsertCharacterAsync(Character character)
+    private async Task InsertGhostAsync(string ghostId, Character character)
     {
         await using var connection = new MySqlConnection(_connectionString);
-        var row = new CharacterRow(character);
+        var row = new GhostRow(ghostId, character);
 
         await connection.ExecuteAsync(@"
-            INSERT INTO Characters (Id, Name, Level, XP, Attack, Defense, Speed, DeckCardIds, Wins, Losses, MMR, IsGhost, IsPublished, OwnerPlayerId, CreatedAt, LastModified)
-            VALUES (@Id, @Name, @Level, @XP, @Attack, @Defense, @Speed, @DeckCardIds, @Wins, @Losses, @MMR, @IsGhost, @IsPublished, @OwnerPlayerId, @CreatedAt, @LastModified)",
+            INSERT INTO GhostSnapshots (Id, SourceCharacterId, SerializedCharacterState, GhostMMR, Wins, Losses, TimesUsed, AIProfileId, CreatedAt)
+            VALUES (@Id, @SourceCharacterId, @SerializedCharacterState, @GhostMMR, @Wins, @Losses, @TimesUsed, @AIProfileId, @CreatedAt)",
             row);
     }
 
-    private async Task UpdateCharacterAsync(Character character)
+    private async Task UpdateGhostAsync(string ghostId, Character character)
     {
         await using var connection = new MySqlConnection(_connectionString);
-        var row = new CharacterRow(character);
+        var row = new GhostRow(ghostId, character);
 
         await connection.ExecuteAsync(@"
-            UPDATE Characters SET
-                Name = @Name, Level = @Level, XP = @XP,
-                Attack = @Attack, Defense = @Defense, Speed = @Speed,
-                DeckCardIds = @DeckCardIds, Wins = @Wins, Losses = @Losses,
-                MMR = @MMR, IsGhost = @IsGhost, IsPublished = @IsPublished,
-                LastModified = @LastModified
+            UPDATE GhostSnapshots SET
+                SerializedCharacterState = @SerializedCharacterState,
+                GhostMMR = @GhostMMR,
+                Wins = @Wins, Losses = @Losses
             WHERE Id = @Id",
             row);
     }
 
-    public async Task UpsertCharacterAsync(Character character)
+    public async Task UpsertGhostAsync(Character character)
     {
-        if (await CharacterExistsAsync(character.Id))
+        var ghostId = character.Id;
+        if (await GhostExistsAsync(ghostId))
         {
-            await UpdateCharacterAsync(character);
+            await UpdateGhostAsync(ghostId, character);
         }
         else
         {
-            await InsertCharacterAsync(character);
+            await InsertGhostAsync(ghostId, character);
         }
     }
 
-    private class CharacterRow
+    private class GhostRow
     {
         public string Id { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public int Level { get; set; }
-        public int XP { get; set; }
-        public int Attack { get; set; }
-        public int Defense { get; set; }
-        public int Speed { get; set; }
-        public string? DeckCardIds { get; set; }
+        public string SourceCharacterId { get; set; } = string.Empty;
+        public string SerializedCharacterState { get; set; } = string.Empty;
+        public int GhostMMR { get; set; }
         public int Wins { get; set; }
         public int Losses { get; set; }
-        public int MMR { get; set; }
-        public bool IsGhost { get; set; }
-        public bool IsPublished { get; set; }
-        public string? OwnerPlayerId { get; set; }
+        public int TimesUsed { get; set; }
+        public string AIProfileId { get; set; } = "default";
         public DateTime? CreatedAt { get; set; }
-        public DateTime? LastModified { get; set; }
 
-        public CharacterRow() { }
+        public GhostRow() { }
 
-        public CharacterRow(Character c)
+        public GhostRow(string ghostId, Character c)
         {
-            Id = c.Id;
-            Name = c.Name;
-            Level = c.Level;
-            XP = c.XP;
-            Attack = c.Attack;
-            Defense = c.Defense;
-            Speed = c.Speed;
-            DeckCardIds = JsonSerializer.Serialize(c.DeckCardIds);
+            Id = ghostId;
+            SourceCharacterId = c.Id;
+            SerializedCharacterState = JsonSerializer.Serialize(c);
+            GhostMMR = c.MMR;
             Wins = c.Wins;
             Losses = c.Losses;
-            MMR = c.MMR;
-            IsGhost = c.IsGhost;
-            IsPublished = c.IsPublished;
-            OwnerPlayerId = c.OwnerPlayerId;
-            CreatedAt = c.CreatedAt;
-            LastModified = c.LastModified;
+            TimesUsed = 0;
+            AIProfileId = "default";
+            CreatedAt = DateTime.UtcNow;
         }
     }
 }

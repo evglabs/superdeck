@@ -3,144 +3,136 @@ using Microsoft.Data.Sqlite;
 using SuperDeck.Core.Models;
 using SuperDeck.Tools.CharacterSeeder.Services;
 using Dapper;
+using System.Text.Json;
 
 namespace SuperDeck.Tests.Tools.CharacterSeeder;
 
-public class SqliteDatabaseSeederTests : IDisposable
+public class DatabaseSeederTests : IDisposable
 {
     private readonly string _testDbPath;
     private readonly SqliteDatabaseSeeder _seeder;
 
-    public SqliteDatabaseSeederTests()
+    public DatabaseSeederTests()
     {
         _testDbPath = Path.Combine(Path.GetTempPath(), $"test_seeder_{Guid.NewGuid()}.db");
-        InitializeTestDatabase();
         _seeder = new SqliteDatabaseSeeder(_testDbPath);
     }
 
-    private void InitializeTestDatabase()
-    {
-        using var connection = new SqliteConnection($"Data Source={_testDbPath}");
-        connection.Open();
-        connection.Execute(@"
-            CREATE TABLE IF NOT EXISTS Characters (
-                Id TEXT PRIMARY KEY,
-                Name TEXT NOT NULL,
-                Level INTEGER DEFAULT 1,
-                XP INTEGER DEFAULT 0,
-                Attack INTEGER DEFAULT 0,
-                Defense INTEGER DEFAULT 0,
-                Speed INTEGER DEFAULT 5,
-                DeckCardIds TEXT,
-                Wins INTEGER DEFAULT 0,
-                Losses INTEGER DEFAULT 0,
-                MMR INTEGER DEFAULT 1000,
-                IsGhost INTEGER DEFAULT 0,
-                IsPublished INTEGER DEFAULT 0,
-                OwnerPlayerId TEXT,
-                CreatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
-                LastModified TEXT DEFAULT CURRENT_TIMESTAMP
-            )");
-    }
-
     [Fact]
-    public async Task InsertCharacterAsync_ShouldInsertCharacter()
+    public async Task UpsertGhostAsync_WhenNew_ShouldInsertGhostSnapshot()
     {
-        var character = CreateTestCharacter("test_1");
+        var character = CreateTestCharacter("ghost_test_fire_lv5");
 
-        await _seeder.InsertCharacterAsync(character);
+        await _seeder.UpsertGhostAsync(character);
 
         using var connection = new SqliteConnection($"Data Source={_testDbPath}");
-        var count = await connection.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM Characters WHERE Id = 'test_1'");
+        var count = await connection.ExecuteScalarAsync<int>(
+            "SELECT COUNT(*) FROM GhostSnapshots WHERE Id = 'ghost_test_fire_lv5'");
         count.Should().Be(1);
     }
 
     [Fact]
-    public async Task CharacterExistsAsync_WhenCharacterExists_ShouldReturnTrue()
+    public async Task UpsertGhostAsync_ShouldSerializeCharacterState()
     {
-        var character = CreateTestCharacter("exists_test");
-        await _seeder.InsertCharacterAsync(character);
+        var character = CreateTestCharacter("ghost_serialize_test");
 
-        var exists = await _seeder.CharacterExistsAsync("exists_test");
+        await _seeder.UpsertGhostAsync(character);
 
-        exists.Should().BeTrue();
+        using var connection = new SqliteConnection($"Data Source={_testDbPath}");
+        var json = await connection.ExecuteScalarAsync<string>(
+            "SELECT SerializedCharacterState FROM GhostSnapshots WHERE Id = 'ghost_serialize_test'");
+        json.Should().NotBeNullOrEmpty();
+
+        var deserialized = JsonSerializer.Deserialize<Character>(json!);
+        deserialized.Should().NotBeNull();
+        deserialized!.Name.Should().Be("Test Character");
+        deserialized.Attack.Should().Be(10);
+        deserialized.DeckCardIds.Should().Contain("card1");
     }
 
     [Fact]
-    public async Task CharacterExistsAsync_WhenCharacterDoesNotExist_ShouldReturnFalse()
+    public async Task UpsertGhostAsync_ShouldSetGhostMMR()
     {
-        var exists = await _seeder.CharacterExistsAsync("nonexistent");
+        var character = CreateTestCharacter("ghost_mmr_test");
+        character.MMR = 1234;
 
-        exists.Should().BeFalse();
+        await _seeder.UpsertGhostAsync(character);
+
+        using var connection = new SqliteConnection($"Data Source={_testDbPath}");
+        var mmr = await connection.ExecuteScalarAsync<int>(
+            "SELECT GhostMMR FROM GhostSnapshots WHERE Id = 'ghost_mmr_test'");
+        mmr.Should().Be(1234);
     }
 
     [Fact]
-    public async Task UpdateCharacterAsync_ShouldUpdateExistingCharacter()
+    public async Task UpsertGhostAsync_ShouldSetAIProfileToDefault()
     {
-        var character = CreateTestCharacter("update_test");
-        await _seeder.InsertCharacterAsync(character);
+        var character = CreateTestCharacter("ghost_profile_test");
+
+        await _seeder.UpsertGhostAsync(character);
+
+        using var connection = new SqliteConnection($"Data Source={_testDbPath}");
+        var profileId = await connection.ExecuteScalarAsync<string>(
+            "SELECT AIProfileId FROM GhostSnapshots WHERE Id = 'ghost_profile_test'");
+        profileId.Should().Be("default");
+    }
+
+    [Fact]
+    public async Task UpsertGhostAsync_WhenExists_ShouldUpdateExisting()
+    {
+        var character = CreateTestCharacter("ghost_upsert_test");
+        character.MMR = 1000;
+        await _seeder.UpsertGhostAsync(character);
 
         character.MMR = 1500;
         character.Attack = 20;
-        await _seeder.UpdateCharacterAsync(character);
+        await _seeder.UpsertGhostAsync(character);
 
         using var connection = new SqliteConnection($"Data Source={_testDbPath}");
-        var row = await connection.QueryFirstAsync<dynamic>("SELECT MMR, Attack FROM Characters WHERE Id = 'update_test'");
-        ((int)row.MMR).Should().Be(1500);
-        ((int)row.Attack).Should().Be(20);
+        var count = await connection.ExecuteScalarAsync<int>(
+            "SELECT COUNT(*) FROM GhostSnapshots WHERE Id = 'ghost_upsert_test'");
+        count.Should().Be(1);
+
+        var mmr = await connection.ExecuteScalarAsync<int>(
+            "SELECT GhostMMR FROM GhostSnapshots WHERE Id = 'ghost_upsert_test'");
+        mmr.Should().Be(1500);
+
+        var json = await connection.ExecuteScalarAsync<string>(
+            "SELECT SerializedCharacterState FROM GhostSnapshots WHERE Id = 'ghost_upsert_test'");
+        var deserialized = JsonSerializer.Deserialize<Character>(json!);
+        deserialized!.Attack.Should().Be(20);
     }
 
     [Fact]
-    public async Task UpsertCharacterAsync_WhenNew_ShouldInsert()
+    public async Task UpsertGhostAsync_ShouldSetSourceCharacterId()
     {
-        var character = CreateTestCharacter("upsert_new");
+        var character = CreateTestCharacter("ghost_source_test");
 
-        await _seeder.UpsertCharacterAsync(character);
+        await _seeder.UpsertGhostAsync(character);
 
-        var exists = await _seeder.CharacterExistsAsync("upsert_new");
+        using var connection = new SqliteConnection($"Data Source={_testDbPath}");
+        var sourceId = await connection.ExecuteScalarAsync<string>(
+            "SELECT SourceCharacterId FROM GhostSnapshots WHERE Id = 'ghost_source_test'");
+        sourceId.Should().Be("ghost_source_test");
+    }
+
+    [Fact]
+    public async Task GhostExistsAsync_WhenGhostExists_ShouldReturnTrue()
+    {
+        var character = CreateTestCharacter("ghost_exists_test");
+        await _seeder.UpsertGhostAsync(character);
+
+        var exists = await _seeder.GhostExistsAsync("ghost_exists_test");
+
         exists.Should().BeTrue();
     }
 
     [Fact]
-    public async Task UpsertCharacterAsync_WhenExists_ShouldUpdate()
+    public async Task GhostExistsAsync_WhenGhostDoesNotExist_ShouldReturnFalse()
     {
-        var character = CreateTestCharacter("upsert_existing");
-        await _seeder.InsertCharacterAsync(character);
+        var exists = await _seeder.GhostExistsAsync("nonexistent");
 
-        character.MMR = 2000;
-        await _seeder.UpsertCharacterAsync(character);
-
-        using var connection = new SqliteConnection($"Data Source={_testDbPath}");
-        var mmr = await connection.ExecuteScalarAsync<int>("SELECT MMR FROM Characters WHERE Id = 'upsert_existing'");
-        mmr.Should().Be(2000);
-    }
-
-    [Fact]
-    public async Task InsertCharacterAsync_ShouldSerializeDeckCardIds()
-    {
-        var character = CreateTestCharacter("deck_test");
-        character.DeckCardIds = new List<string> { "card1", "card2", "card3" };
-
-        await _seeder.InsertCharacterAsync(character);
-
-        using var connection = new SqliteConnection($"Data Source={_testDbPath}");
-        var deckJson = await connection.ExecuteScalarAsync<string>("SELECT DeckCardIds FROM Characters WHERE Id = 'deck_test'");
-        deckJson.Should().Contain("card1");
-        deckJson.Should().Contain("card2");
-        deckJson.Should().Contain("card3");
-    }
-
-    [Fact]
-    public async Task InsertCharacterAsync_ShouldSetIsGhost()
-    {
-        var character = CreateTestCharacter("ghost_test");
-        character.IsGhost = true;
-
-        await _seeder.InsertCharacterAsync(character);
-
-        using var connection = new SqliteConnection($"Data Source={_testDbPath}");
-        var isGhost = await connection.ExecuteScalarAsync<int>("SELECT IsGhost FROM Characters WHERE Id = 'ghost_test'");
-        isGhost.Should().Be(1);
+        exists.Should().BeFalse();
     }
 
     private static Character CreateTestCharacter(string id)
