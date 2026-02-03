@@ -175,9 +175,17 @@ When `playername` SSHes in, they go straight into SuperDeck. When they quit, the
 
 ## Updating the Client
 
-When a new version is available:
+### Quick Update (if repo is on the client machine)
 
-### On the build machine
+```bash
+./update_client.sh
+```
+
+This pulls the latest changes, publishes the client, and deploys to `/opt/superdeck-client`.
+
+### Manual Update (remote build machine)
+
+#### On the build machine
 
 ```bash
 cd /path/to/superdeck
@@ -186,7 +194,7 @@ dotnet publish src/Client -c Release -o /tmp/superdeck-client
 scp -r /tmp/superdeck-client user@client-machine:/tmp/superdeck-client
 ```
 
-### On the client machine
+#### On the client machine
 
 ```bash
 sudo rm -rf /opt/superdeck-client/*
