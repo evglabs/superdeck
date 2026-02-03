@@ -6,16 +6,16 @@ using Dapper;
 
 namespace SuperDeck.Tests.Tools.CharacterSeeder;
 
-public class DatabaseSeederTests : IDisposable
+public class SqliteDatabaseSeederTests : IDisposable
 {
     private readonly string _testDbPath;
-    private readonly DatabaseSeeder _seeder;
+    private readonly SqliteDatabaseSeeder _seeder;
 
-    public DatabaseSeederTests()
+    public SqliteDatabaseSeederTests()
     {
         _testDbPath = Path.Combine(Path.GetTempPath(), $"test_seeder_{Guid.NewGuid()}.db");
         InitializeTestDatabase();
-        _seeder = new DatabaseSeeder(_testDbPath);
+        _seeder = new SqliteDatabaseSeeder(_testDbPath);
     }
 
     private void InitializeTestDatabase()

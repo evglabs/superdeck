@@ -14,7 +14,7 @@ var suitOption = new Option<string>(
 var databaseOption = new Option<string>(
     name: "--database",
     getDefaultValue: () => "superdeck.db",
-    description: "SQLite database path");
+    description: "SQLite database path (used when provider is sqlite)");
 
 var levelOption = new Option<int?>(
     name: "--level",
@@ -30,6 +30,15 @@ var cardsPathOption = new Option<string>(
     getDefaultValue: () => "Data/ServerCards",
     description: "Path to ServerCards directory");
 
+var providerOption = new Option<string>(
+    name: "--provider",
+    getDefaultValue: () => "sqlite",
+    description: "Database provider: sqlite or mariadb");
+
+var connectionStringOption = new Option<string?>(
+    name: "--connection-string",
+    description: "MariaDB connection string (required when provider is mariadb)");
+
 var rootCommand = new RootCommand("Ghost Character Seeder - generates level-scaled ghost characters for offline mode")
 {
     nameOption,
@@ -37,10 +46,12 @@ var rootCommand = new RootCommand("Ghost Character Seeder - generates level-scal
     databaseOption,
     levelOption,
     verboseOption,
-    cardsPathOption
+    cardsPathOption,
+    providerOption,
+    connectionStringOption
 };
 
-rootCommand.SetHandler(async (name, suitStr, database, level, verbose, cardsPath) =>
+rootCommand.SetHandler(async (name, suitStr, database, level, verbose, cardsPath, provider, connectionString) =>
 {
     if (!Enum.TryParse<Suit>(suitStr, ignoreCase: true, out var suit))
     {
@@ -57,6 +68,22 @@ rootCommand.SetHandler(async (name, suitStr, database, level, verbose, cardsPath
         return;
     }
 
+    var normalizedProvider = provider.ToLowerInvariant();
+    if (normalizedProvider != "sqlite" && normalizedProvider != "mariadb")
+    {
+        Console.Error.WriteLine($"Invalid provider: {provider}");
+        Console.Error.WriteLine("Valid providers: sqlite, mariadb");
+        Environment.Exit(1);
+        return;
+    }
+
+    if (normalizedProvider == "mariadb" && string.IsNullOrEmpty(connectionString))
+    {
+        Console.Error.WriteLine("--connection-string is required when provider is mariadb");
+        Environment.Exit(1);
+        return;
+    }
+
     var options = new SeedOptions
     {
         Name = name,
@@ -64,12 +91,14 @@ rootCommand.SetHandler(async (name, suitStr, database, level, verbose, cardsPath
         Database = database,
         Level = level,
         Verbose = verbose,
-        CardsPath = cardsPath
+        CardsPath = cardsPath,
+        Provider = normalizedProvider,
+        ConnectionString = connectionString
     };
 
     await RunSeeder(options, suit);
 },
-nameOption, suitOption, databaseOption, levelOption, verboseOption, cardsPathOption);
+nameOption, suitOption, databaseOption, levelOption, verboseOption, cardsPathOption, providerOption, connectionStringOption);
 
 return await rootCommand.InvokeAsync(args);
 
@@ -77,11 +106,17 @@ async Task RunSeeder(SeedOptions options, Suit suit)
 {
     var generator = new CharacterGenerator();
     var deckBuilder = new DeckBuilder();
-    var seeder = new DatabaseSeeder(options.Database);
+
+    IDatabaseSeeder seeder = options.Provider switch
+    {
+        "mariadb" => new MariaDbDatabaseSeeder(options.ConnectionString!),
+        _ => new SqliteDatabaseSeeder(options.Database)
+    };
 
     if (options.Verbose)
     {
         Console.WriteLine($"Loading cards from: {options.CardsPath}");
+        Console.WriteLine($"Database provider: {options.Provider}");
     }
 
     await deckBuilder.LoadCardsAsync(options.CardsPath);
@@ -94,7 +129,10 @@ async Task RunSeeder(SeedOptions options, Suit suit)
     {
         Console.WriteLine($"Generating ghost characters for {options.Name} ({suit})");
         Console.WriteLine($"Levels: {string.Join(", ", levels)}");
-        Console.WriteLine($"Database: {options.Database}");
+        if (options.Provider == "sqlite")
+            Console.WriteLine($"Database: {options.Database}");
+        else
+            Console.WriteLine($"Database: MariaDB");
         Console.WriteLine();
     }
 

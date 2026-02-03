@@ -8,4 +8,6 @@ public class SeedOptions
     public int? Level { get; init; }
     public bool Verbose { get; init; }
     public string CardsPath { get; init; } = "Data/ServerCards";
+    public string Provider { get; init; } = "sqlite";
+    public string? ConnectionString { get; init; }
 }

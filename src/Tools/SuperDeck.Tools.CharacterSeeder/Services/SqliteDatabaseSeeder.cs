@@ -5,11 +5,11 @@ using SuperDeck.Core.Models;
 
 namespace SuperDeck.Tools.CharacterSeeder.Services;
 
-public class DatabaseSeeder
+public class SqliteDatabaseSeeder : IDatabaseSeeder
 {
     private readonly string _connectionString;
 
-    public DatabaseSeeder(string databasePath)
+    public SqliteDatabaseSeeder(string databasePath)
     {
         _connectionString = $"Data Source={databasePath}";
         InitializeDatabase();
