@@ -24,7 +24,7 @@ superdeck/
 ├── SuperDeck.slnx                    # Solution file
 ├── run_client.sh                     # Quick start script
 ├── update_server.sh                  # One-command server redeployment
-├── update_client.sh                  # One-command client redeployment
+├── update_client.sh                  # Deploy staged client build
 ├── design_doc_v2.md                  # Game design document
 ├── implementation_plan.md            # Development roadmap
 │

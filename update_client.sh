@@ -1,26 +1,28 @@
 #!/bin/bash
 set -e
 
-REPO_DIR="/opt/superdeck"
+STAGING_DIR="/tmp/superdeck-client"
 CLIENT_DIR="/opt/superdeck-client"
 WRAPPER="/usr/local/bin/superdeck"
 
 echo "=== SuperDeck Client Update ==="
 
-# Pull latest changes
-echo "Pulling latest changes..."
-cd "$REPO_DIR"
-git pull
-
-# Rebuild
-echo "Publishing client..."
-dotnet publish src/Client -c Release -o /tmp/superdeck-client
+# Check for staged build
+if [ ! -d "$STAGING_DIR" ]; then
+    echo "ERROR: No staged build found at $STAGING_DIR"
+    echo ""
+    echo "On the build machine, run:"
+    echo "  dotnet publish src/Client -c Release -o /tmp/superdeck-client"
+    echo "  scp -r /tmp/superdeck-client $(whoami)@$(hostname):/tmp/superdeck-client"
+    exit 1
+fi
 
 # Deploy
-echo "Deploying client..."
-sudo cp -r /tmp/superdeck-client/* "$CLIENT_DIR/"
-sudo chmod -R 755 "$CLIENT_DIR"
-rm -rf /tmp/superdeck-client
+echo "Deploying to $CLIENT_DIR..."
+mkdir -p "$CLIENT_DIR"
+cp -r "$STAGING_DIR"/* "$CLIENT_DIR/"
+chmod -R 755 "$CLIENT_DIR"
+rm -rf "$STAGING_DIR"
 
 # Verify
 if [ -f "$CLIENT_DIR/SuperDeck.Client.dll" ]; then
@@ -33,5 +35,5 @@ fi
 if [ -x "$WRAPPER" ]; then
     echo "Wrapper script OK: $WRAPPER"
 else
-    echo "NOTE: No wrapper script at $WRAPPER — run 'superdeck' won't work until one is created"
+    echo "NOTE: No wrapper script at $WRAPPER — 'superdeck' command won't work until one is created"
 fi

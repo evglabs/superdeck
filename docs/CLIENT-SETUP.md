@@ -175,17 +175,7 @@ When `playername` SSHes in, they go straight into SuperDeck. When they quit, the
 
 ## Updating the Client
 
-### Quick Update (if repo is on the client machine)
-
-```bash
-./update_client.sh
-```
-
-This pulls the latest changes, publishes the client, and deploys to `/opt/superdeck-client`.
-
-### Manual Update (remote build machine)
-
-#### On the build machine
+### On the build machine
 
 ```bash
 cd /path/to/superdeck
@@ -194,14 +184,13 @@ dotnet publish src/Client -c Release -o /tmp/superdeck-client
 scp -r /tmp/superdeck-client user@client-machine:/tmp/superdeck-client
 ```
 
-#### On the client machine
+### On the client machine
 
 ```bash
-sudo rm -rf /opt/superdeck-client/*
-sudo cp -r /tmp/superdeck-client/* /opt/superdeck-client/
-sudo chmod -R 755 /opt/superdeck-client
-rm -rf /tmp/superdeck-client
+sudo ./update_client.sh
 ```
+
+This deploys the staged build from `/tmp/superdeck-client` to `/opt/superdeck-client` and cleans up. If no staged build is found, it prints the `scp` command to run from the build machine.
 
 No service restart needed - each `superdeck` invocation runs the latest files.
 
