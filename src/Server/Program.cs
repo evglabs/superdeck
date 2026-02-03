@@ -27,9 +27,6 @@ else
     builder.WebHost.UseUrls("http://localhost:5000");
 }
 
-// Configuration
-builder.Configuration.AddJsonFile("serversettings.json", optional: true, reloadOnChange: true);
-
 // Game Settings
 builder.Services.Configure<GameSettings>(builder.Configuration.GetSection("GameSettings"));
 builder.Services.AddSingleton(sp =>
