@@ -102,7 +102,7 @@ Each battle consists of multiple rounds until a winner is determined:
 ### 2.3 Win Conditions
 
 - **Primary:** Reduce opponent's HP to zero
-- **Secondary:** System damage starts from round 10 (configurable through serversettings.json) and doubles each turn, ensuring battles conclude even if no direct damage occurs
+- **Secondary:** System damage starts from round 10 (configurable through appsettings.json) and doubles each turn, ensuring battles conclude even if no direct damage occurs
 - **Tie:** If simultaneous KO, last player to act wins
 
 ### 2.4 Card Economy
@@ -462,7 +462,7 @@ Even with full Game State access, these remain server-controlled:
 - **Win conditions**: Server validates HP <= 0 after each card resolution
 - **Character persistence**: Changes saved only after battle completion
 - **Card validation**: Server verifies card exists in card library
-- **Script timeout**: 500ms execution limit (configurable in serversettings.json)
+- **Script timeout**: 500ms execution limit (configurable in appsettings.json)
 - **Memory limits**: Sandboxed execution with memory caps
 
 **Online Mode Security:**
@@ -533,7 +533,7 @@ Each battle consists of multiple rounds until a winner is determined:
 - Base queue size: 3 cards
 - Modified by active status effects via `onQueuePhaseStart` hooks
 - Minimum queue size: 1 slot
-- Maximum queue size: Configurable in serversettings.json (default: 5)
+- Maximum queue size: Configurable in appsettings.json (default: 5)
 
 **Card Selection:**
 - Players secretly select cards from their hand
@@ -945,7 +945,7 @@ Cards can modify queues during resolution:
 - Battle end triggers `onBattleEnd` hooks before final state is saved
 
 **System Damage (Timeout Mechanic):**
-Starting from round 10 (configurable in serversettings.json):
+Starting from round 10 (configurable in appsettings.json):
 - Both players take escalating damage at round end
 - Damage doubles each round: 1, 2, 4, 8, 16...
 - Ensures battles conclude even without direct damage
@@ -1019,7 +1019,7 @@ SuperDeck/
 ├── Server/                        # ASP.NET Core API
 │   ├── ServerProgram.cs           # Minimal HTTP API
 │   ├── ServerSettings.cs          # Server configuration
-│   ├── serversettings.json        # Server balance settings
+│   ├── appsettings.json           # All game & server settings
 │   │
 │   ├── Services/
 │   │   ├── CardService.cs         # Card loading & serving
@@ -1101,19 +1101,23 @@ SuperDeck will support two types of clients:
 
 **Example:**
 ```json
-// serversettings.json (controlled by the server operator)
+// appsettings.json → GameSettings (controlled by the server operator)
 {
-  "BaseHP": 100,
-  "HPPerLevel": 10,
-  "MaxDeckSize": 60,
-  "ScriptTimeoutMs": 500,
-  "InitialHandSize": 5,
-  "CardsDrawnPerTurn": 3,
-  "AttackDamageMultiplier": 0.02,
-  "DefenseDamageReduction": 0.02,
-  "XPPerWin": 1.0,
-  "XPPerLoss": 0.5,
-  "MaxLevel": 10
+  "GameSettings": {
+    "Character": {
+      "BaseHP": 100,
+      "HPPerLevel": 10,
+      "MaxLevel": 10
+    },
+    "Battle": {
+      "StartingHandSize": 5,
+      "CardsDrawnPerTurn": 3
+    },
+    "XP": {
+      "XPForWin": 50,
+      "XPForLoss": 25
+    }
+  }
 }
 ```
 

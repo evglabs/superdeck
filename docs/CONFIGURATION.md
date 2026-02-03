@@ -24,7 +24,6 @@ Complete reference for all configuration options in SuperDeck.
 | `appsettings.json` | `src/Server/` | Main configuration |
 | `appsettings.Development.json` | `src/Server/` | Development overrides |
 | `appsettings.Production.json` | `src/Server/` | Production overrides |
-| `serversettings.json` | `src/Server/` | Server-specific settings |
 | `suitweights.json` | `src/Server/` | Card suit drop rates |
 
 ### Configuration Hierarchy
@@ -233,24 +232,12 @@ Location: `appsettings.json` → `GameSettings.RarityWeights`
 
 ## Server Settings
 
-### Basic Server Settings
+### Path Settings
 
-Location: `serversettings.json`
-
-```json
-{
-  "BaseHP": 100,
-  "HPPerLevel": 10,
-  "ScriptTimeoutMs": 500,
-  "InitialHandSize": 5,
-  "DatabasePath": "superdeck.db",
-  "CardLibraryPath": "Data/ServerCards"
-}
-```
+Location: `appsettings.json` (top-level)
 
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `ScriptTimeoutMs` | 500 | Script execution timeout |
 | `DatabasePath` | superdeck.db | SQLite database path |
 | `CardLibraryPath` | Data/ServerCards | Card JSON directory |
 

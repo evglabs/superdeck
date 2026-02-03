@@ -51,7 +51,6 @@ superdeck/
 │   │   ├── Program.cs                # API endpoints
 │   │   ├── appsettings.json          # Main configuration
 │   │   ├── appsettings.Development.json
-│   │   ├── serversettings.json       # Server-specific config
 │   │   ├── suitweights.json          # Card drop rates
 │   │   ├── superdeck.db              # SQLite database (created at runtime)
 │   │   │
@@ -123,7 +122,7 @@ superdeck/
 
 **Default:** `src/Server/superdeck.db`
 
-**Custom location:** Set in `serversettings.json`:
+**Custom location:** Set in `appsettings.json`:
 ```json
 {
   "DatabasePath": "/custom/path/superdeck.db"
@@ -134,7 +133,7 @@ superdeck/
 
 **Default:** `src/Server/Data/ServerCards/`
 
-**Custom location:** Set in `serversettings.json`:
+**Custom location:** Set in `appsettings.json`:
 ```json
 {
   "CardLibraryPath": "/custom/path/cards"
@@ -186,7 +185,6 @@ The client stores nothing persistently - all state comes from the server.
 │  ├── SuperDeck.Server.dll                               │
 │  ├── appsettings.json                                   │
 │  ├── appsettings.Production.json                        │
-│  ├── serversettings.json                                │
 │  ├── suitweights.json                                   │
 │  └── Data/ServerCards/*.json                            │
 │                                                          │
@@ -210,7 +208,6 @@ The client stores nothing persistently - all state comes from the server.
 | `appsettings.json` | `src/Server/` | Main game configuration |
 | `appsettings.Development.json` | `src/Server/` | Development overrides |
 | `appsettings.Production.json` | `src/Server/` | Production overrides |
-| `serversettings.json` | `src/Server/` | Server-specific settings |
 | `suitweights.json` | `src/Server/` | Card drop rate weights |
 
 ### Configuration Loading Order
@@ -477,7 +474,6 @@ fi
 # Configuration backup
 tar -czf $BACKUP_DIR/config_$DATE.tar.gz \
     src/Server/appsettings*.json \
-    src/Server/serversettings.json \
     src/Server/suitweights.json
 
 # Custom cards backup
