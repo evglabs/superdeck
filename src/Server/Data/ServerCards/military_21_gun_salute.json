@@ -1,0 +1,12 @@
+{
+  "id": "military_21_gun_salute",
+  "name": "21-gun Salute",
+  "suit": "Military",
+  "type": "Attack",
+  "rarity": "Rare",
+  "description": "Deploy 7 Troops. Each troop you have deals 3 damage to your opponent.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "if (!State.ContainsKey(\"troops\")) State[\"troops\"] = 0; State[\"troops\"] = (int)State[\"troops\"] + 7; int troops = (int)State[\"troops\"]; int damage = troops * 3; DealDamage(Opponent, damage);"
+  }
+}

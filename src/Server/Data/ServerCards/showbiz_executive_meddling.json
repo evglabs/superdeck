@@ -1,0 +1,12 @@
+{
+  "id": "showbiz_executive_meddling",
+  "name": "Executive Meddling",
+  "suit": "Showbiz",
+  "type": "Debuff",
+  "rarity": "Common",
+  "description": "Your opponent's played cards are shuffled into a random order in the queue.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "Shuffle(OpponentQueue); Log(PlayerDisplayName + \" meddles with the production! \" + OpponentDisplayName + \"'s queue is shuffled!\");"
+  }
+}

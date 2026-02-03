@@ -1,0 +1,12 @@
+{
+  "id": "magic_extend_enchantment",
+  "name": "Extend Enchantment",
+  "suit": "Magic",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "Any buffs you currently have are extended by 1 turn. Any debuffs your opponent has are extended by 1 turn.",
+  "immediateEffect": {
+    "target": "Both",
+    "script": "int buffCount = 0; int debuffCount = 0; foreach (var status in GetStatuses(Player)) { if (status.IsBuff) { status.Duration += 1; buffCount++; } } foreach (var status in GetStatuses(Opponent)) { if (!status.IsBuff) { status.Duration += 1; debuffCount++; } } Log(PlayerDisplayName + \" extends \" + buffCount + \" buffs and \" + debuffCount + \" debuffs!\");"
+  }
+}

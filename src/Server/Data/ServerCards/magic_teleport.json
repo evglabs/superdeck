@@ -1,0 +1,22 @@
+{
+  "id": "magic_teleport",
+  "name": "Teleport",
+  "suit": "Magic",
+  "type": "Debuff",
+  "rarity": "Uncommon",
+  "description": "The next two cards that your opponent plays are suspended until next turn.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "Log(PlayerDisplayName + \" casts Teleport on \" + OpponentDisplayName + \"!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Teleport Suspended",
+      "duration": 2,
+      "hooks": {
+        "OnPlay": "if (!State.ContainsKey(\"suspended\")) State[\"suspended\"] = 0; if ((int)State[\"suspended\"] < 2 && Card != null) { Battle.SuspendedCards.Add(Card); Card = null; State[\"suspended\"] = (int)State[\"suspended\"] + 1; Log(\"Card suspended by Teleport!\"); if ((int)State[\"suspended\"] >= 2) RemoveStatus(); }"
+      }
+    }
+  }
+}

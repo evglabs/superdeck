@@ -1,0 +1,23 @@
+{
+  "id": "radiation_shielding",
+  "name": "Shielding",
+  "suit": "Radiation",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "Block 25% of damage for three turns, exploding for 100% of damage blocked when expires.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" activates radiation shielding!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Radiation Shield",
+      "duration": 3,
+      "hooks": {
+        "OnTakeDamage": "int blocked = (int)(IncomingDamage * 0.25); IncomingDamage -= blocked; if (!State.ContainsKey(\"absorbed\")) State[\"absorbed\"] = 0; State[\"absorbed\"] = (int)State[\"absorbed\"] + blocked; Log(\"Shield absorbs \" + blocked + \" damage! Total stored: \" + State[\"absorbed\"]);",
+        "OnBuffExpire": "int stored = State.ContainsKey(\"absorbed\") ? (int)State[\"absorbed\"] : 0; DealDamage(Opponent, stored);"
+      }
+    }
+  }
+}

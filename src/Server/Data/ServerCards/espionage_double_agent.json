@@ -1,0 +1,22 @@
+{
+  "id": "espionage_double_agent",
+  "name": "Double-Agent",
+  "suit": "Espionage",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "You copy the next two cards your opponent plays and play them.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" activates a double-agent!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Double-Agent Active",
+      "duration": 2,
+      "hooks": {
+        "OnOpponentPlay": "if (Card != null) { if (!State.ContainsKey(\"copies\")) State[\"copies\"] = 0; if ((int)State[\"copies\"] < 2) { var copy = Card.Clone(); PlayerQueue.Add(copy); State[\"copies\"] = (int)State[\"copies\"] + 1; Log(PlayerDisplayName + \"'s double-agent copies and queues \" + Card.Name + \"!\"); if ((int)State[\"copies\"] >= 2) RemoveStatus(); } }"
+      }
+    }
+  }
+}

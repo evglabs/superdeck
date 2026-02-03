@@ -1,0 +1,12 @@
+{
+  "id": "electricity_release_the_magic_smoke",
+  "name": "Release the Magic Smoke",
+  "suit": "Electricity",
+  "type": "Attack",
+  "rarity": "Legendary",
+  "description": "Reduce both you and your opponent's HP to 10% (maximum, will not raise lower HP)",
+  "immediateEffect": {
+    "target": "Both",
+    "script": "int playerTarget = (int)(Player.MaxHP * 0.10); int opponentTarget = (int)(Opponent.MaxHP * 0.10); if (Player.CurrentHP > playerTarget) Player.CurrentHP = playerTarget; if (Opponent.CurrentHP > opponentTarget) Opponent.CurrentHP = opponentTarget; Log(\"The magic smoke is released! Both players reduced to 10% HP!\");"
+  }
+}

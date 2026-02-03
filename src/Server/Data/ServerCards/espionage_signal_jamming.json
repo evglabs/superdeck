@@ -1,0 +1,22 @@
+{
+  "id": "espionage_signal_jamming",
+  "name": "Signal Jamming",
+  "suit": "Espionage",
+  "type": "Debuff",
+  "rarity": "Uncommon",
+  "description": "Your opponent loses 1 queue slot on their next turn.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "Log(PlayerDisplayName + \" jams \" + OpponentDisplayName + \"'s signals!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Signal Jammed",
+      "duration": 1,
+      "hooks": {
+        "OnQueuePhaseStart": "Battle.QueueSize -= 1; Log(OpponentDisplayName + \"'s queue is jammed! Only \" + Battle.QueueSize + \" slots available!\");"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "espionage_assassinate",
+  "name": "Assassinate",
+  "suit": "Espionage",
+  "type": "Attack",
+  "rarity": "Legendary",
+  "description": "For each turn in which you have not been dealt damage, deal 10% of your opponent's remaining hit points.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int turnsWithoutDamage = Player.TurnsWithoutDamage; int damagePercent = turnsWithoutDamage * 10; int damage = (int)(Opponent.CurrentHP * damagePercent / 100); DealDamage(Opponent, damage);"
+  }
+}

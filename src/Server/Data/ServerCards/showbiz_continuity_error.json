@@ -1,0 +1,12 @@
+{
+  "id": "showbiz_continuity_error",
+  "name": "Continuity Error",
+  "suit": "Showbiz",
+  "type": "Buff",
+  "rarity": "Common",
+  "description": "One random card you played last turn is echoed this turn, at +20% effectiveness.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "var lastTurnCards = Player.LastTurnPlayedCards; if (lastTurnCards != null && lastTurnCards.Count > 0) { var echoed = lastTurnCards[Rng.Next(lastTurnCards.Count)]; Battle.EchoCard = echoed; Battle.EchoEffectiveness = 1.20; Log(PlayerDisplayName + \" exploits a continuity error! \" + echoed.Name + \" echoes at 120% effectiveness!\"); } else { Log(\"No cards to echo from last turn!\"); }"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "martial_arts_death_touch",
+  "name": "Death Touch",
+  "suit": "MartialArts",
+  "type": "Debuff",
+  "rarity": "Legendary",
+  "description": "Your opponent dies if they are hit with 13 more attack cards.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "Log(PlayerDisplayName + \" marks \" + OpponentDisplayName + \" with the Death Touch!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Death Touch Mark",
+      "duration": 99,
+      "hooks": {
+        "OnTakeDamage": "if (!State.ContainsKey(\"hits\")) State[\"hits\"] = 0; State[\"hits\"] = (int)State[\"hits\"] + 1; int remaining = 13 - (int)State[\"hits\"]; Log(\"Death Touch: \" + remaining + \" hits remaining!\"); if ((int)State[\"hits\"] >= 13) { Player.CurrentHP = 0; Log(\"Death Touch activates! \" + PlayerDisplayName + \" dies!\"); }"
+      }
+    }
+  }
+}

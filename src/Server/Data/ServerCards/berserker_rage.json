@@ -1,0 +1,19 @@
+{
+  "id": "berserker_rage",
+  "name": "Rage",
+  "suit": "Berserker",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "You deal and receive 30% more damage for the next 2 turns. The next card you play counts as a Punch card.",
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Rage",
+      "duration": 2,
+      "hooks": {
+        "OnCalculateAttack": "Amount = (int)(Amount * 1.3); Log(\"Rage increases attack by 30%!\");",
+        "OnTakeDamage": "Amount = (int)(Amount * 1.3); Log(\"Rage increases damage taken by 30%!\");"
+      }
+    }
+  }
+}

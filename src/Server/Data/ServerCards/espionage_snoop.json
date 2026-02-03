@@ -1,0 +1,22 @@
+{
+  "id": "espionage_snoop",
+  "name": "Snoop",
+  "suit": "Espionage",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "On the next turn, before you choose your cards to play, your opponent chooses their cards first and then reveals them to you.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" plants surveillance on \" + OpponentDisplayName + \"!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Surveillance Active",
+      "duration": 1,
+      "hooks": {
+        "OnQueuePhaseStart": "Battle.OpponentQueueRevealed = true; Log(PlayerDisplayName + \" sees \" + OpponentDisplayName + \"'s queue!\");"
+      }
+    }
+  }
+}

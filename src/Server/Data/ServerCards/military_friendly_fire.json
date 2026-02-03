@@ -1,0 +1,22 @@
+{
+  "id": "military_friendly_fire",
+  "name": "Friendly Fire",
+  "suit": "Military",
+  "type": "Debuff",
+  "rarity": "Common",
+  "description": "For the next 2 turns, any damage dealt is dealt to both players.",
+  "immediateEffect": {
+    "target": "Both",
+    "script": "Log(\"Friendly fire activated! All damage hits both players!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Both",
+    "status": {
+      "name": "Friendly Fire",
+      "duration": 2,
+      "hooks": {
+        "OnDealDamage": "int mirrored = OutgoingDamage; DealDamage(Player, mirrored);"
+      }
+    }
+  }
+}

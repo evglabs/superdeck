@@ -1,0 +1,22 @@
+{
+  "id": "espionage_switcheroo",
+  "name": "Switcheroo",
+  "suit": "Espionage",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "This card self-destructs after it is used. The next card your opponent plays is copied into your discard pile.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" prepares a switcheroo!\"); SelfDestruct();"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Switcheroo Ready",
+      "duration": 2,
+      "hooks": {
+        "OnOpponentPlay": "if (Card != null) { var copy = Card.Clone(); PlayerDiscard.Add(copy); RemoveStatus(); Log(PlayerDisplayName + \" copies \" + Card.Name + \" into their discard pile!\"); }"
+      }
+    }
+  }
+}

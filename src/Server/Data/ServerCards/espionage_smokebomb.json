@@ -1,0 +1,22 @@
+{
+  "id": "espionage_smokebomb",
+  "name": "Smokebomb",
+  "suit": "Espionage",
+  "type": "Debuff",
+  "rarity": "Rare",
+  "description": "The next attack-type card your opponent plays is discarded without resolving. You lose 1 queue slot on your next turn.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" throws a smokebomb!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Smoke Covered",
+      "duration": 2,
+      "hooks": {
+        "OnPlay": "if (Card != null && Card.Type.ToString() == \"Attack\") { PlayerDiscard.Add(Card); Card = null; RemoveStatus(); Log(\"The smokebomb obscures the attack! Card cancelled!\"); }"
+      }
+    }
+  }
+}

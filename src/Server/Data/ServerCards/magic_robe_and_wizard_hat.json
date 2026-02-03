@@ -1,0 +1,12 @@
+{
+  "id": "magic_robe_and_wizard_hat",
+  "name": "Robe and Wizard Hat",
+  "suit": "Magic",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "Duplicate all buffs you currently have.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "var buffs = GetBuffs(Player); int count = buffs.Count; foreach (var buff in buffs) { var clone = buff.Clone(); AddStatus(Player, clone); } Log(PlayerDisplayName + \" dons the robe and wizard hat, duplicating \" + count + \" buffs!\");"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "showbiz_dramatic_reversal",
+  "name": "Dramatic Reversal",
+  "suit": "Showbiz",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "If any damage would reduce your hit points below 30% this turn, your hit points are instead set to 70%.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" prepares for a Dramatic Reversal!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Plot Armor",
+      "duration": 1,
+      "hooks": {
+        "OnTakeDamage": "int threshold = (int)(Player.MaxHP * 0.30); int resultHP = Player.CurrentHP - IncomingDamage; if (resultHP < threshold && Player.CurrentHP >= threshold) { IncomingDamage = 0; Player.CurrentHP = (int)(Player.MaxHP * 0.70); Log(\"DRAMATIC REVERSAL! HP set to 70%!\"); }"
+      }
+    }
+  }
+}

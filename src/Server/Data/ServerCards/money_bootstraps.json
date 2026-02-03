@@ -1,0 +1,13 @@
+{
+  "id": "money_bootstraps",
+  "name": "Bootstraps",
+  "suit": "Money",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "suitRarity": 0.0001,
+  "description": "Randomly place any card from any suit into your next queue slot. (And gain $1,000)",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Player.Money += 1000; var randomCard = GetRandomCardFromAllSuits(); if (randomCard != null) { PlayerQueue.Add(randomCard); Log(PlayerDisplayName + \" pulls themselves up by their bootstraps! Gained \" + randomCard.Name + \" and $1,000!\"); } else { Log(PlayerDisplayName + \" gains $1,000!\"); }"
+  }
+}

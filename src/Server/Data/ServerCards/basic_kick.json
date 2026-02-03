@@ -1,0 +1,12 @@
+{
+  "id": "basic_kick",
+  "name": "Kick",
+  "suit": "Basic",
+  "type": "Attack",
+  "rarity": "Uncommon",
+  "description": "You deal 15 damage",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 15);"
+  }
+}

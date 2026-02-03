@@ -1,0 +1,12 @@
+{
+  "id": "military_decimate",
+  "name": "Decimate",
+  "suit": "Military",
+  "type": "Attack",
+  "rarity": "Uncommon",
+  "description": "Attack your opponent for 10% of their current hit points. You lose 10% (rounded up) of your troops. You deal additional damage equal to the number of troops lost. Then deploy 1 Troop.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int baseDamage = (int)(Opponent.CurrentHP * 0.10); int troops = State.ContainsKey(\"troops\") ? (int)State[\"troops\"] : 0; int troopsLost = (int)Math.Ceiling(troops * 0.10); if (!State.ContainsKey(\"troops\")) State[\"troops\"] = 0; State[\"troops\"] = Math.Max(0, (int)State[\"troops\"] - troopsLost); int totalDamage = baseDamage + troopsLost; DealDamage(Opponent, totalDamage); State[\"troops\"] = (int)State[\"troops\"] + 1;"
+  }
+}

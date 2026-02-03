@@ -1,0 +1,22 @@
+{
+  "id": "magic_magic_missile",
+  "name": "Magic Missile",
+  "suit": "Magic",
+  "type": "Attack",
+  "rarity": "Common",
+  "description": "For the next two turns, you deal 1 damage for each card that resolves.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" casts Magic Missile!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Magic Missiles",
+      "duration": 2,
+      "hooks": {
+        "OnCardResolve": "DealDamage(Opponent, 1);"
+      }
+    }
+  }
+}

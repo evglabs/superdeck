@@ -1,0 +1,23 @@
+{
+  "id": "money_living_off_interest",
+  "name": "Living Off of the Interest",
+  "suit": "Money",
+  "type": "Buff",
+  "rarity": "Common",
+  "suitRarity": 0.0001,
+  "description": "Each card that resolves in the queue heals you for 2 HP and increases your bank account by $400.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" starts living off the interest!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Interest Income",
+      "duration": 99,
+      "hooks": {
+        "OnCardResolve": "Player.CurrentHP += 2; Player.Money += 400; Log(\"Interest pays out! +2 HP, +$400!\");"
+      }
+    }
+  }
+}

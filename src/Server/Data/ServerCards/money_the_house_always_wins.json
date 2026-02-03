@@ -1,0 +1,24 @@
+{
+  "id": "money_the_house_always_wins",
+  "name": "The House Always Wins",
+  "suit": "Money",
+  "type": "Attack",
+  "rarity": "Uncommon",
+  "suitRarity": 0.0001,
+  "description": "If you do not lose the match in the next 6 rounds, you win the match. Receive $1,000 per round while this buff is active.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" bets it all! The House Always Wins!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "House Bet",
+      "duration": 6,
+      "hooks": {
+        "OnTurnEnd": "Player.Money += 1000; Log(\"The house pays out $1,000!\");",
+        "OnBuffExpire": "Battle.Winner = Player; Log(\"THE HOUSE ALWAYS WINS! \" + PlayerDisplayName + \" wins the match!\");"
+      }
+    }
+  }
+}

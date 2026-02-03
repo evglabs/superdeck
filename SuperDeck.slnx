@@ -1,0 +1,19 @@
+<Solution>
+  <Folder Name="/src/" />
+  <Folder Name="/src/Client/">
+    <Project Path="src/Client/SuperDeck.Client.csproj" />
+  </Folder>
+  <Folder Name="/src/Core/">
+    <Project Path="src/Core/SuperDeck.Core.csproj" />
+  </Folder>
+  <Folder Name="/src/Server/">
+    <Project Path="src/Server/SuperDeck.Server.csproj" />
+  </Folder>
+  <Folder Name="/src/Tools/">
+    <Project Path="src/Tools/SuperDeck.Tools.CharacterSeeder/SuperDeck.Tools.CharacterSeeder.csproj" />
+  </Folder>
+  <Folder Name="/tests/" />
+  <Folder Name="/tests/Tests/">
+    <Project Path="tests/Tests/SuperDeck.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,22 @@
+{
+  "id": "berserker_atlantean_sword",
+  "name": "Atlantean Sword",
+  "suit": "Berserker",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "Any ATK card you play deals an additional 6 damage and removes 1 round from 1 random BUF effect from the target. This BUF can only be gained once. If you already have this BUF, ATK for 18 damage.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "var existing = PlayerStatuses.FirstOrDefault(s => s.Name == \"Atlantean Sword Equipped\"); if (existing != null) { DealDamage(Opponent, 18); } else { Log(PlayerDisplayName + \" equips the Atlantean Sword!\"); }"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Atlantean Sword Equipped",
+      "duration": 999,
+      "hooks": {
+        "OnDealDamage": "Amount += 6; if (OpponentStatuses.Count > 0) { var randomBuff = OpponentStatuses[Rng.Next(OpponentStatuses.Count)]; randomBuff.RemainingDuration--; Log(\"Atlantean Sword reduces \" + randomBuff.Name + \" duration!\"); }"
+      }
+    }
+  }
+}

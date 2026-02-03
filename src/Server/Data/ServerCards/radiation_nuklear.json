@@ -1,0 +1,12 @@
+{
+  "id": "radiation_nuklear",
+  "name": "Nuklear",
+  "suit": "Radiation",
+  "type": "Attack",
+  "rarity": "Legendary",
+  "description": "Deals 50 damage, has 33% chance to clear all players' queue and cards in hand.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 50); if (Rng.Next(100) < 33) { while (PlayerQueue.Count > 0) { var c = PlayerQueue[0]; PlayerQueue.RemoveAt(0); PlayerDiscard.Add(c); } while (OpponentQueue.Count > 0) { var c = OpponentQueue[0]; OpponentQueue.RemoveAt(0); OpponentDiscard.Add(c); } while (PlayerHand.Count > 0) { var c = PlayerHand[0]; PlayerHand.RemoveAt(0); PlayerDiscard.Add(c); } while (OpponentHand.Count > 0) { var c = OpponentHand[0]; OpponentHand.RemoveAt(0); OpponentDiscard.Add(c); } Log(\"NUCLEAR FALLOUT! All queues and hands are cleared!\"); }"
+  }
+}

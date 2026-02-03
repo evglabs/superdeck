@@ -1,0 +1,23 @@
+{
+  "id": "military_purple_heart",
+  "name": "Purple Heart",
+  "suit": "Military",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "For the next turn, your Troops take damage instead of you. Each point of damage you suffer kills 1 Troop. Any surviving Troops are converted to Veterans and they each attack for 1 damage each round for the rest of the match.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" activates Purple Heart protocol!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Purple Heart",
+      "duration": 1,
+      "hooks": {
+        "OnTakeDamage": "int troops = State.ContainsKey(\"troops\") ? (int)State[\"troops\"] : 0; if (troops > 0) { int absorbed = Math.Min(IncomingDamage, troops); State[\"troops\"] = troops - absorbed; IncomingDamage -= absorbed; Log(absorbed + \" troops sacrificed! Remaining: \" + State[\"troops\"]); }",
+        "OnBuffExpire": "int survivors = State.ContainsKey(\"troops\") ? (int)State[\"troops\"] : 0; if (survivors > 0) { State[\"veterans\"] = (State.ContainsKey(\"veterans\") ? (int)State[\"veterans\"] : 0) + survivors; State[\"troops\"] = 0; Log(survivors + \" troops become Veterans!\"); }"
+      }
+    }
+  }
+}

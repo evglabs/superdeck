@@ -1,0 +1,23 @@
+{
+  "id": "electricity_battery",
+  "name": "Battery",
+  "suit": "Electricity",
+  "type": "Attack",
+  "rarity": "Rare",
+  "description": "Every Electricity card you play in the next 3 turns adds 10 damage to battery buff. After 3 turns expel all damage and remove buff.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" activates Battery!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Battery Charge",
+      "duration": 3,
+      "hooks": {
+        "OnPlay": "if (Card != null && Card.Suit.ToString() == \"Electricity\") { if (!State.ContainsKey(\"charge\")) State[\"charge\"] = 0; State[\"charge\"] = (int)State[\"charge\"] + 10; Log(\"Battery charged! Total: \" + State[\"charge\"] + \" damage!\"); }",
+        "OnBuffExpire": "int charge = State.ContainsKey(\"charge\") ? (int)State[\"charge\"] : 0; DealDamage(Opponent, charge);"
+      }
+    }
+  }
+}

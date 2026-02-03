@@ -1,0 +1,12 @@
+{
+  "id": "electricity_taze",
+  "name": "Taze",
+  "suit": "Electricity",
+  "type": "Debuff",
+  "rarity": "Uncommon",
+  "description": "Stun opponent (skip next queued action)",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "if (OpponentQueue.Count > 0) { var stunned = OpponentQueue[0]; OpponentQueue.RemoveAt(0); OpponentDiscard.Add(stunned); Log(OpponentDisplayName + \" is tazed! \" + stunned.Name + \" is cancelled!\"); } else { Log(OpponentDisplayName + \" has nothing to stun!\"); }"
+  }
+}

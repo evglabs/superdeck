@@ -1,0 +1,13 @@
+{
+  "id": "money_broligarchy",
+  "name": "Broligarchy",
+  "suit": "Money",
+  "type": "Buff",
+  "rarity": "Rare",
+  "suitRarity": 0.0001,
+  "description": "If opponent also has Money suit, end fight giving both a win. (ONE BILLION DOLLARS)",
+  "immediateEffect": {
+    "target": "Both",
+    "script": "bool opponentHasMoney = false; foreach (var card in OpponentDeck) { if (card.Suit.ToString() == \"Money\") { opponentHasMoney = true; break; } } if (!opponentHasMoney) { foreach (var card in OpponentHand) { if (card.Suit.ToString() == \"Money\") { opponentHasMoney = true; break; } } } if (opponentHasMoney) { Player.Money += 1000000000; Opponent.Money += 1000000000; Battle.BothWin = true; Log(\"BROLIGARCHY! Both players win and receive ONE BILLION DOLLARS!\"); } else { Log(\"No deal... opponent doesn't have Money cards.\"); }"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "Basic": 20,
+  "Fire": 20,
+  "MartialArts": 20,
+  "Magic": 20,
+  "Electricity": 20,
+  "Mental": 15,
+  "Espionage": 15,
+  "Nature": 15,
+  "Tech": 15,
+  "Berserker": 15,
+  "Military": 15,
+  "Radiation": 10,
+  "Showbiz": 10,
+  "Speedster": 10,
+  "Money": 0.01
+}

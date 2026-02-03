@@ -1,0 +1,12 @@
+{
+  "id": "basic_heal",
+  "name": "Heal",
+  "suit": "Basic",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "description": "Heal for 20 HP",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Heal(Player, 20);"
+  }
+}

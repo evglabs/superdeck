@@ -1,0 +1,18 @@
+{
+  "BaseHP": 100,
+  "HPPerLevel": 10,
+  "MaxDeckSize": 60,
+  "MinDeckSize": 9,
+  "ScriptTimeoutMs": 500,
+  "InitialHandSize": 5,
+  "BaseQueueSlots": 3,
+  "MaxQueueSlots": 5,
+  "AttackDamageMultiplier": 0.02,
+  "DefenseDamageReduction": 0.02,
+  "XPPerWin": 50,
+  "XPPerLoss": 25,
+  "MaxLevel": 10,
+  "SystemDamageStartRound": 10,
+  "DatabasePath": "superdeck.db",
+  "CardLibraryPath": "Data/ServerCards"
+}

@@ -1,0 +1,23 @@
+{
+  "id": "money_only_the_finest",
+  "name": "Only the Finest",
+  "suit": "Money",
+  "type": "Debuff",
+  "rarity": "Epic",
+  "suitRarity": 0.0001,
+  "description": "Next turn, your opponent may only queue Epic or higher-quality cards.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "Log(PlayerDisplayName + \" demands only the finest!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Only the Finest",
+      "duration": 1,
+      "hooks": {
+        "OnQueue": "if (Card != null && Card.Rarity < 4) { Log(\"Only Epic or higher cards allowed!\"); PreventQueue = true; }"
+      }
+    }
+  }
+}

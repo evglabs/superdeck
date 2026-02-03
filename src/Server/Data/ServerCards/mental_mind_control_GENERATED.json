@@ -1,0 +1,12 @@
+{
+  "id": "mental_mind_control_GENERATED",
+  "name": "Mind Control",
+  "suit": "Mental",
+  "type": "Debuff",
+  "rarity": "Legendary",
+  "description": "Take control of your opponent's next queued card and play it as your own.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "if (OpponentQueue.Count > 0) { var stolen = OpponentQueue[0]; OpponentQueue.RemoveAt(0); PlayerQueue.Add(stolen); Log(PlayerDisplayName + \" takes control of \" + stolen.Name + \"!\"); } else { Log(OpponentDisplayName + \" has no cards to control!\"); }"
+  }
+}

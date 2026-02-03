@@ -1,0 +1,22 @@
+{
+  "id": "magic_rabbit_out_of_a_hat",
+  "name": "Rabbit Out of a Hat",
+  "suit": "Magic",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "For the next 3 turns, your hand size is increased by 1.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" pulls a rabbit out of a hat!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Magic Hat",
+      "duration": 3,
+      "hooks": {
+        "OnDrawPhase": "Battle.HandSize += 1; Log(\"The magic hat provides an extra card!\");"
+      }
+    }
+  }
+}

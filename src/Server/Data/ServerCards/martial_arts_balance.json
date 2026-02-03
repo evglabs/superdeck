@@ -1,0 +1,22 @@
+{
+  "id": "martial_arts_balance",
+  "name": "Balance",
+  "suit": "MartialArts",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "description": "If at any time you would lose a BUF, that BUF instead is kept, and its duration is extended by 1.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" achieves perfect balance!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Balanced",
+      "duration": 99,
+      "hooks": {
+        "OnBuffExpire": "if (ExpiringStatus != null && ExpiringStatus.IsBuff) { ExpiringStatus.Duration += 1; PreventExpire = true; Log(\"Balance preserves \" + ExpiringStatus.Name + \"!\"); }"
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "berserker_everything_is_a_fist",
+  "name": "Everything is a Fist",
+  "suit": "Berserker",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "This card counts as a Punch card. The next two cards you play count as Punch cards.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 10);"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Everything is a Fist",
+      "duration": 2,
+      "hooks": {
+        "OnPlay": "DealDamage(Opponent, 10);"
+      }
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "id": "money_cash",
+  "name": "Cash",
+  "suit": "Money",
+  "type": "Buff",
+  "rarity": "Common",
+  "suitRarity": 0.0001,
+  "description": "Get $1,000 dollars. That's it, good job!",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Player.Money += 1000; Log(PlayerDisplayName + \" receives $1,000! Total: $\" + Player.Money);"
+  }
+}

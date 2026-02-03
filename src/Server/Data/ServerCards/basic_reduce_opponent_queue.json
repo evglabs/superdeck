@@ -1,0 +1,18 @@
+{
+  "id": "basic_reduce_opponent_queue",
+  "name": "Reduce Opponent's Queue to 2",
+  "suit": "Basic",
+  "type": "Debuff",
+  "rarity": "Legendary",
+  "description": "Next turn, your opponent's queue is reduced to 2",
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Queue Restriction",
+      "duration": 1,
+      "hooks": {
+        "OnQueuePhaseStart": "Battle.CurrentOpponentQueueSlots = 2; Log(PlayerDisplayName + \" has only 2 queue slots this turn!\");"
+      }
+    }
+  }
+}

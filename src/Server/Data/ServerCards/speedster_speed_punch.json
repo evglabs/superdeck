@@ -1,0 +1,12 @@
+{
+  "id": "speedster_speed_punch",
+  "name": "Speed Punch",
+  "suit": "Speedster",
+  "type": "Attack",
+  "rarity": "Common",
+  "description": "Deal 5 damage, and keep attacking with lower odds (75% -> 37.5% -> 18.75% and so on until failure).",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int totalDamage = 0; int hits = 0; double chance = 100; while (Rng.Next(100) < chance) { DealDamage(Opponent, 5); totalDamage += 5; hits++; chance *= 0.75; if (chance < 1) break; }"
+  }
+}

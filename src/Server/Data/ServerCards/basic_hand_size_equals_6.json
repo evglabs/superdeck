@@ -1,0 +1,18 @@
+{
+  "id": "basic_hand_size_equals_6",
+  "name": "Hand Size Equals 6",
+  "suit": "Basic",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "Next turn, your hand size equals 6 instead of 5",
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Expanded Hand",
+      "duration": 1,
+      "hooks": {
+        "OnDrawPhase": "DrawCards(Player, 1); Log(PlayerDisplayName + \" draws an extra card!\");"
+      }
+    }
+  }
+}

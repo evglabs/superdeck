@@ -1,0 +1,18 @@
+{
+  "id": "berserker_will_is_strongest",
+  "name": "Will is Strongest",
+  "suit": "Berserker",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "For the next turn, any damage you take that would reduce you below 1 HP is entirely negated.",
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Indomitable Will",
+      "duration": 1,
+      "hooks": {
+        "OnTakeDamage": "if (Player.CurrentHP - Amount < 1) { Amount = Math.Max(0, Player.CurrentHP - 1); Log(\"Will is Strongest negates fatal damage!\"); }"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "radiation_gamma_burst",
+  "name": "Gamma Burst",
+  "suit": "Radiation",
+  "type": "Attack",
+  "rarity": "Epic",
+  "description": "Deals 30 damage to target, has a 95% chance to Irradiate (3 damage/turn) for 3 turns, or a 2% chance to 'Hulkerize' target doubling their attack power for 3 turns instead.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 30); int roll = Rng.Next(100); if (roll < 2) { ApplyHulkerize(Opponent); Log(OpponentDisplayName + \" is HULKERIZED!\"); } else if (roll < 97) { ApplyIrradiate(Opponent); Log(OpponentDisplayName + \" is irradiated!\"); }"
+  }
+}

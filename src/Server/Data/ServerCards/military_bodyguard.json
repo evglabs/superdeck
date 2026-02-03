@@ -1,0 +1,22 @@
+{
+  "id": "military_bodyguard",
+  "name": "Bodyguard",
+  "suit": "Military",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "description": "Deploy 1 Troop. For the next turn, any time an effect would cause you to lose a buff, you instead lose one Troop.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "if (!State.ContainsKey(\"troops\")) State[\"troops\"] = 0; State[\"troops\"] = (int)State[\"troops\"] + 1; Log(PlayerDisplayName + \" deploys a bodyguard! Total troops: \" + State[\"troops\"]);"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Protected",
+      "duration": 1,
+      "hooks": {
+        "OnBuffExpire": "if (ExpiringStatus != null && ExpiringStatus.IsBuff && State.ContainsKey(\"troops\") && (int)State[\"troops\"] > 0) { State[\"troops\"] = (int)State[\"troops\"] - 1; PreventExpire = true; Log(\"A bodyguard sacrifices themselves to protect the buff! Troops: \" + State[\"troops\"]); }"
+      }
+    }
+  }
+}

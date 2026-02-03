@@ -1,0 +1,13 @@
+{
+  "id": "money_rent",
+  "name": "Rent",
+  "suit": "Money",
+  "type": "Debuff",
+  "rarity": "Common",
+  "suitRarity": 0.0001,
+  "description": "One card in your opponent's queue affects your opponent instead of you. Receive $1,700.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "Player.Money += 1700; if (OpponentQueue.Count > 0) { int idx = Rng.Next(OpponentQueue.Count); var card = OpponentQueue[idx]; card.TargetSelf = true; Log(PlayerDisplayName + \" collects rent ($1,700) and redirects \" + card.Name + \" at \" + OpponentDisplayName + \"!\"); } else { Log(PlayerDisplayName + \" collects rent ($1,700)!\"); }"
+  }
+}

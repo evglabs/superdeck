@@ -1,0 +1,24 @@
+{
+  "id": "martial_arts_meditation",
+  "name": "Meditation",
+  "suit": "MartialArts",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "Until you play an attack card, you heal 5 HP per turn, gain first-turn priority, and receive 25% less damage.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" enters deep meditation!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Meditating",
+      "duration": 99,
+      "hooks": {
+        "OnTurnStart": "Player.CurrentHP += 5; Player.HasPriority = true; Log(PlayerDisplayName + \" heals 5 HP through meditation!\");",
+        "OnTakeDamage": "int reduced = (int)(IncomingDamage * 0.25); IncomingDamage -= reduced; Log(\"Meditation reduces damage by \" + reduced + \"!\");",
+        "OnPlay": "if (Card != null && Card.Type.ToString() == \"Attack\") { RemoveStatus(); Log(PlayerDisplayName + \" breaks from meditation!\"); }"
+      }
+    }
+  }
+}

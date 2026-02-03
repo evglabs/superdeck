@@ -1,0 +1,22 @@
+{
+  "id": "speedster_slow_time",
+  "name": "Slow Time",
+  "suit": "Speedster",
+  "type": "Buff",
+  "rarity": "Legendary",
+  "description": "Reduce opponent's queue slots by 1 for 2 turns.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" slows time!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Time Slowed",
+      "duration": 2,
+      "hooks": {
+        "OnQueuePhaseStart": "Battle.QueueSize -= 1; Log(OpponentDisplayName + \"'s time is slowed! Queue reduced by 1!\");"
+      }
+    }
+  }
+}

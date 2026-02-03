@@ -1,0 +1,18 @@
+{
+  "id": "basic_reduce_opponent_hand",
+  "name": "Reduce Opponent's Hand to 3",
+  "suit": "Basic",
+  "type": "Debuff",
+  "rarity": "Epic",
+  "description": "Next turn, your opponent's hand is reduced to 3",
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Hand Restriction",
+      "duration": 1,
+      "hooks": {
+        "OnDrawPhase": "while (OpponentHand.Count > 3) { var card = OpponentHand[OpponentHand.Count - 1]; OpponentHand.RemoveAt(OpponentHand.Count - 1); OpponentDiscard.Add(card); } Log(PlayerDisplayName + \"'s hand is restricted to 3 cards!\");"
+      }
+    }
+  }
+}

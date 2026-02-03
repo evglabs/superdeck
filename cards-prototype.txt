@@ -1,0 +1,95 @@
+ Basic	Block	1	BUF	Apply a shield for the next attack blocking half the damage
+ Basic	Punch	1	ATK	Basic attack for 10 damage
+ Basic	Heal	2	BUF	Heal for 20 HP
+ Basic	Kick	2	ATK	You deal 15 damage.
+ Basic	Hand Size Equals 6	3	BUF	Next turn, your hand size equals 6 instead of 5.
+ Basic	Queue Size Equals 4	4	BUF	Next turn, your queue has 4 slots instead of 3.
+ Basic	Reduce Opponent's Hand to 3	4	DBF	Next turn, your opponent's hand is reduced to 3.
+ Basic	Reduce Opponent's Queue to 2	5	DBF	Next turn, your opponent's queue is reduced to 2.
+Berserker	Battleaxe	1	BUF	For the rest of the match, any ATK card you play deals an additional 3 damage. This BUF can only be gained once. If you already have this BUF, ATK for 15 damage.
+Berserker	Brute Force	1	BUF	For the rest of the match, each successive consecutive [Punch] card you play deals 110% (multiplicative x1.10) more damage than the last. This buff is lost if you play any card other than [Punch].
+Berserker	Revenge	2	ATK	Deal 10 damage. If you were received damage this turn, that damage is added to this attack.
+Berserker	Atlantean Sword	3	BUF	Any ATK card you play deals an additional 6 damage and removes 1 round from 1 random BUF effect from the target. This BUF can only be gained once. If you already have this BUF, ATK for 18 damage.
+Berserker	Everything is a Fist	3	BUF	This card counts as a [Punch] card. The next two cards you play count as [Punch] cards.
+Berserker	Flesh is Stronger	3	BUF	For the next 2 turns, whenever you deal damage, you heal for 2 HP.
+Berserker	Rage	4	BUF	You deal and receive 30% more damage for the next 2 turns. The next card you play counts as a [Punch] card.
+Berserker	Will is Strongest	4	BUF	For the next turn, any damage you take that would reduce you below 1 HP is entirely negated.
+Berserker	Execute	5	ATK	This card deals damage equal to 40% of your opponent's maximum hitpoints if they were reduced to below 30% HP this turn.
+Electricity	Spark	1	ATK	Deal 8 damage, 10% chance to stun target (skips next queued action)
+Electricity	Taze	2	DBF	Stun opponent (skip next queued action)
+Electricity	Battery	3	ATK	Every Electricity card you play in the next 3 turns adds 10 damage to battery buff. After 3 turns expel all damage and remove buff.
+Electricity	Arc	4	ATK	Deal 10 damage plus 10 more for each card target has in hand
+Electricity	Release the Magic Smoke	5	ATK	Reduce both you and your opponents HP to 10% (maximum, will not raise lower HP)
+Espionage	Cloak and Dagger	1	ATK	You deal 10 damage to your opponent. The damage you take next turn is reduced by 25%.
+Espionage	Signal Jamming	2	DBF	Your opponent loses 1 queue slot on their next turn.
+Espionage	Smokebomb	3	DBF	The next attack-type card your opponent plays is (denied/cancelled/counterspelled/"discarded without resolving"). You lose 1 queue slot on your next turn.
+Espionage	Snoop	3	BUF	On the next turn, before you choose your cards to play, your opponent chooses their cards first and then reveals them to you.
+Espionage	Switcheroo	3	BUF	This card self-destructs after it is used. The next card your opponent plays is copied into your discard pile.
+Espionage	Double-Agent	4	BUF	You copy the next two cards your opponent plays and play them.
+Espionage	Assassinate	5	ATK	For each turn in which you have not been dealt damage, deal 10% of your opponent's remaining hit points.
+Fire	Ignite	1	DBF	Deal no damage when played but add ignite to target for 3 turns, dealing 1 damage/turn with a 33% chance to get snuffed out
+Fire	Fireball	2	ATK	Deal 25 damage, apply 1 burn for 3 turns (deals 2 damage per turn)
+Fire	Tinder	3	DBF	Add tinder debuff equaling the amount of cards in opponent's discard pile when played, lasts for three turns
+Fire	Pyre	4	ATK	Deal the total amount of tinder buffs on target, consuming them
+Fire	Phoenix	5	BUF	If at or lower then 0 HP at the end of this turn, heal back up to 50% of HP and discard all cards and shuffle back into draw pile
+Magic	Magic Missile	1	ATK	For the next two turns, you deal 1 damage for each card that resolves.
+Magic	Mirror Image	2	BUF	Any card that resolves is resolved again on the opposite target at 20% effectiveness.
+Magic	Teleport	2	DBF	The next two cards that your opponent plays are suspended until next turn.
+Magic	Haste	3	BUF	Next turn, both you and your opponent gain 1 queue slot.
+Magic	Rabbit Out of a Hat	3	BUF	For the next 3 turns, your hand size is increased by 1.
+Magic	Extend Enchantment	4	BUF	Any buffs you currently have are extended by 1 turn. Any debuffs your opponent has are extended by 1 turn.
+Magic	Robe and Wizard Hat	4	BUF	Duplicate all buffs you currently have.
+Magic	Magic Missile Barrage	5	ATK	Immediately play all Magic Missile cards in your deck.
+Martial Arts	Flurry of Blows	1	ATK	You deal 4 damage. This card is automatically played again the next two turns.
+Martial Arts	Balance	2	BUF	If at any time you would lose a BUF, that BUF instead is kept, and its duration is extended by 1.
+Martial Arts	Sparring Practice	2	BUF	Your attack power stat is doubled for the next 1 turn.
+Martial Arts	Iaijutsu	2	ATK	If this is the first card played this turn, you deal 20 damage. Otherwise, deal 12 damage. You gain first-turn priority next turn.
+Martial Arts	Meditation	3	BUF	Until you play an attack card, you heal 5 HP per turn, gain first-turn priority, and receive 25% less damage.
+Martial Arts		4		
+Martial Arts	Death Touch	5	DBF	Your opponent dies if they are hit with 13 more attack cards.
+Martial Arts				
+Mental				
+Mental	ADHD	2	DBF	Shuffle opponent's queue
+Mental	Super Intelligence	3	BUF	Queue any card from your deck
+Mental				
+Mental				
+Military	Deploy Troops	1	ATK	Deploy 1 Troop. For the next 3 turns, you deal 2 damage for each Troop you have deployed.
+Military	Friendly Fire	1	DBF	For the next 2 turns, any damage dealt is dealt to both players.
+Military	Bodyguard	2	BUF	Deploy 1 Troop. For the next turn, any time an effect would cause you to lose a buff, you instead lose one Troop.
+Military	Decimate	2	ATK	Attack your opponent for 10% of their current hit points. You lose 10% (rounded up) of your troops. You deal additional damage equal to the number of troops lost. Then deploy 1 Troop.
+Military	21-gun Salute	3	ATK	Deploy 7 Troops. Each troop you have deals 3 damage to your opponent.
+Military	Winter Campaign	3	DBF	For the next 2 turns, each time you are attacked, your opponent discards a card and one random buff they have is reduced in duration by 1.
+Military	Artillery Bombardment	4	ATK	Deploy 3 Troops. For the next two turns, your Troops deal 2 damage each time a card played by your opponent resolves. Your opponent loses one queue slot next turn.
+Military	Purple Heart	4	BUF	For the next turn, your Troops take damage instead of you. Each point of damage you suffer kills 1 Troop. Any surviving Troops are converted to Veterans and they each attack for 1 damage each round for the rest of the match.
+Military	Full Mobilization	5	BUF	Double the number of Troops you have deployed.
+Money (Suit can only appear 0.01% of the time)	Cash	1	BUF	Get $1,000 dollars. That's it, good job!
+Money (Suit can only appear 0.01% of the time)	It's a Banana, How Much Could it Cost?	1	BUF	Your opponent loses 1 queue slot next turn. You gain $10.
+Money (Suit can only appear 0.01% of the time)	Living Off of the Interest	1	BUF	Each card that resolves in the queue heals you for 2 HP and increases your bank account by $400.
+Money (Suit can only appear 0.01% of the time)	Rent	1	DBF	One card in your opponent's queue affects your opponent instead of you. Receive $1,700.
+Money (Suit can only appear 0.01% of the time)	Bootstraps	2	BUF	Randomly place any card from any suit into your next queue slot. (And gain $1,000)
+Money (Suit can only appear 0.01% of the time)	Healthcare	2	BUF	Heal for 10% of HP, gain a ghost copy of this back into your hand. (And gain $1,000)
+Money (Suit can only appear 0.01% of the time)	The House Always Wins	2	ATK	If you do not lose the match in the next 6 rounds, you win the match. Receive $1,000 per round while this buff is active.
+Money (Suit can only appear 0.01% of the time)	Broligarchy	3	BUF	If opponent also has Money suit, end fight giving both a win. (ONE BILLION DOLLARS)
+Money (Suit can only appear 0.01% of the time)	Means of Production	3	DBF	Take all cards from opponent's hand and place into yours (And gain $1,000 per card)
+Money (Suit can only appear 0.01% of the time)	Only the Finest	4	DBF	Next turn, your opponent may only queue Epic or higher-quality cards.
+Money (Suit can only appear 0.01% of the time)	Golden Parachute	5	BUF	After fight get a booster pack of nothing but legendaries. (And gain $25,000)
+Radiation	RadPunch	1	ATK	Deal 10 damage with a 25% chance to irradiate (3 damage/turn)
+Radiation	*click click click*	2	BUF	Gain Radioactive buff for 3 turns, every turn add Irradiate (3 damage/turn) buff to opponent for 3 turns
+Radiation	Shielding	3	BUF	Block 25% of damage for three turns, exploding for 100% of damage blocked when expires
+Radiation	Gamma Burst	4	ATK	Deals 30 damage to target, has a 95% chance to Irradiate (3 damage/turn) for 3 turns, or a 2% chance to 'Hulkerize' target doubling their attack power for 3 turns instead
+Radiation	Nuklear	5	ATK	Deals 50 damage has 33% chance to clear all player's queue and cards in hand
+Showbiz	Continuity Error	1	BUF	One random card you played last turn is echoed this turn, at +20% effectiveness.
+Showbiz	Executive Meddling	1	DBF	Your opponent's played cards are shuffled into a random order in the queue.
+Showbiz	Method Acting	1	ATK	Your opponent takes 10 damage and discards two random cards.
+Showbiz	Take a Bow	1	BUF	Both you and your opponent lose 1 queue slot next turn. You heal 20 HP this turn.
+Showbiz	Paparazzi	2	DBF	You copy one random card in your opponent's queue and play it.
+Showbiz	Pitch Meeting	2	BUF	One random other card you play this turn will be echoed at +50% effectiveness two turns from now.
+Showbiz	Explosive Finale	3	ATK	You deal 20 damage. Plus, your opponent suffers 5 damage for each successive card played by you or your opponent this turn.
+Showbiz	Dramatic Reversal	4	BUF	If any damage would reduce your hit points below 30% this turn, your hit points are instead set to 70%.
+Showbiz	Awards Season	5	BUF	If you deal at least 50% overkill damage to your opponent in a match, the next pack of cards you open will have at least 1 additional Legendary card and 1 additional Rare card.
+Showbiz	Showstopper	5	ATK	Deal 50 damage. You lose all queue slots next turn. Lose all your buffs. Deal 5 additional damage for each queue slot lost and 2 additional damage for each buff lost.
+Speedster	Speed Punch	1	ATK	Deal 5 damage, and keep attacking with lower odds (75% -> 37.5% -> 18.75 and so on until failure)
+Speedster	On Your Marks	2	BUF	Gain 5 extra speed points for the next 2 turns
+Speedster	Get Ready	3	BUF	Gain an extra queue slot for each 2 points of speed next turn
+Speedster	Go!	4	BUF	Your next attack deals 3 times your speed stat
+Speedster	Slow Time	5	BUF	Reduce opponent's queue slots by 1 for 2 turns

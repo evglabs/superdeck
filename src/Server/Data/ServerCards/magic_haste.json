@@ -1,0 +1,22 @@
+{
+  "id": "magic_haste",
+  "name": "Haste",
+  "suit": "Magic",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "Next turn, both you and your opponent gain 1 queue slot.",
+  "immediateEffect": {
+    "target": "Both",
+    "script": "Log(PlayerDisplayName + \" casts Haste! Both players gain a queue slot next turn!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Both",
+    "status": {
+      "name": "Hasted",
+      "duration": 1,
+      "hooks": {
+        "OnQueuePhaseStart": "Battle.QueueSize += 1; Log(\"Haste grants an extra queue slot!\");"
+      }
+    }
+  }
+}

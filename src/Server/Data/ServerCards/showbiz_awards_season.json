@@ -1,0 +1,22 @@
+{
+  "id": "showbiz_awards_season",
+  "name": "Awards Season",
+  "suit": "Showbiz",
+  "type": "Buff",
+  "rarity": "Legendary",
+  "description": "If you deal at least 50% overkill damage to your opponent in a match, the next pack of cards you open will have at least 1 additional Legendary card and 1 additional Rare card.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" enters Awards Season!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Awards Contender",
+      "duration": 99,
+      "hooks": {
+        "OnBattleEnd": "if (Battle.Winner == Player && Battle.OverkillDamage >= (Opponent.MaxHP * 0.50)) { Player.PendingRewards.Add(\"BonusLegendary\"); Player.PendingRewards.Add(\"BonusRare\"); Log(\"AWARDS SWEEP! Bonus Legendary and Rare cards incoming!\"); }"
+      }
+    }
+  }
+}

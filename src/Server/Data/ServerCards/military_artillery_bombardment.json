@@ -1,0 +1,23 @@
+{
+  "id": "military_artillery_bombardment",
+  "name": "Artillery Bombardment",
+  "suit": "Military",
+  "type": "Attack",
+  "rarity": "Epic",
+  "description": "Deploy 3 Troops. For the next two turns, your Troops deal 2 damage each time a card played by your opponent resolves. Your opponent loses one queue slot next turn.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "if (!State.ContainsKey(\"troops\")) State[\"troops\"] = 0; State[\"troops\"] = (int)State[\"troops\"] + 3; Log(PlayerDisplayName + \" calls in Artillery Bombardment! Deployed 3 troops, total: \" + State[\"troops\"]);"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Artillery Support",
+      "duration": 2,
+      "hooks": {
+        "OnOpponentPlay": "int troops = State.ContainsKey(\"troops\") ? (int)State[\"troops\"] : 0; int damage = troops * 2; DealDamage(Opponent, damage);",
+        "OnQueuePhaseStart": "Battle.OpponentQueueSize -= 1; Log(\"Artillery suppresses the enemy! They lose a queue slot!\");"
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "money_its_a_banana",
+  "name": "It's a Banana, How Much Could it Cost?",
+  "suit": "Money",
+  "type": "Buff",
+  "rarity": "Common",
+  "suitRarity": 0.0001,
+  "description": "Your opponent loses 1 queue slot next turn. You gain $10.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Player.Money += 10; Log(PlayerDisplayName + \" gains $10 from the banana!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Banana Confusion",
+      "duration": 1,
+      "hooks": {
+        "OnQueuePhaseStart": "Battle.QueueSize -= 1; Log(OpponentDisplayName + \" is confused by the banana! Queue reduced!\");"
+      }
+    }
+  }
+}

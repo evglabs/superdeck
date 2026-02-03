@@ -1,0 +1,12 @@
+{
+  "id": "military_full_mobilization",
+  "name": "Full Mobilization",
+  "suit": "Military",
+  "type": "Buff",
+  "rarity": "Legendary",
+  "description": "Double the number of Troops you have deployed.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "int troops = State.ContainsKey(\"troops\") ? (int)State[\"troops\"] : 0; State[\"troops\"] = troops * 2; Log(PlayerDisplayName + \" mobilizes! Troops doubled to \" + State[\"troops\"] + \"!\");"
+  }
+}

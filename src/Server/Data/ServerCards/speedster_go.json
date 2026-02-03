@@ -1,0 +1,22 @@
+{
+  "id": "speedster_go",
+  "name": "Go!",
+  "suit": "Speedster",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "Your next attack deals 3 times your speed stat.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" shouts GO!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Speed Force",
+      "duration": 2,
+      "hooks": {
+        "OnDealDamage": "if (Card != null && Card.Type.ToString() == \"Attack\") { int speedDamage = Player.Speed * 3; OutgoingDamage += speedDamage; RemoveStatus(); Log(\"Speed force adds \" + speedDamage + \" damage (3x speed)!\"); }"
+      }
+    }
+  }
+}

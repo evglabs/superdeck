@@ -1,0 +1,18 @@
+{
+  "id": "berserker_flesh_is_stronger",
+  "name": "Flesh is Stronger",
+  "suit": "Berserker",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "For the next 2 turns, whenever you deal damage, you heal for 2 HP.",
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Flesh is Stronger",
+      "duration": 2,
+      "hooks": {
+        "OnDealDamage": "Heal(Player, 2);"
+      }
+    }
+  }
+}

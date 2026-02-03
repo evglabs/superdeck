@@ -1,0 +1,18 @@
+{
+  "id": "basic_queue_size_equals_4",
+  "name": "Queue Size Equals 4",
+  "suit": "Basic",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "Next turn, your queue has 4 slots instead of 3",
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Extended Queue",
+      "duration": 1,
+      "hooks": {
+        "OnQueuePhaseStart": "Battle.CurrentPlayerQueueSlots = 4; Log(PlayerDisplayName + \" has 4 queue slots this turn!\");"
+      }
+    }
+  }
+}

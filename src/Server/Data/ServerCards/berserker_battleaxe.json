@@ -1,0 +1,22 @@
+{
+  "id": "berserker_battleaxe",
+  "name": "Battleaxe",
+  "suit": "Berserker",
+  "type": "Buff",
+  "rarity": "Common",
+  "description": "For the rest of the match, any ATK card you play deals an additional 3 damage. This BUF can only be gained once. If you already have this BUF, ATK for 15 damage.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "var existing = PlayerStatuses.FirstOrDefault(s => s.Name == \"Battleaxe Equipped\"); if (existing != null) { DealDamage(Opponent, 15); } else { Log(PlayerDisplayName + \" equips the Battleaxe!\"); }"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Battleaxe Equipped",
+      "duration": 999,
+      "hooks": {
+        "OnDealDamage": "Amount += 3; Log(\"Battleaxe adds 3 damage!\");"
+      }
+    }
+  }
+}

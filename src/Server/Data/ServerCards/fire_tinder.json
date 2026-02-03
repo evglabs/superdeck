@@ -1,0 +1,22 @@
+{
+  "id": "fire_tinder",
+  "name": "Tinder",
+  "suit": "Fire",
+  "type": "Debuff",
+  "rarity": "Rare",
+  "description": "Add tinder debuff equaling the amount of cards in opponent's discard pile when played, lasts for three turns.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int tinderStacks = OpponentDiscard.Count; Log(PlayerDisplayName + \" covers \" + OpponentDisplayName + \" with \" + tinderStacks + \" tinder stacks!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Tinder",
+      "duration": 3,
+      "hooks": {
+        "OnTurnStart": "Log(PlayerDisplayName + \" has tinder!\");"
+      }
+    }
+  }
+}

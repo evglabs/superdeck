@@ -1,0 +1,13 @@
+{
+  "id": "money_healthcare",
+  "name": "Healthcare",
+  "suit": "Money",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "suitRarity": 0.0001,
+  "description": "Heal for 10% of HP, gain a ghost copy of this back into your hand. (And gain $1,000)",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "int heal = (int)(Player.MaxHP * 0.10); Player.CurrentHP = Math.Min(Player.MaxHP, Player.CurrentHP + heal); Player.Money += 1000; var ghostCopy = Card.Clone(); ghostCopy.IsGhost = true; PlayerHand.Add(ghostCopy); Log(PlayerDisplayName + \" uses Healthcare! Healed \" + heal + \" HP, gained $1,000 and a ghost copy!\");"
+  }
+}

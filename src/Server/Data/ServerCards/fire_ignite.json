@@ -1,0 +1,22 @@
+{
+  "id": "fire_ignite",
+  "name": "Ignite",
+  "suit": "Fire",
+  "type": "Debuff",
+  "rarity": "Common",
+  "description": "Deal no damage when played but add ignite to target for 3 turns, dealing 1 damage/turn with a 33% chance to get snuffed out.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "Log(PlayerDisplayName + \" ignites \" + OpponentDisplayName + \"!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Ignited",
+      "duration": 3,
+      "hooks": {
+        "OnTurnStart": "if (Rng.Next(100) < 33) { Log(\"The ignite is snuffed out!\"); RemoveStatus(); } else { DealDamage(Player, 1); }"
+      }
+    }
+  }
+}

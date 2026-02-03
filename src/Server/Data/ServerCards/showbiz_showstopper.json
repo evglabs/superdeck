@@ -1,0 +1,12 @@
+{
+  "id": "showbiz_showstopper",
+  "name": "Showstopper",
+  "suit": "Showbiz",
+  "type": "Attack",
+  "rarity": "Legendary",
+  "description": "Deal 50 damage. You lose all queue slots next turn. Lose all your buffs. Deal 5 additional damage for each queue slot lost and 2 additional damage for each buff lost.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int baseDamage = 50; int queueSlots = Battle.QueueSize; var buffs = GetBuffs(Player); int buffCount = buffs.Count; foreach (var buff in buffs) { RemoveStatus(buff); } int bonusDamage = (queueSlots * 5) + (buffCount * 2); int totalDamage = baseDamage + bonusDamage; DealDamage(Opponent, totalDamage); Battle.QueueSize = 0;"
+  }
+}

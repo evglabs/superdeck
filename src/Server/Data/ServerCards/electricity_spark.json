@@ -1,0 +1,12 @@
+{
+  "id": "electricity_spark",
+  "name": "Spark",
+  "suit": "Electricity",
+  "type": "Attack",
+  "rarity": "Common",
+  "description": "Deal 8 damage, 10% chance to stun target (skips next queued action)",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 8); if (Rng.Next(100) < 10) { if (OpponentQueue.Count > 0) { var stunned = OpponentQueue[0]; OpponentQueue.RemoveAt(0); OpponentDiscard.Add(stunned); Log(OpponentDisplayName + \" is stunned! \" + stunned.Name + \" is cancelled!\"); } }"
+  }
+}

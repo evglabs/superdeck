@@ -1,0 +1,22 @@
+{
+  "id": "martial_arts_flurry_of_blows",
+  "name": "Flurry of Blows",
+  "suit": "MartialArts",
+  "type": "Attack",
+  "rarity": "Common",
+  "description": "You deal 4 damage. This card is automatically played again the next two turns.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 4);"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Flurry Momentum",
+      "duration": 2,
+      "hooks": {
+        "OnTurnStart": "DealDamage(Opponent, 4);"
+      }
+    }
+  }
+}

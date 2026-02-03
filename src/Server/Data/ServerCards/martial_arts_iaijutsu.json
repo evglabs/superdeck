@@ -1,0 +1,12 @@
+{
+  "id": "martial_arts_iaijutsu",
+  "name": "Iaijutsu",
+  "suit": "MartialArts",
+  "type": "Attack",
+  "rarity": "Uncommon",
+  "description": "If this is the first card played this turn, you deal 20 damage. Otherwise, deal 12 damage. You gain first-turn priority next turn.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int damage = Battle.CardsPlayedThisTurn == 0 ? 20 : 12; DealDamage(Opponent, damage); Player.HasPriority = true;"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "mental_mind_read_GENERATED",
+  "name": "Mind Read",
+  "suit": "Mental",
+  "type": "Buff",
+  "rarity": "Common",
+  "description": "See all cards in your opponent's hand for the next 2 turns.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" reads \" + OpponentDisplayName + \"'s mind!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Mind Reading",
+      "duration": 2,
+      "hooks": {
+        "OnDrawPhase": "Battle.OpponentHandRevealed = true; Log(PlayerDisplayName + \" sees \" + OpponentDisplayName + \"'s hand!\");"
+      }
+    }
+  }
+}

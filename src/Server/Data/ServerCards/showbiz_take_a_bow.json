@@ -1,0 +1,22 @@
+{
+  "id": "showbiz_take_a_bow",
+  "name": "Take a Bow",
+  "suit": "Showbiz",
+  "type": "Buff",
+  "rarity": "Common",
+  "description": "Both you and your opponent lose 1 queue slot next turn. You heal 20 HP this turn.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Player.CurrentHP = Math.Min(Player.MaxHP, Player.CurrentHP + 20); Log(PlayerDisplayName + \" takes a bow and heals 20 HP!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Both",
+    "status": {
+      "name": "Intermission",
+      "duration": 1,
+      "hooks": {
+        "OnQueuePhaseStart": "Battle.QueueSize -= 1; Log(\"Intermission! Queue size reduced!\");"
+      }
+    }
+  }
+}

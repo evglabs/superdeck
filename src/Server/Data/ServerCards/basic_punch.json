@@ -1,0 +1,12 @@
+{
+  "id": "basic_punch",
+  "name": "Punch",
+  "suit": "Basic",
+  "type": "Attack",
+  "rarity": "Common",
+  "description": "Basic attack for 10 damage",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 10);"
+  }
+}

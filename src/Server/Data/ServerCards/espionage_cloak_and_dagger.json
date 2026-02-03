@@ -1,0 +1,22 @@
+{
+  "id": "espionage_cloak_and_dagger",
+  "name": "Cloak and Dagger",
+  "suit": "Espionage",
+  "type": "Attack",
+  "rarity": "Common",
+  "description": "You deal 10 damage to your opponent. The damage you take next turn is reduced by 25%.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 10);"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Cloaked",
+      "duration": 1,
+      "hooks": {
+        "OnTakeDamage": "int reduced = (int)(IncomingDamage * 0.25); IncomingDamage -= reduced; Log(PlayerDisplayName + \"'s cloak absorbs \" + reduced + \" damage!\");"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "showbiz_method_acting",
+  "name": "Method Acting",
+  "suit": "Showbiz",
+  "type": "Attack",
+  "rarity": "Common",
+  "description": "Your opponent takes 10 damage and discards two random cards.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 10); for (int i = 0; i < 2 && OpponentHand.Count > 0; i++) { int idx = Rng.Next(OpponentHand.Count); var discarded = OpponentHand[idx]; OpponentHand.RemoveAt(idx); OpponentDiscard.Add(discarded); Log(OpponentDisplayName + \" discards \" + discarded.Name + \"!\"); }"
+  }
+}

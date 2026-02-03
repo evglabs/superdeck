@@ -1,0 +1,12 @@
+{
+  "id": "showbiz_paparazzi",
+  "name": "Paparazzi",
+  "suit": "Showbiz",
+  "type": "Debuff",
+  "rarity": "Uncommon",
+  "description": "You copy one random card in your opponent's queue and play it.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "if (OpponentQueue.Count > 0) { int idx = Rng.Next(OpponentQueue.Count); var copied = OpponentQueue[idx].Clone(); PlayerQueue.Add(copied); Log(PlayerDisplayName + \"'s paparazzi catches \" + copied.Name + \" and queues a copy!\"); } else { Log(\"No cards to photograph in opponent's queue!\"); }"
+  }
+}

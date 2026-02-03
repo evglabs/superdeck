@@ -1,0 +1,12 @@
+{
+  "id": "mental_adhd",
+  "name": "ADHD",
+  "suit": "Mental",
+  "type": "Debuff",
+  "rarity": "Uncommon",
+  "description": "Shuffle opponent's queue.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "Shuffle(OpponentQueue); Log(PlayerDisplayName + \" distracts \" + OpponentDisplayName + \"! Their queue is shuffled!\");"
+  }
+}

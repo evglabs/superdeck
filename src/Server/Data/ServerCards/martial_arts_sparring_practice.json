@@ -1,0 +1,22 @@
+{
+  "id": "martial_arts_sparring_practice",
+  "name": "Sparring Practice",
+  "suit": "MartialArts",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "description": "Your attack power stat is doubled for the next 1 turn.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" practices their strikes!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Trained",
+      "duration": 1,
+      "hooks": {
+        "OnCalculateAttack": "AttackMultiplier *= 2.0; Log(PlayerDisplayName + \"'s training doubles their attack power!\");"
+      }
+    }
+  }
+}

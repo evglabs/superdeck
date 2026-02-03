@@ -1,0 +1,22 @@
+{
+  "id": "fire_fireball",
+  "name": "Fireball",
+  "suit": "Fire",
+  "type": "Attack",
+  "rarity": "Uncommon",
+  "description": "Deal 25 damage, apply 1 burn for 3 turns (deals 2 damage per turn).",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 25);"
+  },
+  "grantsStatusTo": {
+    "target": "Opponent",
+    "status": {
+      "name": "Burning",
+      "duration": 3,
+      "hooks": {
+        "OnTurnStart": "DealDamage(Player, 2);"
+      }
+    }
+  }
+}

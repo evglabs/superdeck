@@ -1,0 +1,6 @@
+@SuperDeck.Server_HostAddress = http://localhost:5000
+
+GET {{SuperDeck.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

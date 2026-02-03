@@ -1,0 +1,22 @@
+{
+  "id": "fire_phoenix",
+  "name": "Phoenix",
+  "suit": "Fire",
+  "type": "Buff",
+  "rarity": "Legendary",
+  "description": "If at or lower than 0 HP at the end of this turn, heal back up to 50% of HP and discard all cards and shuffle back into draw pile.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" channels the Phoenix!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Phoenix Rising",
+      "duration": 1,
+      "hooks": {
+        "OnTurnEnd": "if (Player.CurrentHP <= 0) { Player.CurrentHP = (int)(Player.MaxHP * 0.50); while (PlayerHand.Count > 0) { var card = PlayerHand[0]; PlayerHand.RemoveAt(0); PlayerDeck.Add(card); } Shuffle(PlayerDeck); Log(PlayerDisplayName + \" rises from the ashes with \" + Player.CurrentHP + \" HP!\"); }"
+      }
+    }
+  }
+}

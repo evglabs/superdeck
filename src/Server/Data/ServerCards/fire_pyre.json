@@ -1,0 +1,12 @@
+{
+  "id": "fire_pyre",
+  "name": "Pyre",
+  "suit": "Fire",
+  "type": "Attack",
+  "rarity": "Epic",
+  "description": "Deal the total amount of tinder buffs on target, consuming them.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "var tinderStatuses = GetStatuses(Opponent, \"Tinder\"); int tinderCount = tinderStatuses.Count; int damage = tinderCount * 10; foreach (var status in tinderStatuses) { RemoveStatus(status); } DealDamage(Opponent, damage);"
+  }
+}

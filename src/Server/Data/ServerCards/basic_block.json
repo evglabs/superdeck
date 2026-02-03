@@ -1,0 +1,18 @@
+{
+  "id": "basic_block",
+  "name": "Block",
+  "suit": "Basic",
+  "type": "Defense",
+  "rarity": "Common",
+  "description": "Apply a shield for the next attack blocking half the damage",
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Blocking",
+      "duration": 1,
+      "hooks": {
+        "OnTakeDamage": "Amount = (int)(Amount * 0.5); Log(PlayerDisplayName + \"'s block absorbs half the damage!\");"
+      }
+    }
+  }
+}

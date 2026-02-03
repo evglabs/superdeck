@@ -1,0 +1,13 @@
+{
+  "id": "money_means_of_production",
+  "name": "Means of Production",
+  "suit": "Money",
+  "type": "Debuff",
+  "rarity": "Rare",
+  "suitRarity": 0.0001,
+  "description": "Take all cards from opponent's hand and place into yours (And gain $1,000 per card)",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int cardsTaken = OpponentHand.Count; Player.Money += cardsTaken * 1000; while (OpponentHand.Count > 0) { var card = OpponentHand[0]; OpponentHand.RemoveAt(0); PlayerHand.Add(card); } Log(PlayerDisplayName + \" seizes the means of production! Took \" + cardsTaken + \" cards and gained $\" + (cardsTaken * 1000) + \"!\");"
+  }
+}

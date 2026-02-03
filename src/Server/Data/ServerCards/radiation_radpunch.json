@@ -1,0 +1,12 @@
+{
+  "id": "radiation_radpunch",
+  "name": "RadPunch",
+  "suit": "Radiation",
+  "type": "Attack",
+  "rarity": "Common",
+  "description": "Deal 10 damage with a 25% chance to irradiate (3 damage/turn).",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "DealDamage(Opponent, 10); if (Rng.Next(100) < 25) { ApplyIrradiate(Opponent); Log(OpponentDisplayName + \" is irradiated!\"); }"
+  }
+}

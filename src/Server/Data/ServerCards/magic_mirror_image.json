@@ -1,0 +1,22 @@
+{
+  "id": "magic_mirror_image",
+  "name": "Mirror Image",
+  "suit": "Magic",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "description": "Any card that resolves is resolved again on the opposite target at 20% effectiveness.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" creates mirror images!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Mirror Image",
+      "duration": 2,
+      "hooks": {
+        "OnCardResolve": "Battle.MirrorEffectiveness = 0.20; Battle.MirrorNextResolve = true; Log(\"Mirror image echoes the card at 20% effectiveness!\");"
+      }
+    }
+  }
+}

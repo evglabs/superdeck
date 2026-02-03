@@ -1,0 +1,12 @@
+{
+  "id": "magic_magic_missile_barrage",
+  "name": "Magic Missile Barrage",
+  "suit": "Magic",
+  "type": "Attack",
+  "rarity": "Legendary",
+  "description": "Immediately play all Magic Missile cards in your deck.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "int missileCount = 0; var toRemove = new List<Card>(); foreach (var card in PlayerDeck) { if (card.Id == \"magic_magic_missile\") { toRemove.Add(card); missileCount++; } } foreach (var card in toRemove) { PlayerDeck.Remove(card); PlayCard(card); } Log(PlayerDisplayName + \" unleashes a barrage of \" + missileCount + \" Magic Missiles!\");"
+  }
+}

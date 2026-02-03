@@ -1,0 +1,12 @@
+{
+  "id": "electricity_arc",
+  "name": "Arc",
+  "suit": "Electricity",
+  "type": "Attack",
+  "rarity": "Epic",
+  "description": "Deal 10 damage plus 10 more for each card target has in hand",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int baseDamage = 10; int bonusDamage = OpponentHand.Count * 10; int totalDamage = baseDamage + bonusDamage; DealDamage(Opponent, totalDamage);"
+  }
+}

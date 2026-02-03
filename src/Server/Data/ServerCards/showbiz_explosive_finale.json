@@ -1,0 +1,12 @@
+{
+  "id": "showbiz_explosive_finale",
+  "name": "Explosive Finale",
+  "suit": "Showbiz",
+  "type": "Attack",
+  "rarity": "Rare",
+  "description": "You deal 20 damage. Plus, your opponent suffers 5 damage for each successive card played by you or your opponent this turn.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int baseDamage = 20; int bonusDamage = Battle.CardsPlayedThisTurn * 5; int totalDamage = baseDamage + bonusDamage; DealDamage(Opponent, totalDamage);"
+  }
+}

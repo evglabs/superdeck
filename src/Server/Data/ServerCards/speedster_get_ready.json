@@ -1,0 +1,22 @@
+{
+  "id": "speedster_get_ready",
+  "name": "Get Ready",
+  "suit": "Speedster",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "Gain an extra queue slot for each 2 points of speed next turn.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" gets ready!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Ready to Run",
+      "duration": 1,
+      "hooks": {
+        "OnQueuePhaseStart": "int extraSlots = Player.Speed / 2; Battle.QueueSize += extraSlots; Log(PlayerDisplayName + \" gains \" + extraSlots + \" extra queue slots from speed!\");"
+      }
+    }
+  }
+}

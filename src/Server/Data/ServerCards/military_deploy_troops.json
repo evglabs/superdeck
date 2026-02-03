@@ -1,0 +1,22 @@
+{
+  "id": "military_deploy_troops",
+  "name": "Deploy Troops",
+  "suit": "Military",
+  "type": "Attack",
+  "rarity": "Common",
+  "description": "Deploy 1 Troop. For the next 3 turns, you deal 2 damage for each Troop you have deployed.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "if (!State.ContainsKey(\"troops\")) State[\"troops\"] = 0; State[\"troops\"] = (int)State[\"troops\"] + 1; Log(PlayerDisplayName + \" deploys a troop! Total: \" + State[\"troops\"]);"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Troop Deployment",
+      "duration": 3,
+      "hooks": {
+        "OnTurnStart": "int troops = State.ContainsKey(\"troops\") ? (int)State[\"troops\"] : 0; int damage = troops * 2; DealDamage(Opponent, damage);"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "mental_super_intelligence",
+  "name": "Super Intelligence",
+  "suit": "Mental",
+  "type": "Buff",
+  "rarity": "Rare",
+  "description": "Queue any card from your deck.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Battle.AllowDeckQueue = true; Log(PlayerDisplayName + \" activates Super Intelligence! They may queue any card from their deck!\");"
+  }
+}

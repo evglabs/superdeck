@@ -1,0 +1,13 @@
+{
+  "id": "money_golden_parachute",
+  "name": "Golden Parachute",
+  "suit": "Money",
+  "type": "Buff",
+  "rarity": "Legendary",
+  "suitRarity": 0.0001,
+  "description": "After fight get a booster pack of nothing but legendaries. (And gain $25,000)",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Player.Money += 25000; Player.PendingRewards.Add(\"LegendaryBoosterPack\"); Log(PlayerDisplayName + \" deploys the Golden Parachute! +$25,000 and a Legendary booster pack!\");"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "military_winter_campaign",
+  "name": "Winter Campaign",
+  "suit": "Military",
+  "type": "Debuff",
+  "rarity": "Rare",
+  "description": "For the next 2 turns, each time you are attacked, your opponent discards a card and one random buff they have is reduced in duration by 1.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" initiates a Winter Campaign!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Winter Campaign",
+      "duration": 2,
+      "hooks": {
+        "OnTakeDamage": "if (OpponentHand.Count > 0) { int idx = Rng.Next(OpponentHand.Count); var discarded = OpponentHand[idx]; OpponentHand.RemoveAt(idx); OpponentDiscard.Add(discarded); Log(OpponentDisplayName + \" loses \" + discarded.Name + \" to the winter!\"); } var buffs = GetBuffs(Opponent); if (buffs.Count > 0) { var buff = buffs[Rng.Next(buffs.Count)]; buff.Duration -= 1; Log(OpponentDisplayName + \"'s \" + buff.Name + \" weakens in the cold!\"); }"
+      }
+    }
+  }
+}

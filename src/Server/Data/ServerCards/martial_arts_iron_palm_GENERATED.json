@@ -1,0 +1,12 @@
+{
+  "id": "martial_arts_iron_palm_GENERATED",
+  "name": "Iron Palm",
+  "suit": "MartialArts",
+  "type": "Attack",
+  "rarity": "Epic",
+  "description": "Deal 30 damage. If this kills the opponent, restore 20% of your maximum HP.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "int prevHP = Opponent.CurrentHP; DealDamage(Opponent, 30); if (prevHP > 0 && Opponent.CurrentHP <= 0) { int heal = (int)(Player.MaxHP * 0.20); Player.CurrentHP += heal; Log(PlayerDisplayName + \" absorbs \" + heal + \" HP from the finishing blow!\"); }"
+  }
+}

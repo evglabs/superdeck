@@ -1,0 +1,22 @@
+{
+  "id": "speedster_on_your_marks",
+  "name": "On Your Marks",
+  "suit": "Speedster",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "description": "Gain 5 extra speed points for the next 2 turns.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" gets on their marks!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Speed Boost",
+      "duration": 2,
+      "hooks": {
+        "OnCalculateSpeed": "SpeedBonus += 5; Log(PlayerDisplayName + \" gains +5 speed!\");"
+      }
+    }
+  }
+}

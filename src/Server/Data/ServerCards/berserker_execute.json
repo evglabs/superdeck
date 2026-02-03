@@ -1,0 +1,12 @@
+{
+  "id": "berserker_execute",
+  "name": "Execute",
+  "suit": "Berserker",
+  "type": "Attack",
+  "rarity": "Legendary",
+  "description": "This card deals damage equal to 40% of your opponent's maximum hitpoints if they were reduced to below 30% HP this turn.",
+  "immediateEffect": {
+    "target": "Opponent",
+    "script": "double hpPercent = (double)Opponent.CurrentHP / Opponent.MaxHP; if (hpPercent < 0.30) { int damage = (int)(Opponent.MaxHP * 0.40); DealDamage(Opponent, damage); } else { Log(\"Execute fails - opponent HP too high!\"); }"
+  }
+}

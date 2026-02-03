@@ -1,0 +1,22 @@
+{
+  "id": "showbiz_pitch_meeting",
+  "name": "Pitch Meeting",
+  "suit": "Showbiz",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "description": "One random other card you play this turn will be echoed at +50% effectiveness two turns from now.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" starts a pitch meeting!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Pitch in Progress",
+      "duration": 1,
+      "hooks": {
+        "OnPlay": "if (Card != null && !State.ContainsKey(\"pitched\")) { State[\"pitched\"] = true; State[\"pitchedCard\"] = Card; AddStatus(Player, new Status { Name = \"Pitched Card\", Duration = 2, Hooks = new Dictionary<string, string> { { \"OnBuffExpire\", \"var pitched = State[\\\"pitchedCard\\\"]; Battle.EchoCard = pitched; Battle.EchoEffectiveness = 1.50; Log(\\\"The pitch is greenlit! \\\" + pitched.Name + \\\" echoes at 150%!\\\");\" } } }); Log(\"Pitched \" + Card.Name + \" for future echo!\"); }"
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "radiation_click_click_click",
+  "name": "*click click click*",
+  "suit": "Radiation",
+  "type": "Buff",
+  "rarity": "Uncommon",
+  "description": "Gain Radioactive buff for 3 turns, every turn add Irradiate (3 damage/turn) buff to opponent for 3 turns.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" becomes radioactive! *click click click*\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Radioactive",
+      "duration": 3,
+      "hooks": {
+        "OnTurnStart": "ApplyIrradiate(Opponent); Log(\"Radiation spreads to \" + OpponentDisplayName + \"!\");"
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "id": "mental_psychic_barrier_GENERATED",
+  "name": "Psychic Barrier",
+  "suit": "Mental",
+  "type": "Buff",
+  "rarity": "Epic",
+  "description": "For the next 2 turns, reflect 50% of damage taken back to your opponent.",
+  "immediateEffect": {
+    "target": "Self",
+    "script": "Log(PlayerDisplayName + \" erects a Psychic Barrier!\");"
+  },
+  "grantsStatusTo": {
+    "target": "Self",
+    "status": {
+      "name": "Psychic Barrier",
+      "duration": 2,
+      "hooks": {
+        "OnTakeDamage": "int reflected = (int)(IncomingDamage * 0.50); DealDamage(Opponent, reflected);"
+      }
+    }
+  }
+}
