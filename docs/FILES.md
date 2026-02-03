@@ -35,6 +35,7 @@ superdeck/
 │   ├── CONFIGURATION.md              # Configuration reference
 │   ├── ARCHITECTURE.md               # Technical architecture
 │   ├── API.md                        # API reference
+│   ├── CHARACTER-SEEDER.md           # Ghost character seeder tool
 │   └── FILES.md                      # This file
 │
 ├── src/
