@@ -2,6 +2,20 @@ using Spectre.Console;
 using SuperDeck.Client.Networking;
 using SuperDeck.Client.UI;
 
+// Parse command-line arguments
+string? presetServerUrl = null;
+for (int i = 0; i < args.Length; i++)
+{
+    if (args[i] == "--server" && i + 1 < args.Length)
+    {
+        presetServerUrl = args[i + 1];
+        i++;
+    }
+}
+
+// Also check environment variable
+presetServerUrl ??= Environment.GetEnvironmentVariable("SUPERDECK_SERVER");
+
 AnsiConsole.Clear();
 AnsiConsole.Write(new FigletText("SuperDeck").Color(Color.Gold1).Centered());
 AnsiConsole.MarkupLine("[grey]A Deck-Building Card Game[/]");
@@ -12,26 +26,39 @@ ApiClient? apiClient = null;
 
 try
 {
-    // Mode selection
-    var mode = AnsiConsole.Prompt(
-        new SelectionPrompt<string>()
-            .Title("[yellow]Select Mode[/]")
-            .HighlightStyle(new Style(Color.Gold1))
-            .AddChoices(new[]
-            {
-                "Offline (Local Server)",
-                "Online (Connect to Server)"
-            }));
+    string? mode;
+    string? serverUrl;
+
+    if (presetServerUrl != null)
+    {
+        // Skip mode selection and URL prompt when preconfigured
+        mode = "Online";
+        serverUrl = presetServerUrl;
+    }
+    else
+    {
+        mode = AnsiConsole.Prompt(
+            new SelectionPrompt<string>()
+                .Title("[yellow]Select Mode[/]")
+                .HighlightStyle(new Style(Color.Gold1))
+                .AddChoices(new[]
+                {
+                    "Offline (Local Server)",
+                    "Online (Connect to Server)"
+                }));
+
+        serverUrl = mode.StartsWith("Online")
+            ? AnsiConsole.Ask<string>(
+                "[green]Enter server URL[/] [grey](e.g., http://localhost:5000)[/]:",
+                "http://localhost:5000")
+            : null;
+    }
 
     if (mode.StartsWith("Online"))
     {
-        // Get server URL
-        var serverUrl = AnsiConsole.Ask<string>(
-            "[green]Enter server URL[/] [grey](e.g., http://localhost:5000)[/]:",
-            "http://localhost:5000");
 
-        AnsiConsole.MarkupLine($"[yellow]Connecting to server at {Markup.Escape(serverUrl)}...[/]");
-        apiClient = new ApiClient(serverUrl);
+        AnsiConsole.MarkupLine($"[yellow]Connecting to server at {Markup.Escape(serverUrl!)}...[/]");
+        apiClient = new ApiClient(serverUrl!);
 
         if (!await apiClient.IsHealthyAsync())
         {
