@@ -177,7 +177,9 @@ ExecStart=/usr/bin/dotnet /opt/superdeck/publish/SuperDeck.Server.dll
 Restart=always
 RestartSec=10
 Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=ASPNETCORE_URLS=http://localhost:5000
+# Use localhost:5000 to only allow connections from this machine
+# Use 0.0.0.0:5000 to allow connections from other machines on the network
+Environment=ASPNETCORE_URLS=http://0.0.0.0:5000
 Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 
 [Install]
