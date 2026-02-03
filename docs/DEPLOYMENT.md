@@ -168,10 +168,11 @@ Description=SuperDeck Game Server
 After=network.target mariadb.service
 
 [Service]
-Type=notify
+Type=simple
 User=www-data
 Group=www-data
 WorkingDirectory=/opt/superdeck/publish
+# Find your dotnet path with: which dotnet
 ExecStart=/usr/bin/dotnet /opt/superdeck/publish/SuperDeck.Server.dll
 Restart=always
 RestartSec=10
@@ -304,13 +305,9 @@ GRANT ALL PRIVILEGES ON superdeck.* TO 'superdeck_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
-#### 3. Initialize Schema
+#### 3. Configure Connection
 
-```bash
-mysql -u superdeck_user -p superdeck < src/Server/Data/schema.sql
-```
-
-#### 4. Configure Connection
+Tables are created automatically when the server starts for the first time - no manual schema setup is needed.
 
 In `appsettings.Production.json`:
 
@@ -325,31 +322,27 @@ In `appsettings.Production.json`:
 
 ---
 
-## Environment Variables
+## Environment Variables (Alternative to Config Files)
 
-Override configuration via environment variables:
+If you prefer environment variables over JSON config files (common in Docker and CI/CD), you can use them **instead of** `appsettings.Production.json`. This is not needed if you already have a config file.
+
+Use `__` (double underscore) to represent nested keys:
+
+```bash
+# These two are equivalent:
+# appsettings.json:  "ConnectionStrings": { "MariaDB": "Server=..." }
+# Environment var:
+export ConnectionStrings__MariaDB="Server=localhost;Database=superdeck;User=superdeck;Password=secret"
+```
+
+The two variables you **do** always need as environment variables (they aren't set in config files):
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `ASPNETCORE_ENVIRONMENT` | Environment name | `Production` |
-| `ASPNETCORE_URLS` | Listening URL(s) | `http://0.0.0.0:5000` |
-| `DatabaseProvider` | Database type | `MariaDB` or `SQLite` |
-| `ConnectionStrings__MariaDB` | DB connection string | `Server=...` |
+| `ASPNETCORE_ENVIRONMENT` | Tells the server to load `appsettings.Production.json` | `Production` |
+| `ASPNETCORE_URLS` | What address/port the server listens on | `http://0.0.0.0:5000` |
 
-### Setting in Systemd
-
-```ini
-Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=ASPNETCORE_URLS=http://localhost:5000
-```
-
-### Setting in Docker
-
-```yaml
-environment:
-  - ASPNETCORE_ENVIRONMENT=Production
-  - DatabaseProvider=MariaDB
-```
+These are set in the systemd service file (step 4 above) or in Docker Compose.
 
 ---
 

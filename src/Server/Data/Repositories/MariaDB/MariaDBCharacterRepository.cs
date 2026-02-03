@@ -30,7 +30,7 @@ public class MariaDBCharacterRepository : ICharacterRepository
                 XP INT DEFAULT 0,
                 Attack INT DEFAULT 0,
                 Defense INT DEFAULT 0,
-                Speed INT DEFAULT 5,
+                Speed INT DEFAULT 0,
                 DeckCardIds TEXT,
                 Wins INT DEFAULT 0,
                 Losses INT DEFAULT 0,
