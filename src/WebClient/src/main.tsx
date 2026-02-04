@@ -4,16 +4,19 @@ import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { GameProvider } from './context/GameContext'
 import { App } from './App'
+import { loadConfig } from './api/client'
 import './styles/global.css'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <GameProvider>
-          <App />
-        </GameProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </StrictMode>,
-)
+loadConfig().then(() => {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <BrowserRouter>
+        <AuthProvider>
+          <GameProvider>
+            <App />
+          </GameProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </StrictMode>,
+  )
+})

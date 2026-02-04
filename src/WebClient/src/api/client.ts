@@ -15,11 +15,37 @@ import type {
   Suit,
 } from '../types'
 
+interface AppConfig {
+  apiUrl: string
+}
+
+let _config: AppConfig = { apiUrl: '' }
+
+export async function loadConfig(): Promise<void> {
+  try {
+    const res = await fetch('/config.json')
+    if (res.ok) {
+      const json = await res.json()
+      _config = { apiUrl: (json.apiUrl ?? '').replace(/\/+$/, '') }
+    }
+  } catch {
+    // Fall back to relative URLs (works with Vite proxy in dev)
+  }
+}
+
+export function getConfig(): AppConfig {
+  return _config
+}
+
 class ApiClient {
   private token: string | null = null
 
   constructor() {
     this.token = localStorage.getItem('auth_token')
+  }
+
+  private get baseUrl(): string {
+    return _config.apiUrl
   }
 
   private headers(): HeadersInit {
@@ -31,7 +57,7 @@ class ApiClient {
   }
 
   private async request<T>(url: string, options?: RequestInit): Promise<T> {
-    const res = await fetch(url, {
+    const res = await fetch(`${this.baseUrl}${url}`, {
       ...options,
       headers: { ...this.headers(), ...options?.headers },
     })

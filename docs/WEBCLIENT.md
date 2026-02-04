@@ -212,11 +212,23 @@ services:
       - superdeck
 ```
 
-### Environment Configuration
+### Configuring the API Server URL
 
-The web client connects to whichever server the Vite proxy (dev) or reverse proxy (production) points to. There are no environment variables to configure in the web client itself.
+The web client can connect to a SuperDeck server running on any machine. Configuration is done via `config.json`, which is loaded at startup before React mounts.
 
-To point at a different server during development, edit `vite.config.ts`:
+#### Development
+
+Edit `src/WebClient/public/config.json`:
+
+```json
+{
+  "apiUrl": "http://192.168.1.100:5000"
+}
+```
+
+When `apiUrl` is empty (`""`), the client uses relative URLs — which means requests go through the Vite dev proxy (configured in `vite.config.ts` to forward `/api/*` to `localhost:5000`).
+
+To point the Vite proxy at a different server, edit `vite.config.ts`:
 
 ```typescript
 proxy: {
@@ -226,6 +238,25 @@ proxy: {
   },
 },
 ```
+
+#### Production
+
+After building (`npm run build`), edit `dist/config.json`:
+
+```json
+{
+  "apiUrl": "https://superdeck.example.com"
+}
+```
+
+This file is served as a static asset and fetched at runtime — no rebuild is required to change the server URL. If you're using a reverse proxy (Nginx) that forwards `/api/*` to the server, you can leave `apiUrl` empty.
+
+| Scenario | `apiUrl` value |
+|----------|---------------|
+| Dev with Vite proxy | `""` (empty) |
+| Dev with remote server | `"http://192.168.1.100:5000"` |
+| Production with Nginx proxy | `""` (empty) |
+| Production direct to server | `"https://superdeck.example.com"` |
 
 ---
 
@@ -237,6 +268,8 @@ src/WebClient/
 ├── package.json            # Dependencies and scripts
 ├── tsconfig.json           # TypeScript configuration
 ├── vite.config.ts          # Vite dev server + build config
+├── public/
+│   └── config.json         # Runtime API URL configuration
 ├── src/
 │   ├── main.tsx            # React entry point
 │   ├── App.tsx             # Route definitions
