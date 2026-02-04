@@ -10,7 +10,7 @@ public class CharacterGenerator
     public Character Generate(string name, Suit[] suits, int level, List<string> deckCardIds)
     {
         var profile = GetCombinedStatProfile(suits);
-        var totalStatPoints = (level * 2) + 5;
+        var totalStatPoints = level;
 
         var (attack, defense, speed) = DistributeStats(totalStatPoints, profile);
         var mmr = CalculateMMR(level);
