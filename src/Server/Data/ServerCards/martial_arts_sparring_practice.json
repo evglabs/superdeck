@@ -15,7 +15,7 @@
       "name": "Trained",
       "duration": 1,
       "hooks": {
-        "OnCalculateAttack": "AttackMultiplier *= 2.0; Log(PlayerDisplayName + \"'s training doubles their attack power!\");"
+        "OnCalculateAttack": "Amount *= 2; Log(PlayerDisplayName + \"'s training doubles their attack power!\");"
       }
     }
   }

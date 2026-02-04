@@ -89,6 +89,39 @@ public class HookExecutor
         return ExecuteStatCalculationHooks(hookType, battle, character, opponent, rng, baseValue);
     }
 
+    public bool ExecuteQueueHooks(
+        BattleState battle,
+        Character player,
+        Character opponent,
+        Random rng,
+        Card card)
+    {
+        var context = CreateContext(battle, player, opponent, rng, card, 0);
+
+        var playerStatuses = (player == battle.Player ? battle.PlayerStatuses : battle.OpponentStatuses)
+            .Where(s => s.CompiledHooks.ContainsKey(HookType.OnQueue))
+            .ToList();
+
+        foreach (var status in playerStatuses)
+        {
+            context.Status = status;
+            try
+            {
+                status.CompiledHooks[HookType.OnQueue](context);
+                if (context.PreventQueue)
+                {
+                    return false; // Card cannot be queued
+                }
+            }
+            catch (Exception ex)
+            {
+                battle.BattleLog.Add($"[Error] Status '{status.Name}' OnQueue hook failed: {ex.Message}");
+            }
+        }
+
+        return true; // Card can be queued
+    }
+
     private static HookContext CreateContext(
         BattleState battle,
         Character player,

@@ -265,11 +265,15 @@ public class BattleService
         }
 
         var card = battle.PlayerHand[action.HandIndex.Value];
+
+        // Execute onQueue hooks BEFORE queuing - they can prevent the queue
+        if (!_hookExecutor.ExecuteQueueHooks(battle, battle.Player, battle.Opponent, session.Rng, card))
+        {
+            return (false, "A status effect prevented this card from being queued", battle);
+        }
+
         battle.PlayerHand.RemoveAt(action.HandIndex.Value);
         battle.PlayerQueue.Add(card);
-
-        // Execute onQueue hooks
-        _hookExecutor.ExecuteHooks(HookType.OnQueue, battle, battle.Player, battle.Opponent, session.Rng, card);
 
         battle.Log($"You queue {card.Name}");
 
@@ -494,12 +498,19 @@ public class BattleService
                         Opponent = opponent,
                         Battle = battle,
                         Status = status,
+                        ExpiringStatus = status,
                         Rng = rng,
                         Log = msg => battle.Log(msg)
                     };
                     try
                     {
                         expireHook(context);
+                        // If hook set PreventExpire, don't remove the status
+                        if (context.PreventExpire)
+                        {
+                            status.RemainingDuration = 1; // Extend by 1 turn
+                            continue;
+                        }
                     }
                     catch (Exception ex)
                     {

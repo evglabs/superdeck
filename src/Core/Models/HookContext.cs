@@ -20,6 +20,10 @@ public class HookContext
     // Modifiable values (for stat calculation hooks)
     public int Amount { get; set; }
     public int IncomingDamage { get; set; }  // Original damage before hooks
+    public int OutgoingDamage { get; set; }  // Damage being dealt (for OnDealDamage)
+    public bool PreventExpire { get; set; }  // Prevent status from expiring
+    public bool PreventQueue { get; set; }   // Prevent card from being queued
+    public StatusEffect? ExpiringStatus { get; set; }  // Status about to expire (for OnBuffExpire)
 
     // Utilities
     public Random Rng { get; set; } = null!;

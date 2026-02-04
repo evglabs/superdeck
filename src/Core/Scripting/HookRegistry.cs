@@ -33,8 +33,12 @@ public class HookRegistry
                     {
                         var globals = CreateGlobalsFromContext(context);
                         compiledAction(globals);
-                        // Copy back Amount for stat calculation hooks
+                        // Copy back modifiable values from script execution
                         context.Amount = globals.Amount;
+                        context.IncomingDamage = globals.IncomingDamage;
+                        context.OutgoingDamage = globals.OutgoingDamage;
+                        context.PreventExpire = globals.PreventExpire;
+                        context.PreventQueue = globals.PreventQueue;
                     };
                 }
                 catch (ScriptCompilationException ex)
@@ -77,6 +81,11 @@ public class HookRegistry
             Battle = context.Battle,
             Status = context.Status,
             Amount = context.Amount,
+            IncomingDamage = context.IncomingDamage,
+            OutgoingDamage = context.OutgoingDamage,
+            PreventExpire = context.PreventExpire,
+            PreventQueue = context.PreventQueue,
+            ExpiringStatus = context.ExpiringStatus,
             Rng = context.Rng,
             This = context.TriggeringCard ?? new Card()
         };

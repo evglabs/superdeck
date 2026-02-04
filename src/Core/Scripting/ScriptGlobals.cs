@@ -77,10 +77,43 @@ public class ScriptGlobals
         double attackMultiplier = 1.0 + (attackStat * AttackPercentPerPoint / 100.0);
         int boostedAmount = (int)(amount * attackMultiplier);
 
+        // Execute OnDealDamage hooks for the attacker (can modify OutgoingDamage)
+        var attackerStatuses = attacker == Battle.Player ? Battle.PlayerStatuses : Battle.OpponentStatuses;
+        var dealDamageHooks = attackerStatuses
+            .Where(s => s.CompiledHooks.ContainsKey(HookType.OnDealDamage))
+            .ToList();
+
+        int outgoingDamage = boostedAmount;
+        foreach (var status in dealDamageHooks)
+        {
+            try
+            {
+                var hookContext = new HookContext
+                {
+                    Player = attacker,
+                    Opponent = target,
+                    Caster = attacker,
+                    Target = target,
+                    Battle = Battle,
+                    Rng = Rng,
+                    Status = status,
+                    TriggeringCard = This,
+                    OutgoingDamage = outgoingDamage,
+                    Log = Log
+                };
+                status.CompiledHooks[HookType.OnDealDamage](hookContext);
+                outgoingDamage = hookContext.OutgoingDamage; // Hooks can modify OutgoingDamage
+            }
+            catch (Exception ex)
+            {
+                Log($"[Error] OnDealDamage hook '{status.Name}' failed: {ex.Message}");
+            }
+        }
+
         // Apply target's defense percentage reduction
         int defense = target.BattleStats.Defense;
         double defenseMultiplier = Math.Max(0, 1.0 - (defense * DefensePercentPerPoint / 100.0));
-        int damageAfterDefense = Math.Max(1, (int)(boostedAmount * defenseMultiplier));
+        int damageAfterDefense = Math.Max(1, (int)(outgoingDamage * defenseMultiplier));
 
         // Execute OnTakeDamage hooks for the target
         var targetStatuses = target == Battle.Player ? Battle.PlayerStatuses : Battle.OpponentStatuses;
@@ -108,7 +141,7 @@ public class ScriptGlobals
                     Log = Log
                 };
                 status.CompiledHooks[HookType.OnTakeDamage](hookContext);
-                finalDamage = hookContext.Amount; // Hooks can modify the amount
+                finalDamage = hookContext.IncomingDamage; // Hooks can modify IncomingDamage
             }
             catch (Exception ex)
             {
@@ -161,7 +194,7 @@ public class ScriptGlobals
                     Log = Log
                 };
                 status.CompiledHooks[HookType.OnTakeDamage](hookContext);
-                finalDamage = hookContext.Amount;
+                finalDamage = hookContext.IncomingDamage; // Hooks can modify IncomingDamage
             }
             catch (Exception ex)
             {
