@@ -89,43 +89,25 @@ public class CharacterService
         var character = await _characterRepository.GetByIdAsync(characterId);
         if (character == null) return null;
 
-        if (attack < 0 || defense < 0 || speed < _settings.Character.MinSpeed || bonusHP < 0)
+        if (bonusHP < 0 || bonusHP % _settings.Character.HPPerStatPoint != 0)
         {
-            throw new InvalidOperationException($"Stats cannot be negative, and speed must be at least {_settings.Character.MinSpeed}");
+            throw new InvalidOperationException($"BonusHP must be non-negative and a multiple of {_settings.Character.HPPerStatPoint}");
         }
 
-        if (attack % _settings.Character.AttackPerStatPoint != 0)
-        {
-            throw new InvalidOperationException($"Attack must be a multiple of {_settings.Character.AttackPerStatPoint}");
-        }
-
-        if (defense % _settings.Character.DefensePerStatPoint != 0)
-        {
-            throw new InvalidOperationException($"Defense must be a multiple of {_settings.Character.DefensePerStatPoint}");
-        }
-
-        if (speed % _settings.Character.SpeedPerStatPoint != 0)
-        {
-            throw new InvalidOperationException($"Speed must be a multiple of {_settings.Character.SpeedPerStatPoint}");
-        }
-
-        if (bonusHP % _settings.Character.HPPerStatPoint != 0)
-        {
-            throw new InvalidOperationException($"BonusHP must be a multiple of {_settings.Character.HPPerStatPoint}");
-        }
-
-        int attackPoints = attack / _settings.Character.AttackPerStatPoint;
-        int defensePoints = defense / _settings.Character.DefensePerStatPoint;
-        int speedPoints = speed / _settings.Character.SpeedPerStatPoint;
         int hpPoints = bonusHP / _settings.Character.HPPerStatPoint;
 
         // Validate stat allocation
-        int totalStats = attackPoints + defensePoints + speedPoints + hpPoints;
+        int totalStats = attack + defense + speed + hpPoints;
         int allowedStats = character.Level * _settings.Character.StatPointsPerLevel;
 
         if (totalStats > allowedStats)
         {
             throw new InvalidOperationException($"Invalid stat allocation. Total: {totalStats}, Allowed: {allowedStats}");
+        }
+
+        if (attack < 0 || defense < 0 || speed < _settings.Character.MinSpeed)
+        {
+            throw new InvalidOperationException($"Stats cannot be negative, and speed must be at least {_settings.Character.MinSpeed}");
         }
 
         character.Attack = attack;
@@ -171,11 +153,8 @@ public class CharacterService
     public int GetAvailableStatPoints(Character character)
     {
         int totalAllowed = character.Level * _settings.Character.StatPointsPerLevel;
-        int attackPoints = character.Attack / _settings.Character.AttackPerStatPoint;
-        int defensePoints = character.Defense / _settings.Character.DefensePerStatPoint;
-        int speedPoints = character.Speed / _settings.Character.SpeedPerStatPoint;
         int hpPoints = character.BonusHP / _settings.Character.HPPerStatPoint;
-        int totalUsed = attackPoints + defensePoints + speedPoints + hpPoints;
+        int totalUsed = character.Attack + character.Defense + character.Speed + hpPoints;
         return totalAllowed - totalUsed;
     }
 

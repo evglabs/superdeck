@@ -287,11 +287,8 @@ public class GameRunner
     private int GetAvailableStatPoints(Character character)
     {
         int totalAllowed = character.Level * _serverSettings.StatPointsPerLevel;
-        int attackPoints = character.Attack / _serverSettings.AttackPerStatPoint;
-        int defensePoints = character.Defense / _serverSettings.DefensePerStatPoint;
-        int speedPoints = character.Speed / _serverSettings.SpeedPerStatPoint;
         int hpPoints = character.BonusHP / _serverSettings.HpPerStatPoint;
-        int totalUsed = attackPoints + defensePoints + speedPoints + hpPoints;
+        int totalUsed = character.Attack + character.Defense + character.Speed + hpPoints;
         return Math.Max(0, totalAllowed - totalUsed);
     }
 
@@ -524,15 +521,15 @@ public class GameRunner
                 .DefaultValue(_currentCharacter.BonusHP));
 
         var attack = AnsiConsole.Prompt(
-            new TextPrompt<int>($"[red]Attack[/] (current: {_currentCharacter.Attack}, increments of {_serverSettings.AttackPerStatPoint}):")
+            new TextPrompt<int>($"[red]Attack[/] (current: {_currentCharacter.Attack}):")
                 .DefaultValue(_currentCharacter.Attack));
 
         var defense = AnsiConsole.Prompt(
-            new TextPrompt<int>($"[blue]Defense[/] (current: {_currentCharacter.Defense}, increments of {_serverSettings.DefensePerStatPoint}):")
+            new TextPrompt<int>($"[blue]Defense[/] (current: {_currentCharacter.Defense}):")
                 .DefaultValue(_currentCharacter.Defense));
 
         var speed = AnsiConsole.Prompt(
-            new TextPrompt<int>($"[yellow]Speed[/] (current: {_currentCharacter.Speed}, min: 1, increments of {_serverSettings.SpeedPerStatPoint}):")
+            new TextPrompt<int>($"[yellow]Speed[/] (current: {_currentCharacter.Speed}, min: 1):")
                 .DefaultValue(_currentCharacter.Speed));
 
         if (speed < 1)
@@ -589,32 +586,31 @@ public class GameRunner
                 new SelectionPrompt<string>()
                     .Title("[yellow]Add a point to:[/]")
                     .HighlightStyle(new Style(Color.Gold1))
-                    .AddChoices(new[] { $"+{_serverSettings.HpPerStatPoint} HP", $"+{_serverSettings.AttackPerStatPoint} Attack", $"+{_serverSettings.DefensePerStatPoint} Defense", $"+{_serverSettings.SpeedPerStatPoint} Speed", "Confirm & Save" }));
+                    .AddChoices(new[] { $"+{_serverSettings.HpPerStatPoint} HP", "+1 Attack", "+1 Defense", "+1 Speed", "Confirm & Save" }));
 
-            if (choice.EndsWith("Attack"))
+            switch (choice)
             {
-                attack += _serverSettings.AttackPerStatPoint;
-                remaining--;
-            }
-            else if (choice.EndsWith("Defense"))
-            {
-                defense += _serverSettings.DefensePerStatPoint;
-                remaining--;
-            }
-            else if (choice.EndsWith("Speed"))
-            {
-                speed += _serverSettings.SpeedPerStatPoint;
-                remaining--;
-            }
-            else if (choice == "Confirm & Save")
-            {
-                remaining = 0;
-            }
-            else
-            {
-                // HP choice
-                bonusHP += _serverSettings.HpPerStatPoint;
-                remaining--;
+                case "+1 Attack":
+                    attack++;
+                    remaining--;
+                    break;
+                case "+1 Defense":
+                    defense++;
+                    remaining--;
+                    break;
+                case "+1 Speed":
+                    speed++;
+                    remaining--;
+                    break;
+                case "Confirm & Save":
+                    // Allow saving even with remaining points
+                    remaining = 0;
+                    break;
+                default:
+                    // HP choice
+                    bonusHP += _serverSettings.HpPerStatPoint;
+                    remaining--;
+                    break;
             }
         }
 
