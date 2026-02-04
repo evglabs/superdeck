@@ -11,6 +11,21 @@ import { CardDetailModal } from '../components/CardDetailModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { CardDisplay } from '../components/CardDisplay'
 
+function StatValue({ label, base, effective, color }: { label: string; base: number; effective?: number; color: string }) {
+  const value = effective ?? base
+  const diff = value - base
+  const hasBuff = diff > 0
+  const hasDebuff = diff < 0
+
+  return (
+    <span style={{ color }}>
+      {label} {value}
+      {hasBuff && <span style={{ color: '#22c55e', fontSize: '0.65rem' }}> +{diff}</span>}
+      {hasDebuff && <span style={{ color: '#ef4444', fontSize: '0.65rem' }}> {diff}</span>}
+    </span>
+  )
+}
+
 export function BattlePage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -46,9 +61,9 @@ export function BattlePage() {
           </div>
           <div style={{ fontSize: '0.75rem', marginTop: 4, display: 'flex', gap: 8 }}>
             <span style={{ color: 'var(--color-text-secondary)' }}>Lv.{state.player.level}</span>
-            <span style={{ color: '#ef4444' }}>ATK {state.player.attack}</span>
-            <span style={{ color: '#3b82f6' }}>DEF {state.player.defense}</span>
-            <span style={{ color: '#eab308' }}>SPD {state.player.speed}</span>
+            <StatValue label="ATK" base={state.player.attack} effective={state.playerEffectiveStats?.attack} color="#ef4444" />
+            <StatValue label="DEF" base={state.player.defense} effective={state.playerEffectiveStats?.defense} color="#3b82f6" />
+            <StatValue label="SPD" base={state.player.speed} effective={state.playerEffectiveStats?.speed} color="#eab308" />
           </div>
         </div>
         <div style={{ textAlign: 'center' }}>
@@ -62,9 +77,9 @@ export function BattlePage() {
           </div>
           <div style={{ fontSize: '0.75rem', marginTop: 4, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
             <span style={{ color: 'var(--color-text-secondary)' }}>Lv.{state.opponent.level}</span>
-            <span style={{ color: '#ef4444' }}>ATK {state.opponent.attack}</span>
-            <span style={{ color: '#3b82f6' }}>DEF {state.opponent.defense}</span>
-            <span style={{ color: '#eab308' }}>SPD {state.opponent.speed}</span>
+            <StatValue label="ATK" base={state.opponent.attack} effective={state.opponentEffectiveStats?.attack} color="#ef4444" />
+            <StatValue label="DEF" base={state.opponent.defense} effective={state.opponentEffectiveStats?.defense} color="#3b82f6" />
+            <StatValue label="SPD" base={state.opponent.speed} effective={state.opponentEffectiveStats?.speed} color="#eab308" />
           </div>
         </div>
       </div>

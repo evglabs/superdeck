@@ -89,6 +89,12 @@ export interface Character {
   lastTurnPlayedCards: Card[]
 }
 
+export interface EffectiveStats {
+  attack: number
+  defense: number
+  speed: number
+}
+
 export interface BattleState {
   battleId: string
   round: number
@@ -107,6 +113,8 @@ export interface BattleState {
   opponentDiscard: Card[]
   playerStatuses: StatusEffect[]
   opponentStatuses: StatusEffect[]
+  playerEffectiveStats: EffectiveStats | null
+  opponentEffectiveStats: EffectiveStats | null
   baseQueueSlots: number
   maxQueueSlots: number
   currentPlayerQueueSlots: number

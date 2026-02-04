@@ -32,6 +32,10 @@ public class BattleState
     public List<StatusEffect> PlayerStatuses { get; set; } = new();
     public List<StatusEffect> OpponentStatuses { get; set; } = new();
 
+    // Effective stats (base + status effects)
+    public EffectiveStats PlayerEffectiveStats { get; set; } = new();
+    public EffectiveStats OpponentEffectiveStats { get; set; } = new();
+
     // Configuration (from server settings)
     public int BaseQueueSlots { get; set; } = 3;
     public int MaxQueueSlots { get; set; } = 5;

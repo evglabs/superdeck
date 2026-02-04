@@ -107,6 +107,20 @@ public class BattleService
         battle.Player.InitializeForBattle();
         battle.Opponent.InitializeForBattle();
 
+        // Initialize effective stats (base stats, no buffs yet)
+        battle.PlayerEffectiveStats = new EffectiveStats
+        {
+            Attack = battle.Player.BattleStats.Attack,
+            Defense = battle.Player.BattleStats.Defense,
+            Speed = battle.Player.BattleStats.Speed
+        };
+        battle.OpponentEffectiveStats = new EffectiveStats
+        {
+            Attack = battle.Opponent.BattleStats.Attack,
+            Defense = battle.Opponent.BattleStats.Defense,
+            Speed = battle.Opponent.BattleStats.Speed
+        };
+
         // Load deck cards
         battle.PlayerDeck = LoadDeck(battle.Player.DeckCardIds, rng);
         battle.OpponentDeck = LoadDeck(battle.Opponent.DeckCardIds, rng);
@@ -435,6 +449,9 @@ public class BattleService
         // Execute onCardResolve hooks (for all players)
         _hookExecutor.ExecuteHooks(HookType.OnCardResolve, battle, battle.Player, battle.Opponent, session.Rng, card);
         _hookExecutor.ExecuteHooks(HookType.OnCardResolve, battle, battle.Opponent, battle.Player, session.Rng, card);
+
+        // Update effective stats after card effects
+        UpdateEffectiveStats(battle, session.Rng);
     }
 
     private async Task CleanupPhaseAsync(BattleSession session)
@@ -459,6 +476,9 @@ public class BattleService
         // Tick status durations and remove expired
         await TickStatusDurationsAsync(battle.PlayerStatuses, battle, battle.Player, battle.Opponent, session.Rng);
         await TickStatusDurationsAsync(battle.OpponentStatuses, battle, battle.Opponent, battle.Player, session.Rng);
+
+        // Update effective stats after status changes
+        UpdateEffectiveStats(battle, session.Rng);
 
         // System damage after configured round
         if (battle.Round >= _settings.Battle.SystemDamageStartRound)
@@ -818,6 +838,25 @@ public class BattleService
     // Helper to get display name (returns "You" for human player)
     private static string GetDisplayName(BattleState battle, Character c) =>
         ReferenceEquals(c, battle.Player) ? "You" : c.Name;
+
+    private void UpdateEffectiveStats(BattleState battle, Random rng)
+    {
+        // Calculate player effective stats
+        battle.PlayerEffectiveStats.Attack = _hookExecutor.GetCalculatedStat(
+            HookType.OnCalculateAttack, battle, battle.Player, rng, battle.Player.BattleStats.Attack);
+        battle.PlayerEffectiveStats.Defense = _hookExecutor.GetCalculatedStat(
+            HookType.OnCalculateDefense, battle, battle.Player, rng, battle.Player.BattleStats.Defense);
+        battle.PlayerEffectiveStats.Speed = _hookExecutor.GetCalculatedStat(
+            HookType.OnCalculateSpeed, battle, battle.Player, rng, battle.Player.BattleStats.Speed);
+
+        // Calculate opponent effective stats
+        battle.OpponentEffectiveStats.Attack = _hookExecutor.GetCalculatedStat(
+            HookType.OnCalculateAttack, battle, battle.Opponent, rng, battle.Opponent.BattleStats.Attack);
+        battle.OpponentEffectiveStats.Defense = _hookExecutor.GetCalculatedStat(
+            HookType.OnCalculateDefense, battle, battle.Opponent, rng, battle.Opponent.BattleStats.Defense);
+        battle.OpponentEffectiveStats.Speed = _hookExecutor.GetCalculatedStat(
+            HookType.OnCalculateSpeed, battle, battle.Opponent, rng, battle.Opponent.BattleStats.Speed);
+    }
 
     public async Task<BattleResult?> FinalizeBattleAsync(string battleId)
     {
