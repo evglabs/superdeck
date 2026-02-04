@@ -270,8 +270,16 @@ public class GameRunner
             ? $"[green]{_currentCharacter.MaxHP}[/] [grey](base {100 + _currentCharacter.Level * _serverSettings.HpPerLevel} + {_currentCharacter.BonusHP} bonus)[/]"
             : $"[green]{_currentCharacter.MaxHP}[/]";
         table.AddRow("HP", hpDisplay);
-        table.AddRow("Attack", $"[red]{_currentCharacter.Attack}[/]");
-        table.AddRow("Defense", $"[blue]{_currentCharacter.Defense}[/]");
+        var atkPercent = _currentCharacter.Attack * _serverSettings.AttackPercentPerPoint;
+        var atkDisplay = _currentCharacter.Attack > 0
+            ? $"[red]{_currentCharacter.Attack}[/] [grey](+{atkPercent:0.#}% dmg)[/]"
+            : $"[red]{_currentCharacter.Attack}[/]";
+        table.AddRow("Attack", atkDisplay);
+        var defPercent = _currentCharacter.Defense * _serverSettings.DefensePercentPerPoint;
+        var defDisplay = _currentCharacter.Defense > 0
+            ? $"[blue]{_currentCharacter.Defense}[/] [grey](-{defPercent:0.#}% dmg taken)[/]"
+            : $"[blue]{_currentCharacter.Defense}[/]";
+        table.AddRow("Defense", defDisplay);
         table.AddRow("Speed", $"[yellow]{_currentCharacter.Speed}[/]");
         table.AddRow("───", "───");
         table.AddRow("Wins", $"[green]{_currentCharacter.Wins}[/]");

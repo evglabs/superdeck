@@ -401,7 +401,9 @@ public class BattleService
                     Target = effectTarget,
                     Battle = battle,
                     This = card,
-                    Rng = session.Rng
+                    Rng = session.Rng,
+                    AttackPercentPerPoint = _settings.Character.AttackPercentPerPoint,
+                    DefensePercentPerPoint = _settings.Character.DefensePercentPerPoint
                 };
                 action(globals);
             }

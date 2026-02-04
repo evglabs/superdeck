@@ -612,6 +612,8 @@ app.MapGet("/api/info", (GameSettings settings) => Results.Ok(new
         baseQueueSlots = settings.Battle.BaseQueueSlots,
         statPointsPerLevel = settings.Character.StatPointsPerLevel,
         hpPerStatPoint = settings.Character.HPPerStatPoint,
+        attackPercentPerPoint = settings.Character.AttackPercentPerPoint,
+        defensePercentPerPoint = settings.Character.DefensePercentPerPoint,
         autoBattleWatchDelayMs = settings.AutoBattle.WatchModeDelayMs
     }
 }))

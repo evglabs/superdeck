@@ -47,6 +47,8 @@ public class CharacterSettings
     public int MaxLevel { get; set; } = 10;
     public int MinSpeed { get; set; } = 0;
     public int HPPerStatPoint { get; set; } = 5;
+    public double AttackPercentPerPoint { get; set; } = 2.0;
+    public double DefensePercentPerPoint { get; set; } = 2.0;
 }
 
 public class BattleSettings

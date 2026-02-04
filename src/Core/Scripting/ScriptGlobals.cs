@@ -58,6 +58,10 @@ public class ScriptGlobals
     public CardType CardType_Debuff => CardType.Debuff;
     public CardType CardType_Utility => CardType.Utility;
 
+    // Stat scaling settings
+    public double AttackPercentPerPoint { get; set; } = 2.0;
+    public double DefensePercentPerPoint { get; set; } = 2.0;
+
     // Logging
     public void Log(string message)
     {
@@ -67,9 +71,16 @@ public class ScriptGlobals
     // Helper methods
     public void DealDamage(Character target, int amount)
     {
-        // Calculate defense reduction
+        // Apply attacker's attack percentage bonus
+        var attacker = target == Battle.Player ? Battle.Opponent : Battle.Player;
+        int attackStat = attacker.BattleStats.Attack;
+        double attackMultiplier = 1.0 + (attackStat * AttackPercentPerPoint / 100.0);
+        int boostedAmount = (int)(amount * attackMultiplier);
+
+        // Apply target's defense percentage reduction
         int defense = target.BattleStats.Defense;
-        int damageAfterDefense = Math.Max(1, amount - defense);
+        double defenseMultiplier = Math.Max(0, 1.0 - (defense * DefensePercentPerPoint / 100.0));
+        int damageAfterDefense = Math.Max(1, (int)(boostedAmount * defenseMultiplier));
 
         // Execute OnTakeDamage hooks for the target
         var targetStatuses = target == Battle.Player ? Battle.PlayerStatuses : Battle.OpponentStatuses;
@@ -111,11 +122,11 @@ public class ScriptGlobals
         var displayName = GetDisplayName(target);
         if (finalDamage != damageAfterDefense)
         {
-            Log($"{displayName} takes {finalDamage} damage (reduced from {damageAfterDefense} by effects)!");
+            Log($"{displayName} takes {finalDamage} damage (modified from {damageAfterDefense} by effects)!");
         }
-        else if (defense > 0)
+        else if (boostedAmount != amount || defense > 0)
         {
-            Log($"{displayName} takes {finalDamage} damage (reduced from {amount} by defense)!");
+            Log($"{displayName} takes {finalDamage} damage (base {amount}, +{attackStat} atk, -{defense} def)!");
         }
         else
         {

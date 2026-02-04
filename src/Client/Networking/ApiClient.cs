@@ -462,6 +462,8 @@ public class ServerSettings
     public int BaseQueueSlots { get; set; } = 3;
     public int StatPointsPerLevel { get; set; } = 1;
     public int HpPerStatPoint { get; set; } = 5;
+    public double AttackPercentPerPoint { get; set; } = 2.0;
+    public double DefensePercentPerPoint { get; set; } = 2.0;
     public int AutoBattleWatchDelayMs { get; set; } = 500;
 }
 
