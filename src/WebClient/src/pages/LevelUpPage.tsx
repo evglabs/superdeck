@@ -27,9 +27,9 @@ export function LevelUpPage() {
 
   // Booster pack actions
   const [addIndices, setAddIndices] = useState<Set<number>>(new Set())
-  const [cardsToRemove, setCardsToRemove] = useState<string[]>([])
+  const [removeIndices, setRemoveIndices] = useState<Set<number>>(new Set())
   const maxActions = 3
-  const actionsUsed = addIndices.size + cardsToRemove.length
+  const actionsUsed = addIndices.size + removeIndices.size
 
   // Stats
   const [attack, setAttack] = useState(0)
@@ -55,7 +55,7 @@ export function LevelUpPage() {
     if (!characterId) return
     setPackLoading(true)
     setAddIndices(new Set())
-    setCardsToRemove([])
+    setRemoveIndices(new Set())
     try {
       const p = await api.generatePack(characterId)
       setPack(p)
@@ -85,14 +85,20 @@ export function LevelUpPage() {
     })
   }
 
-  const toggleRemoveCard = (cardId: string) => {
-    setCardsToRemove(prev => {
-      if (prev.includes(cardId)) return prev.filter(x => x !== cardId)
-      if (actionsUsed >= maxActions) return prev
-      // Enforce min deck size
-      const currentSize = (currentCharacter?.deckCardIds.length ?? 0) - prev.length
-      if (currentSize <= 6) return prev
-      return [...prev, cardId]
+  const toggleRemoveCard = (index: number) => {
+    setRemoveIndices(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) {
+        next.delete(index)
+      } else if (actionsUsed >= maxActions) {
+        return prev
+      } else {
+        // Enforce min deck size
+        const currentSize = (currentCharacter?.deckCardIds.length ?? 0) - prev.size
+        if (currentSize <= 6) return prev
+        next.add(index)
+      }
+      return next
     })
   }
 
@@ -100,8 +106,9 @@ export function LevelUpPage() {
     if (!characterId) return
     setSaving(true)
     try {
-      if (cardsToRemove.length > 0) {
-        await api.removeCards(characterId, cardsToRemove)
+      if (removeIndices.size > 0) {
+        const cardIds = Array.from(removeIndices).map(i => deckCards[i].id)
+        await api.removeCards(characterId, cardIds)
       }
       if (addIndices.size > 0) {
         const cardIds = Array.from(addIndices).map(i => sortedPackCards[i].id)
@@ -234,16 +241,15 @@ export function LevelUpPage() {
       </div>
 
       {/* Pending actions */}
-      {(addIndices.size > 0 || cardsToRemove.length > 0) && (
+      {(addIndices.size > 0 || removeIndices.size > 0) && (
         <div className="panel" style={{ fontSize: '0.9rem' }}>
           <div style={{ fontWeight: 600, marginBottom: 4 }}>Pending Actions</div>
           {Array.from(addIndices).map(i => (
             <div key={i} style={{ color: '#22c55e' }}>+ ADD {sortedPackCards[i].name}</div>
           ))}
-          {cardsToRemove.map(cid => {
-            const dc = deckCards.find(x => x.id === cid)
-            return <div key={cid} style={{ color: '#ef4444' }}>- REMOVE {dc?.card.name ?? cid}</div>
-          })}
+          {Array.from(removeIndices).map(i => (
+            <div key={i} style={{ color: '#ef4444' }}>- REMOVE {deckCards[i]?.card.name ?? deckCards[i]?.id}</div>
+          ))}
         </div>
       )}
 
@@ -254,12 +260,12 @@ export function LevelUpPage() {
             Remove card from deck ({deckCards.length} cards, min 6)
           </summary>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, maxHeight: 300, overflowY: 'auto' }}>
-            {deckCards.filter(dc => !cardsToRemove.includes(dc.id)).map((dc, i) => (
+            {deckCards.map((dc, i) => removeIndices.has(i) ? null : (
               <CardDisplay
-                key={`${dc.id}-${i}`}
+                key={`deck-${i}`}
                 card={dc.card}
                 compact
-                onClick={() => toggleRemoveCard(dc.id)}
+                onClick={() => toggleRemoveCard(i)}
               />
             ))}
           </div>
@@ -268,11 +274,11 @@ export function LevelUpPage() {
 
       <div className="flex gap-2">
         <button className="btn-secondary" onClick={handleConfirmPack} disabled={saving}>
-          {addIndices.size === 0 && cardsToRemove.length === 0 ? 'Skip' : 'Done'}
+          {addIndices.size === 0 && removeIndices.size === 0 ? 'Skip' : 'Done'}
         </button>
-        {(addIndices.size > 0 || cardsToRemove.length > 0) && (
+        {(addIndices.size > 0 || removeIndices.size > 0) && (
           <button className="btn-primary" onClick={handleConfirmPack} disabled={saving}>
-            {saving ? 'Applying...' : `Confirm (${addIndices.size} add, ${cardsToRemove.length} remove)`}
+            {saving ? 'Applying...' : `Confirm (${addIndices.size} add, ${removeIndices.size} remove)`}
           </button>
         )}
       </div>
