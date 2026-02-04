@@ -10,14 +10,16 @@ public class BattleUI
     private readonly ApiClient _apiClient;
     private BattleState _state;
     private readonly string _battleId;
+    private readonly int _watchDelayMs;
     private int _lastLogIndex = 0;
     private bool _autoBattleEnabled = false;
 
-    public BattleUI(ApiClient apiClient, BattleState initialState, string battleId)
+    public BattleUI(ApiClient apiClient, BattleState initialState, string battleId, int watchDelayMs = 500)
     {
         _apiClient = apiClient;
         _state = initialState;
         _battleId = battleId;
+        _watchDelayMs = watchDelayMs;
     }
 
     public async Task RunBattleAsync()
@@ -41,7 +43,7 @@ public class BattleUI
             else
             {
                 // Auto-refresh state for other phases
-                await Task.Delay(300);
+                await Task.Delay(Math.Max(_watchDelayMs / 2, 100));
                 var newState = await _apiClient.GetBattleStateAsync(_battleId);
                 if (newState != null)
                 {
@@ -56,7 +58,7 @@ public class BattleUI
     private async Task HandleAutoQueuePhaseAsync()
     {
         AnsiConsole.MarkupLine("[cyan][[AUTO-BATTLE]] Selecting cards...[/]");
-        await Task.Delay(500);
+        await Task.Delay(_watchDelayMs);
 
         var result = await _apiClient.AutoQueueCardsAsync(_battleId);
         if (result.Valid)

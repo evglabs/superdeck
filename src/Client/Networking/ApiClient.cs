@@ -461,6 +461,7 @@ public class ServerSettings
     public int MaxLevel { get; set; } = 10;
     public int BaseQueueSlots { get; set; } = 3;
     public int StatPointsPerLevel { get; set; } = 1;
+    public int AutoBattleWatchDelayMs { get; set; } = 500;
 }
 
 public class InstantBattleResult
