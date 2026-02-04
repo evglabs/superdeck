@@ -22,8 +22,8 @@ public class MariaDbDatabaseSeeder : IDatabaseSeeder
 
         connection.Execute(@"
             CREATE TABLE IF NOT EXISTS GhostSnapshots (
-                Id VARCHAR(36) PRIMARY KEY,
-                SourceCharacterId VARCHAR(36) NOT NULL,
+                Id VARCHAR(128) PRIMARY KEY,
+                SourceCharacterId VARCHAR(128) NOT NULL,
                 SerializedCharacterState TEXT NOT NULL,
                 GhostMMR INT DEFAULT 1000,
                 Wins INT DEFAULT 0,
@@ -35,6 +35,10 @@ public class MariaDbDatabaseSeeder : IDatabaseSeeder
                 INDEX idx_ghosts_mmr (GhostMMR)
             )
         ");
+
+        // Widen columns on existing tables that were created with VARCHAR(36)
+        connection.Execute("ALTER TABLE GhostSnapshots MODIFY Id VARCHAR(128)");
+        connection.Execute("ALTER TABLE GhostSnapshots MODIFY SourceCharacterId VARCHAR(128)");
     }
 
     private async Task<bool> GhostExistsAsync(string ghostId)
