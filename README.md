@@ -16,8 +16,11 @@ A deck-building superhero card game with fully moddable cards powered by runtime
 ### Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- [Node.js 18+](https://nodejs.org/) (for web client only)
 
 ### Run the Game
+
+#### Console Client
 
 ```bash
 # Clone the repository
@@ -28,14 +31,19 @@ cd superdeck
 ./run_client.sh
 ```
 
-Or manually:
+Select **"Offline (Local Server)"** to start playing immediately.
+
+#### Web Client
 
 ```bash
-dotnet build
-dotnet run --project src/Client
+# Terminal 1: Start the server
+dotnet run --project src/Server
+
+# Terminal 2: Start the web client
+./run_webclient.sh
 ```
 
-Select **"Offline (Local Server)"** to start playing immediately.
+Open `http://localhost:5173` in your browser.
 
 ## Game Overview
 
@@ -77,7 +85,8 @@ Each battle round consists of:
 | [Architecture](docs/ARCHITECTURE.md) | Technical system design |
 | [API Reference](docs/API.md) | REST API documentation |
 | [File Locations](docs/FILES.md) | Where data is stored |
-| [Client Setup](docs/CLIENT-SETUP.md) | Dedicated client machine setup |
+| [Web Client](docs/WEBCLIENT.md) | Web client setup, deployment, architecture |
+| [Client Setup](docs/CLIENT-SETUP.md) | Dedicated console client machine setup |
 
 ## Project Structure
 
@@ -87,6 +96,7 @@ superdeck/
 │   ├── Core/           # Shared domain models & scripting engine
 │   ├── Server/         # ASP.NET Core API server
 │   ├── Client/         # Spectre.Console CLI client
+│   ├── WebClient/      # React browser client
 │   └── Tools/          # Utility projects
 ├── tests/              # Unit tests
 ├── docs/               # Documentation
@@ -99,7 +109,8 @@ superdeck/
 |-----------|------------|
 | Runtime | .NET 10 |
 | Server | ASP.NET Core Minimal API |
-| Client UI | Spectre.Console |
+| Console Client | Spectre.Console |
+| Web Client | React 19 + TypeScript + Vite |
 | Scripting | Roslyn C# Scripting |
 | Database | SQLite (offline) / MariaDB (online) |
 | ORM | Dapper |

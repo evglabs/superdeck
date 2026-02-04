@@ -84,10 +84,16 @@ For development with separate server/client:
 # Terminal 1: Start server
 dotnet run --project src/Server
 
-# Terminal 2: Start client
+# Terminal 2: Start console client
 dotnet run --project src/Client
 # Select "Online" mode and enter: http://localhost:5000
+
+# Or Terminal 2: Start web client
+./run_webclient.sh
+# Open http://localhost:5173 in your browser
 ```
+
+See [Web Client Guide](WEBCLIENT.md) for full web client setup and deployment.
 
 ### 4. Development Database
 
