@@ -611,6 +611,9 @@ app.MapGet("/api/info", (GameSettings settings) => Results.Ok(new
         maxLevel = settings.Character.MaxLevel,
         baseQueueSlots = settings.Battle.BaseQueueSlots,
         statPointsPerLevel = settings.Character.StatPointsPerLevel,
+        attackPerStatPoint = settings.Character.AttackPerStatPoint,
+        defensePerStatPoint = settings.Character.DefensePerStatPoint,
+        speedPerStatPoint = settings.Character.SpeedPerStatPoint,
         hpPerStatPoint = settings.Character.HPPerStatPoint,
         autoBattleWatchDelayMs = settings.AutoBattle.WatchModeDelayMs
     }
