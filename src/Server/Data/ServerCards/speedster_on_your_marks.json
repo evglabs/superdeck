@@ -15,7 +15,7 @@
       "name": "Speed Boost",
       "duration": 2,
       "hooks": {
-        "OnCalculateSpeed": "SpeedBonus += 5; Log(PlayerDisplayName + \" gains +5 speed!\");"
+        "OnCalculateSpeed": "Amount += 5; Log(PlayerDisplayName + \" gains +5 speed!\");"
       }
     }
   }

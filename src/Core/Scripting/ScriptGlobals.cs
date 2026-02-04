@@ -388,7 +388,7 @@ public class ScriptGlobals
         {
             "Attack" => $"Amount += {amount};",
             "Defense" => $"Amount += {amount};",
-            "Speed" => $"SpeedBonus += {amount};",
+            "Speed" => $"Amount += {amount};",
             _ => ""
         };
         var hookType = stat switch
