@@ -59,6 +59,10 @@ public class SQLiteCharacterRepository : ICharacterRepository
                 CREATE INDEX IF NOT EXISTS idx_characters_mmr ON Characters(MMR);
             ");
         }
+
+        // Migration: add BonusHP column if missing
+        try { connection.Execute("ALTER TABLE Characters ADD COLUMN BonusHP INTEGER DEFAULT 0"); }
+        catch { /* column already exists */ }
     }
 
     public async Task<Character?> GetByIdAsync(string id)
@@ -103,8 +107,8 @@ public class SQLiteCharacterRepository : ICharacterRepository
         var row = new CharacterRow(character);
 
         await connection.ExecuteAsync(@"
-            INSERT INTO Characters (Id, Name, Level, XP, Attack, Defense, Speed, DeckCardIds, Wins, Losses, MMR, IsGhost, IsPublished, OwnerPlayerId, CreatedAt, LastModified)
-            VALUES (@Id, @Name, @Level, @XP, @Attack, @Defense, @Speed, @DeckCardIds, @Wins, @Losses, @MMR, @IsGhost, @IsPublished, @OwnerPlayerId, @CreatedAt, @LastModified)",
+            INSERT INTO Characters (Id, Name, Level, XP, Attack, Defense, Speed, BonusHP, DeckCardIds, Wins, Losses, MMR, IsGhost, IsPublished, OwnerPlayerId, CreatedAt, LastModified)
+            VALUES (@Id, @Name, @Level, @XP, @Attack, @Defense, @Speed, @BonusHP, @DeckCardIds, @Wins, @Losses, @MMR, @IsGhost, @IsPublished, @OwnerPlayerId, @CreatedAt, @LastModified)",
             row);
 
         return character;
@@ -118,7 +122,7 @@ public class SQLiteCharacterRepository : ICharacterRepository
         await connection.ExecuteAsync(@"
             UPDATE Characters SET
                 Name = @Name, Level = @Level, XP = @XP,
-                Attack = @Attack, Defense = @Defense, Speed = @Speed,
+                Attack = @Attack, Defense = @Defense, Speed = @Speed, BonusHP = @BonusHP,
                 DeckCardIds = @DeckCardIds, Wins = @Wins, Losses = @Losses,
                 MMR = @MMR, IsGhost = @IsGhost, IsPublished = @IsPublished,
                 LastModified = @LastModified
@@ -167,6 +171,7 @@ internal class CharacterRow
     public int Attack { get; set; }
     public int Defense { get; set; }
     public int Speed { get; set; }
+    public int BonusHP { get; set; }
     public string? DeckCardIds { get; set; }
     public int Wins { get; set; }
     public int Losses { get; set; }
@@ -188,6 +193,7 @@ internal class CharacterRow
         Attack = c.Attack;
         Defense = c.Defense;
         Speed = c.Speed;
+        BonusHP = c.BonusHP;
         DeckCardIds = JsonSerializer.Serialize(c.DeckCardIds);
         Wins = c.Wins;
         Losses = c.Losses;
@@ -208,6 +214,7 @@ internal class CharacterRow
         Attack = Attack,
         Defense = Defense,
         Speed = Speed,
+        BonusHP = BonusHP,
         DeckCardIds = string.IsNullOrEmpty(DeckCardIds)
             ? new List<string>()
             : JsonSerializer.Deserialize<List<string>>(DeckCardIds) ?? new(),

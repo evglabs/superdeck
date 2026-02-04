@@ -219,7 +219,7 @@ app.MapPut("/api/characters/{id}/stats", async (CharacterService characterServic
 {
     try
     {
-        var character = await characterService.AllocateStatsAsync(id, request.Attack, request.Defense, request.Speed);
+        var character = await characterService.AllocateStatsAsync(id, request.Attack, request.Defense, request.Speed, request.BonusHP);
         return character is not null ? Results.Ok(character) : Results.NotFound();
     }
     catch (Exception ex)
@@ -611,6 +611,7 @@ app.MapGet("/api/info", (GameSettings settings) => Results.Ok(new
         maxLevel = settings.Character.MaxLevel,
         baseQueueSlots = settings.Battle.BaseQueueSlots,
         statPointsPerLevel = settings.Character.StatPointsPerLevel,
+        hpPerStatPoint = settings.Character.HPPerStatPoint,
         autoBattleWatchDelayMs = settings.AutoBattle.WatchModeDelayMs
     }
 }))
@@ -627,7 +628,7 @@ app.Run();
 // ========================================
 
 public record CreateCharacterRequest(string Name, Suit SuitChoice, string? PlayerId = null);
-public record UpdateStatsRequest(int Attack, int Defense, int Speed);
+public record UpdateStatsRequest(int Attack, int Defense, int Speed, int BonusHP = 0);
 public record AddCardsRequest(List<string> CardIds);
 public record RemoveCardsRequest(List<string> CardIds);
 public record StartBattleRequest(

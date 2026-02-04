@@ -158,10 +158,10 @@ public class ApiClient : IDisposable
         }
     }
 
-    public async Task<Character> UpdateCharacterStatsAsync(string id, int attack, int defense, int speed)
+    public async Task<Character> UpdateCharacterStatsAsync(string id, int attack, int defense, int speed, int bonusHP = 0)
     {
         var response = await _httpClient.PutAsJsonAsync($"/api/characters/{id}/stats",
-            new { attack, defense, speed }, _jsonOptions);
+            new { attack, defense, speed, bonusHP }, _jsonOptions);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<Character>(_jsonOptions)
             ?? throw new InvalidOperationException("Failed to update character");
@@ -461,6 +461,7 @@ public class ServerSettings
     public int MaxLevel { get; set; } = 10;
     public int BaseQueueSlots { get; set; } = 3;
     public int StatPointsPerLevel { get; set; } = 1;
+    public int HpPerStatPoint { get; set; } = 5;
     public int AutoBattleWatchDelayMs { get; set; } = 500;
 }
 

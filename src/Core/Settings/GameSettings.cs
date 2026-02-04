@@ -46,6 +46,7 @@ public class CharacterSettings
     public int StatPointsPerLevel { get; set; } = 1;
     public int MaxLevel { get; set; } = 10;
     public int MinSpeed { get; set; } = 0;
+    public int HPPerStatPoint { get; set; } = 5;
 }
 
 public class BattleSettings

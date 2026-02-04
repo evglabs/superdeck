@@ -266,7 +266,10 @@ public class GameRunner
         table.AddColumn(new TableColumn("[cyan]Value[/]").Centered());
 
         table.AddRow("Level", $"[bold]{_currentCharacter.Level}[/] / 10");
-        table.AddRow("HP", $"[green]{_currentCharacter.MaxHP}[/]");
+        var hpDisplay = _currentCharacter.BonusHP > 0
+            ? $"[green]{_currentCharacter.MaxHP}[/] [grey](base {100 + _currentCharacter.Level * _serverSettings.HpPerLevel} + {_currentCharacter.BonusHP} bonus)[/]"
+            : $"[green]{_currentCharacter.MaxHP}[/]";
+        table.AddRow("HP", hpDisplay);
         table.AddRow("Attack", $"[red]{_currentCharacter.Attack}[/]");
         table.AddRow("Defense", $"[blue]{_currentCharacter.Defense}[/]");
         table.AddRow("Speed", $"[yellow]{_currentCharacter.Speed}[/]");
@@ -284,7 +287,8 @@ public class GameRunner
     private int GetAvailableStatPoints(Character character)
     {
         int totalAllowed = character.Level * _serverSettings.StatPointsPerLevel;
-        int totalUsed = character.Attack + character.Defense + character.Speed;
+        int hpPoints = character.BonusHP / _serverSettings.HpPerStatPoint;
+        int totalUsed = character.Attack + character.Defense + character.Speed + hpPoints;
         return Math.Max(0, totalAllowed - totalUsed);
     }
 
@@ -509,8 +513,12 @@ public class GameRunner
         AnsiConsole.Clear();
         AnsiConsole.Write(new Rule("[yellow]Allocate Stats[/]").RuleStyle("grey"));
         AnsiConsole.MarkupLine($"[green]Available stat points: {available}[/]");
-        AnsiConsole.MarkupLine($"Current stats: Attack={_currentCharacter!.Attack}, Defense={_currentCharacter.Defense}, Speed={_currentCharacter.Speed}");
+        AnsiConsole.MarkupLine($"Current stats: BonusHP={_currentCharacter!.BonusHP}, Attack={_currentCharacter.Attack}, Defense={_currentCharacter.Defense}, Speed={_currentCharacter.Speed}");
         AnsiConsole.WriteLine();
+
+        var bonusHP = AnsiConsole.Prompt(
+            new TextPrompt<int>($"[green]Bonus HP[/] (current: {_currentCharacter.BonusHP}, increments of {_serverSettings.HpPerStatPoint}):")
+                .DefaultValue(_currentCharacter.BonusHP));
 
         var attack = AnsiConsole.Prompt(
             new TextPrompt<int>($"[red]Attack[/] (current: {_currentCharacter.Attack}):")
@@ -534,7 +542,7 @@ public class GameRunner
         try
         {
             _currentCharacter = await _apiClient.UpdateCharacterStatsAsync(
-                _currentCharacter.Id, attack, defense, speed);
+                _currentCharacter.Id, attack, defense, speed, bonusHP);
             AnsiConsole.MarkupLine("[green]Stats updated successfully![/]");
         }
         catch (Exception ex)
@@ -551,6 +559,7 @@ public class GameRunner
         int attack = _currentCharacter!.Attack;
         int defense = _currentCharacter.Defense;
         int speed = _currentCharacter.Speed;
+        int bonusHP = _currentCharacter.BonusHP;
         int remaining = availablePoints;
 
         while (remaining > 0)
@@ -564,6 +573,7 @@ public class GameRunner
             statsTable.AddColumn("Current");
             statsTable.AddColumn("New");
 
+            statsTable.AddRow("[green]HP[/]", $"+{_currentCharacter.BonusHP}", $"+{bonusHP}");
             statsTable.AddRow("[red]Attack[/]", _currentCharacter.Attack.ToString(), attack.ToString());
             statsTable.AddRow("[blue]Defense[/]", _currentCharacter.Defense.ToString(), defense.ToString());
             statsTable.AddRow("[yellow]Speed[/]", _currentCharacter.Speed.ToString(), speed.ToString());
@@ -576,7 +586,7 @@ public class GameRunner
                 new SelectionPrompt<string>()
                     .Title("[yellow]Add a point to:[/]")
                     .HighlightStyle(new Style(Color.Gold1))
-                    .AddChoices(new[] { "+1 Attack", "+1 Defense", "+1 Speed", "Confirm & Save" }));
+                    .AddChoices(new[] { $"+{_serverSettings.HpPerStatPoint} HP", "+1 Attack", "+1 Defense", "+1 Speed", "Confirm & Save" }));
 
             switch (choice)
             {
@@ -596,13 +606,18 @@ public class GameRunner
                     // Allow saving even with remaining points
                     remaining = 0;
                     break;
+                default:
+                    // HP choice
+                    bonusHP += _serverSettings.HpPerStatPoint;
+                    remaining--;
+                    break;
             }
         }
 
         // Save the stats
         try
         {
-            _currentCharacter = await _apiClient.UpdateCharacterStatsAsync(_currentCharacter.Id, attack, defense, speed);
+            _currentCharacter = await _apiClient.UpdateCharacterStatsAsync(_currentCharacter.Id, attack, defense, speed, bonusHP);
             AnsiConsole.MarkupLine("[green]Stats updated successfully![/]");
         }
         catch (Exception ex)

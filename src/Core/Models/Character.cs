@@ -11,13 +11,14 @@ public class Character
     public int Attack { get; set; } = 0;
     public int Defense { get; set; } = 0;
     public int Speed { get; set; } = 5;  // Default starting speed
+    public int BonusHP { get; set; } = 0;
 
     // Battle-modified stats (reset each battle)
     public BattleStats BattleStats { get; set; } = new();
 
     // Combat state
     public int CurrentHP { get; set; }
-    public int MaxHP => 100 + (Level * 10);
+    public int MaxHP => 100 + (Level * 10) + BonusHP;
 
     // Deck and cards
     public List<string> DeckCardIds { get; set; } = new();

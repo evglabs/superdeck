@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS Characters (
     Attack INTEGER DEFAULT 0,
     Defense INTEGER DEFAULT 0,
     Speed INTEGER DEFAULT 0,
+    BonusHP INTEGER DEFAULT 0,
     DeckCardIds TEXT,
     Wins INTEGER DEFAULT 0,
     Losses INTEGER DEFAULT 0,

@@ -84,13 +84,20 @@ public class CharacterService
         return await _characterRepository.GetByPlayerIdAsync(playerId);
     }
 
-    public async Task<Character?> AllocateStatsAsync(string characterId, int attack, int defense, int speed)
+    public async Task<Character?> AllocateStatsAsync(string characterId, int attack, int defense, int speed, int bonusHP = 0)
     {
         var character = await _characterRepository.GetByIdAsync(characterId);
         if (character == null) return null;
 
+        if (bonusHP < 0 || bonusHP % _settings.Character.HPPerStatPoint != 0)
+        {
+            throw new InvalidOperationException($"BonusHP must be non-negative and a multiple of {_settings.Character.HPPerStatPoint}");
+        }
+
+        int hpPoints = bonusHP / _settings.Character.HPPerStatPoint;
+
         // Validate stat allocation
-        int totalStats = attack + defense + speed;
+        int totalStats = attack + defense + speed + hpPoints;
         int allowedStats = character.Level * _settings.Character.StatPointsPerLevel;
 
         if (totalStats > allowedStats)
@@ -106,6 +113,7 @@ public class CharacterService
         character.Attack = attack;
         character.Defense = defense;
         character.Speed = speed;
+        character.BonusHP = bonusHP;
         character.LastModified = DateTime.UtcNow;
 
         return await _characterRepository.UpdateAsync(character);
@@ -145,7 +153,8 @@ public class CharacterService
     public int GetAvailableStatPoints(Character character)
     {
         int totalAllowed = character.Level * _settings.Character.StatPointsPerLevel;
-        int totalUsed = character.Attack + character.Defense + character.Speed;
+        int hpPoints = character.BonusHP / _settings.Character.HPPerStatPoint;
+        int totalUsed = character.Attack + character.Defense + character.Speed + hpPoints;
         return totalAllowed - totalUsed;
     }
 
