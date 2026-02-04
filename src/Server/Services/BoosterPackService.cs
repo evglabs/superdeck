@@ -101,6 +101,7 @@ public class BoosterPackService
         if (roll < _settings.RarityWeights.CommonThreshold) return Rarity.Common;
         if (roll < _settings.RarityWeights.UncommonThreshold) return Rarity.Uncommon;
         if (roll < _settings.RarityWeights.RareThreshold) return Rarity.Rare;
+        if (roll < _settings.RarityWeights.EpicThreshold) return Rarity.Epic;
         return Rarity.Legendary;
     }
 

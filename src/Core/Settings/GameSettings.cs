@@ -105,7 +105,8 @@ public class RarityWeightSettings
     // Booster pack rarity thresholds (cumulative out of 1000)
     public int CommonThreshold { get; set; } = 600;      // 0-599 = 60%
     public int UncommonThreshold { get; set; } = 900;    // 600-899 = 30%
-    public int RareThreshold { get; set; } = 990;        // 900-989 = 9%
+    public int RareThreshold { get; set; } = 960;        // 900-959 = 6%
+    public int EpicThreshold { get; set; } = 990;        // 960-989 = 3%
     // 990-999 = 1% Legendary
 
     // Starter pack weighted selection
