@@ -457,7 +457,9 @@ public class BattleService
         // System damage after configured round
         if (battle.Round >= _settings.Battle.SystemDamageStartRound)
         {
-            int systemDamage = (int)Math.Pow(_settings.Battle.SystemDamageBase, battle.Round - _settings.Battle.SystemDamageStartRound);
+            int roundsPast = battle.Round - _settings.Battle.SystemDamageStartRound;
+            int systemDamage = (int)Math.Pow(_settings.Battle.SystemDamageBase, roundsPast)
+                + (_settings.Battle.SystemDamagePerRound * roundsPast);
             battle.Player.CurrentHP -= systemDamage;
             battle.Opponent.CurrentHP -= systemDamage;
             battle.Log($"System damage: both players take {systemDamage} damage!");

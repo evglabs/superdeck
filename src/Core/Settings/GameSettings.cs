@@ -56,7 +56,8 @@ public class BattleSettings
     public int CardsDrawnPerTurn { get; set; } = 3;
     public int MinDeckSize { get; set; } = 9;
     public int SystemDamageStartRound { get; set; } = 10;
-    public int SystemDamageBase { get; set; } = 2;
+    public double SystemDamageBase { get; set; } = 1.5;
+    public int SystemDamagePerRound { get; set; } = 0;
     public int DefaultOpponentDeckSize { get; set; } = 9;
     public int GhostSearchRange { get; set; } = 200;
     public int GhostCandidateCount { get; set; } = 10;
