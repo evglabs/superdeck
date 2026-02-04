@@ -16,7 +16,7 @@ export function CharacterCreation() {
   const [name, setName] = useState('')
   const [suit, setSuit] = useState<Suit | null>(null)
   const [starterCards, setStarterCards] = useState<Card[]>([])
-  const [selectedCardIds, setSelectedCardIds] = useState<Set<string>>(new Set())
+  const [selectedIndices, setSelectedIndices] = useState<Set<number>>(new Set())
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -31,7 +31,7 @@ export function CharacterCreation() {
     try {
       const cards = await api.getStarterPack(s)
       setStarterCards(cards)
-      setSelectedCardIds(new Set())
+      setSelectedIndices(new Set())
       setStep('cards')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load starter pack')
@@ -40,13 +40,13 @@ export function CharacterCreation() {
     }
   }
 
-  const toggleCard = (cardId: string) => {
-    setSelectedCardIds(prev => {
+  const toggleCard = (index: number) => {
+    setSelectedIndices(prev => {
       const next = new Set(prev)
-      if (next.has(cardId)) {
-        next.delete(cardId)
+      if (next.has(index)) {
+        next.delete(index)
       } else if (next.size < 3) {
-        next.add(cardId)
+        next.add(index)
       }
       return next
     })
@@ -59,8 +59,9 @@ export function CharacterCreation() {
     try {
       const character = await api.createCharacter(name.trim(), suit, playerId ?? undefined)
 
-      if (selectedCardIds.size > 0) {
-        const updated = await api.addCards(character.id, Array.from(selectedCardIds))
+      if (selectedIndices.size > 0) {
+        const cardIds = Array.from(selectedIndices).map(i => starterCards[i].id)
+        const updated = await api.addCards(character.id, cardIds)
         setCurrentCharacter(updated)
         navigate(`/character/${updated.id}`)
       } else {
@@ -112,19 +113,19 @@ export function CharacterCreation() {
         <div className="panel">
           <div style={{ marginBottom: 12 }}>
             <span style={{ fontWeight: 600 }}>Select up to 3 starter cards</span>
-            <span className="text-muted" style={{ marginLeft: 8 }}>({selectedCardIds.size}/3 selected)</span>
+            <span className="text-muted" style={{ marginLeft: 8 }}>({selectedIndices.size}/3 selected)</span>
           </div>
 
           {starterCards.length === 0 ? (
             <p className="text-muted">No starter cards available for {suit}.</p>
           ) : (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
-              {starterCards.map(card => (
+              {starterCards.map((card, i) => (
                 <CardDisplay
-                  key={card.id}
+                  key={`${card.id}-${i}`}
                   card={card}
-                  selected={selectedCardIds.has(card.id)}
-                  onClick={() => toggleCard(card.id)}
+                  selected={selectedIndices.has(i)}
+                  onClick={() => toggleCard(i)}
                 />
               ))}
             </div>
@@ -133,7 +134,7 @@ export function CharacterCreation() {
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="btn-secondary" onClick={() => setStep('suit')}>Back</button>
             <button className="btn-primary" onClick={handleCreate}>
-              {selectedCardIds.size > 0 ? `Create with ${selectedCardIds.size} card(s)` : 'Create (no extra cards)'}
+              {selectedIndices.size > 0 ? `Create with ${selectedIndices.size} card(s)` : 'Create (no extra cards)'}
             </button>
           </div>
         </div>

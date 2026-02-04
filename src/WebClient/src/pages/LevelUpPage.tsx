@@ -26,10 +26,10 @@ export function LevelUpPage() {
   const [packLoading, setPackLoading] = useState(false)
 
   // Booster pack actions
-  const [cardsToAdd, setCardsToAdd] = useState<Card[]>([])
+  const [addIndices, setAddIndices] = useState<Set<number>>(new Set())
   const [cardsToRemove, setCardsToRemove] = useState<string[]>([])
   const maxActions = 3
-  const actionsUsed = cardsToAdd.length + cardsToRemove.length
+  const actionsUsed = addIndices.size + cardsToRemove.length
 
   // Stats
   const [attack, setAttack] = useState(0)
@@ -41,6 +41,10 @@ export function LevelUpPage() {
   const [detailCard, setDetailCard] = useState<Card | null>(null)
   const [deckCards, setDeckCards] = useState<{ id: string; card: Card }[]>([])
 
+  const sortedPackCards = pack?.cards
+    ? [...pack.cards].sort((a, b) => a.rarity.localeCompare(b.rarity) || a.name.localeCompare(b.name))
+    : []
+
   useEffect(() => {
     if (currentLevel < levelsGained) {
       loadPack()
@@ -50,7 +54,7 @@ export function LevelUpPage() {
   const loadPack = async () => {
     if (!characterId) return
     setPackLoading(true)
-    setCardsToAdd([])
+    setAddIndices(new Set())
     setCardsToRemove([])
     try {
       const p = await api.generatePack(characterId)
@@ -67,12 +71,17 @@ export function LevelUpPage() {
     }
   }
 
-  const toggleAddCard = (card: Card) => {
-    setCardsToAdd(prev => {
-      const exists = prev.find(c => c.id === card.id)
-      if (exists) return prev.filter(c => c.id !== card.id)
-      if (actionsUsed >= maxActions) return prev
-      return [...prev, card]
+  const toggleAddCard = (index: number) => {
+    setAddIndices(prev => {
+      const next = new Set(prev)
+      if (next.has(index)) {
+        next.delete(index)
+      } else if (actionsUsed >= maxActions) {
+        return prev
+      } else {
+        next.add(index)
+      }
+      return next
     })
   }
 
@@ -94,8 +103,9 @@ export function LevelUpPage() {
       if (cardsToRemove.length > 0) {
         await api.removeCards(characterId, cardsToRemove)
       }
-      if (cardsToAdd.length > 0) {
-        await api.addCards(characterId, cardsToAdd.map(c => c.id))
+      if (addIndices.size > 0) {
+        const cardIds = Array.from(addIndices).map(i => sortedPackCards[i].id)
+        await api.addCards(characterId, cardIds)
       }
       await refreshCharacter(characterId)
 
@@ -199,10 +209,6 @@ export function LevelUpPage() {
   // Pack step
   if (packLoading) return <div className="page"><LoadingSpinner message="Generating booster pack..." /></div>
 
-  const sortedPackCards = pack?.cards
-    ? [...pack.cards].sort((a, b) => a.rarity.localeCompare(b.rarity) || a.name.localeCompare(b.name))
-    : []
-
   return (
     <div className="page">
       <h1 className="page-title" style={{ color: '#eab308' }}>
@@ -220,19 +226,19 @@ export function LevelUpPage() {
             <CardDisplay
               key={`${card.id}-${i}`}
               card={card}
-              selected={cardsToAdd.some(c => c.id === card.id)}
-              onClick={() => toggleAddCard(card)}
+              selected={addIndices.has(i)}
+              onClick={() => toggleAddCard(i)}
             />
           ))}
         </div>
       </div>
 
       {/* Pending actions */}
-      {(cardsToAdd.length > 0 || cardsToRemove.length > 0) && (
+      {(addIndices.size > 0 || cardsToRemove.length > 0) && (
         <div className="panel" style={{ fontSize: '0.9rem' }}>
           <div style={{ fontWeight: 600, marginBottom: 4 }}>Pending Actions</div>
-          {cardsToAdd.map(c => (
-            <div key={c.id} style={{ color: '#22c55e' }}>+ ADD {c.name}</div>
+          {Array.from(addIndices).map(i => (
+            <div key={i} style={{ color: '#22c55e' }}>+ ADD {sortedPackCards[i].name}</div>
           ))}
           {cardsToRemove.map(cid => {
             const dc = deckCards.find(x => x.id === cid)
@@ -262,11 +268,11 @@ export function LevelUpPage() {
 
       <div className="flex gap-2">
         <button className="btn-secondary" onClick={handleConfirmPack} disabled={saving}>
-          {cardsToAdd.length === 0 && cardsToRemove.length === 0 ? 'Skip' : 'Done'}
+          {addIndices.size === 0 && cardsToRemove.length === 0 ? 'Skip' : 'Done'}
         </button>
-        {(cardsToAdd.length > 0 || cardsToRemove.length > 0) && (
+        {(addIndices.size > 0 || cardsToRemove.length > 0) && (
           <button className="btn-primary" onClick={handleConfirmPack} disabled={saving}>
-            {saving ? 'Applying...' : `Confirm (${cardsToAdd.length} add, ${cardsToRemove.length} remove)`}
+            {saving ? 'Applying...' : `Confirm (${addIndices.size} add, ${cardsToRemove.length} remove)`}
           </button>
         )}
       </div>
