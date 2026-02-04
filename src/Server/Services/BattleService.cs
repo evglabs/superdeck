@@ -485,6 +485,13 @@ public class BattleService
 
         foreach (var status in statuses.ToList())
         {
+            // Skip tick on the round the status was applied
+            if (status.JustApplied)
+            {
+                status.JustApplied = false;
+                continue;
+            }
+
             status.RemainingDuration--;
 
             if (status.RemainingDuration <= 0)

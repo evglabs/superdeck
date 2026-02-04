@@ -11,6 +11,7 @@ public class StatusEffect
     public int RemainingDuration { get; set; }
     public string SourceCardId { get; set; } = string.Empty;
     public bool IsBuff { get; set; } = true;  // True for buffs, false for debuffs
+    public bool JustApplied { get; set; } = true;  // Skip first duration tick
 
     // Custom state storage for complex effects (e.g., Battery charge)
     [JsonIgnore]
@@ -40,6 +41,7 @@ public class StatusEffect
             RemainingDuration = RemainingDuration,
             SourceCardId = SourceCardId,
             IsBuff = IsBuff,
+            JustApplied = JustApplied,
             CustomState = new Dictionary<string, object>(CustomState),
             HookScripts = new Dictionary<string, string>(HookScripts),
             CompiledHooks = new Dictionary<HookType, Action<HookContext>>(CompiledHooks)
