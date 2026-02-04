@@ -326,6 +326,23 @@ public class ScriptGlobals
         return statuses.Where(s => s.IsBuff).ToList();
     }
 
+    // Add queue slots for a character (capped at MaxQueueSlots)
+    public void AddQueueSlots(Character target, int slots)
+    {
+        if (target == Battle.Player || ReferenceEquals(target, Battle.Player))
+        {
+            Battle.CurrentPlayerQueueSlots = Math.Min(
+                Battle.CurrentPlayerQueueSlots + slots,
+                Battle.MaxQueueSlots);
+        }
+        else
+        {
+            Battle.CurrentOpponentQueueSlots = Math.Min(
+                Battle.CurrentOpponentQueueSlots + slots,
+                Battle.MaxQueueSlots);
+        }
+    }
+
     // Remove current status (for use in status hooks)
     public void RemoveStatus()
     {

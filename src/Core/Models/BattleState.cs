@@ -56,8 +56,6 @@ public class BattleState
 
     // Turn tracking
     public int CardsPlayedThisTurn { get; set; } = 0;
-    public int QueueSize { get; set; } = 3;  // Current queue size for active player
-    public int OpponentQueueSize { get; set; } = 3;
 
     // Special mechanics
     public bool AllowDeckQueue { get; set; } = false;  // Super Intelligence

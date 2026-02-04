@@ -15,7 +15,7 @@
       "name": "Ready to Run",
       "duration": 1,
       "hooks": {
-        "OnQueuePhaseStart": "int extraSlots = Player.Speed / 2; Battle.QueueSize += extraSlots; Log(PlayerDisplayName + \" gains \" + extraSlots + \" extra queue slots from speed!\");"
+        "OnQueuePhaseStart": "int extraSlots = Player.Speed / 2; AddQueueSlots(Player, extraSlots); Log(PlayerDisplayName + \" gains \" + extraSlots + \" extra queue slots from speed!\");"
       }
     }
   }
