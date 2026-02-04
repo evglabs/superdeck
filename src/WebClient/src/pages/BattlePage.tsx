@@ -44,6 +44,12 @@ export function BattlePage() {
           <div style={{ fontSize: '0.8rem', marginTop: 4, color: state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
             {state.playerGoesFirst ? 'FIRST' : 'second'}
           </div>
+          <div style={{ fontSize: '0.75rem', marginTop: 4, display: 'flex', gap: 8 }}>
+            <span style={{ color: 'var(--color-text-secondary)' }}>Lv.{state.player.level}</span>
+            <span style={{ color: '#ef4444' }}>ATK {state.player.attack}</span>
+            <span style={{ color: '#3b82f6' }}>DEF {state.player.defense}</span>
+            <span style={{ color: '#eab308' }}>SPD {state.player.speed}</span>
+          </div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Round {state.round}</div>
@@ -53,6 +59,12 @@ export function BattlePage() {
           <HpBar current={state.opponent.currentHP} max={state.opponent.maxHP} label={state.opponent.name} tint="#f87171" />
           <div style={{ fontSize: '0.8rem', marginTop: 4, textAlign: 'right', color: !state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
             {!state.playerGoesFirst ? 'FIRST' : 'second'}
+          </div>
+          <div style={{ fontSize: '0.75rem', marginTop: 4, display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+            <span style={{ color: 'var(--color-text-secondary)' }}>Lv.{state.opponent.level}</span>
+            <span style={{ color: '#ef4444' }}>ATK {state.opponent.attack}</span>
+            <span style={{ color: '#3b82f6' }}>DEF {state.opponent.defense}</span>
+            <span style={{ color: '#eab308' }}>SPD {state.opponent.speed}</span>
           </div>
         </div>
       </div>
