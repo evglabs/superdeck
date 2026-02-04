@@ -632,7 +632,7 @@ public class GameRunner
         try
         {
             var startResult = await _apiClient.StartBattleAsync(_currentCharacter!.Id);
-            var battleUI = new BattleUI(_apiClient, startResult.BattleState, startResult.BattleId);
+            var battleUI = new BattleUI(_apiClient, startResult.BattleState, startResult.BattleId, _serverSettings.AutoBattleWatchDelayMs);
             await battleUI.RunBattleAsync();
 
             // Finalize battle and get results
@@ -717,6 +717,7 @@ public class GameRunner
         const int maxActions = 3;
         var cardsToAdd = new List<(int packIndex, Card card)>();
         var cardsToRemove = new List<string>();
+        var selectedPackIndices = new HashSet<int>();
 
         int ActionsUsed() => cardsToAdd.Count + cardsToRemove.Count;
         int ActionsRemaining() => maxActions - ActionsUsed();
@@ -745,7 +746,7 @@ public class GameRunner
             {
                 var rarityColor = GetRarityColor(card.Rarity);
                 var typeColor = GetTypeColor(card.Type);
-                var isSelected = cardsToAdd.Any(c => c.packIndex == index - 1);
+                var isSelected = selectedPackIndices.Contains(index - 1);
 
                 var desc = card.Description ?? "";
                 if (desc.Length > 40) desc = desc[..37] + "...";
@@ -823,32 +824,32 @@ public class GameRunner
 
             if (action == "Add Card from Pack")
             {
-                var selectedIndices = cardsToAdd.Select(c => c.packIndex).ToHashSet();
-                var availableCards = sortedCards
-                    .Select((card, i) => (packIndex: i, card))
-                    .Where(x => !selectedIndices.Contains(x.packIndex))
+                var availableIndices = Enumerable.Range(0, sortedCards.Count)
+                    .Where(i => !selectedPackIndices.Contains(i))
                     .ToList();
 
-                if (!availableCards.Any())
+                if (!availableIndices.Any())
                 {
                     AnsiConsole.MarkupLine("[yellow]No more cards available to add.[/]");
                     await Task.Delay(500);
                     continue;
                 }
 
-                var cardToAdd = AnsiConsole.Prompt(
-                    new SelectionPrompt<(int packIndex, Card card)>()
+                var selectedIndex = AnsiConsole.Prompt(
+                    new SelectionPrompt<int>()
                         .Title("[yellow]Select a card to add:[/]")
                         .HighlightStyle(new Style(Color.Gold1))
-                        .UseConverter(x =>
+                        .UseConverter(i =>
                         {
-                            var rarityColor = GetRarityColor(x.card.Rarity);
-                            var typeColor = GetTypeColor(x.card.Type);
-                            return $"#{x.packIndex + 1} [{rarityColor}]{Markup.Escape(x.card.Name)}[/] [{typeColor}]({x.card.Type})[/] - {x.card.Suit}";
+                            var c = sortedCards[i];
+                            var rarityColor = GetRarityColor(c.Rarity);
+                            var typeColor = GetTypeColor(c.Type);
+                            return $"#{i + 1} [{rarityColor}]{Markup.Escape(c.Name)}[/] [{typeColor}]({c.Type})[/] - {c.Suit}";
                         })
-                        .AddChoices(availableCards));
+                        .AddChoices(availableIndices));
 
-                cardsToAdd.Add(cardToAdd);
+                selectedPackIndices.Add(selectedIndex);
+                cardsToAdd.Add((selectedIndex, sortedCards[selectedIndex]));
             }
             else if (action == "Remove Card from Deck")
             {
@@ -856,14 +857,20 @@ public class GameRunner
             }
             else if (action == "Undo Add")
             {
-                var cardToUndo = AnsiConsole.Prompt(
-                    new SelectionPrompt<(int packIndex, Card card)>()
+                var addedIndices = cardsToAdd.Select(c => c.packIndex).ToList();
+                var indexToUndo = AnsiConsole.Prompt(
+                    new SelectionPrompt<int>()
                         .Title("[yellow]Select card to undo:[/]")
                         .HighlightStyle(new Style(Color.Gold1))
-                        .UseConverter(x => $"#{x.packIndex + 1} {Markup.Escape(x.card.Name)} ({x.card.Suit})")
-                        .AddChoices(cardsToAdd));
+                        .UseConverter(i =>
+                        {
+                            var c = sortedCards[i];
+                            return $"#{i + 1} {Markup.Escape(c.Name)} ({c.Suit})";
+                        })
+                        .AddChoices(addedIndices));
 
-                cardsToAdd.Remove(cardToUndo);
+                selectedPackIndices.Remove(indexToUndo);
+                cardsToAdd.RemoveAll(c => c.packIndex == indexToUndo);
             }
             else if (action == "Undo Remove")
             {
@@ -886,16 +893,20 @@ public class GameRunner
             }
             else if (action == "View Card Details")
             {
-                var indexedCards = sortedCards.Select((card, i) => (packIndex: i, card)).ToList();
-                var cardToView = AnsiConsole.Prompt(
-                    new SelectionPrompt<(int packIndex, Card card)>()
+                var allIndices = Enumerable.Range(0, sortedCards.Count).ToList();
+                var indexToView = AnsiConsole.Prompt(
+                    new SelectionPrompt<int>()
                         .Title("[yellow]Select a card to view:[/]")
                         .HighlightStyle(new Style(Color.Gold1))
-                        .UseConverter(x => $"#{x.packIndex + 1} {Markup.Escape(x.card.Name)} ({x.card.Suit} - {x.card.Rarity})")
-                        .AddChoices(indexedCards));
+                        .UseConverter(i =>
+                        {
+                            var c = sortedCards[i];
+                            return $"#{i + 1} {Markup.Escape(c.Name)} ({c.Suit} - {c.Rarity})";
+                        })
+                        .AddChoices(allIndices));
 
                 AnsiConsole.Clear();
-                DisplayCardDetails(cardToView.card);
+                DisplayCardDetails(sortedCards[indexToView]);
                 AnsiConsole.MarkupLine("\n[grey]Press any key to continue...[/]");
                 Console.ReadKey(true);
             }
