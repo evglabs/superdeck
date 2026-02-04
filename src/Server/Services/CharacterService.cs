@@ -34,6 +34,7 @@ public class CharacterService
             Attack = _settings.Character.StartingAttack,
             Defense = _settings.Character.StartingDefense,
             Speed = _settings.Character.StartingSpeed,
+            MMR = _settings.MMR.StartingMMR,
             OwnerPlayerId = playerId
         };
 
