@@ -1,4 +1,4 @@
-import { useReducer, useEffect, useCallback, useRef } from 'react'
+import { useReducer, useEffect, useCallback, useRef, useState } from 'react'
 import { api } from '../api/client'
 import type { BattleState, Card } from '../types'
 import type { BattleEvent } from '../types/events'
@@ -56,6 +56,7 @@ export function useBattle(battleId: string) {
   })
 
   const pollingRef = useRef(false)
+  const [speedMultiplier, setSpeedMultiplier] = useState(1)
 
   // Get events from state, defaulting to empty array
   const events: BattleEvent[] = uiState.state?.events ?? []
@@ -73,7 +74,7 @@ export function useBattle(battleId: string) {
   // Animation queue for event playback
   const animation = useAnimationQueue(events, uiState.state, {
     autoPlay: true,
-    speedMultiplier: 1,
+    speedMultiplier,
   })
 
   // Initial load
@@ -194,5 +195,7 @@ export function useBattle(battleId: string) {
     updateLogIndex,
     // Animation controls
     animation,
+    speedMultiplier,
+    setSpeedMultiplier,
   }
 }

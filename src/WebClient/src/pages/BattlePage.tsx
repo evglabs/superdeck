@@ -33,7 +33,7 @@ export function BattlePage() {
   const battle = useBattle(id!)
   const [showForfeit, setShowForfeit] = useState(false)
 
-  const { state, loading, error, autoBattle, animation } = battle
+  const { state, loading, error, autoBattle, animation, speedMultiplier, setSpeedMultiplier } = battle
 
   // Use animated HP values when animation is playing back events
   const isAnimating = animation.isPlaying && !animation.isComplete
@@ -210,6 +210,24 @@ export function BattlePage() {
               Skip
             </button>
           </div>
+          {/* Speed Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 8 }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>Speed:</span>
+            {[0.5, 1, 2, 4].map(speed => (
+              <button
+                key={speed}
+                className={speedMultiplier === speed ? 'btn-primary' : 'btn-secondary'}
+                onClick={() => setSpeedMultiplier(speed)}
+                style={{
+                  padding: '2px 8px',
+                  fontSize: '0.75rem',
+                  minWidth: 36,
+                }}
+              >
+                {speed}x
+              </button>
+            ))}
+          </div>
         </div>
       )}
 
@@ -232,6 +250,24 @@ export function BattlePage() {
             >
               Skip
             </button>
+          </div>
+          {/* Speed Controls */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginLeft: 8 }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>Speed:</span>
+            {[0.5, 1, 2, 4].map(speed => (
+              <button
+                key={speed}
+                className={speedMultiplier === speed ? 'btn-primary' : 'btn-secondary'}
+                onClick={() => setSpeedMultiplier(speed)}
+                style={{
+                  padding: '2px 8px',
+                  fontSize: '0.75rem',
+                  minWidth: 36,
+                }}
+              >
+                {speed}x
+              </button>
+            ))}
           </div>
         </div>
       )}

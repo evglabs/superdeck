@@ -30,6 +30,10 @@ export function useAnimationQueue(
 ): UseAnimationQueueReturn {
   const { autoPlay = true, speedMultiplier = 1 } = options
 
+  // Use ref to make speedMultiplier reactive without recreating callbacks
+  const speedMultiplierRef = useRef(speedMultiplier)
+  speedMultiplierRef.current = speedMultiplier
+
   // Track the index we should start playing from (last fully processed)
   const playbackStartRef = useRef<number>(0)
 
@@ -94,8 +98,8 @@ export function useAnimationQueue(
         applyEvent(event)
         console.log(`[AnimationQueue] Playing event ${nextIndex}: ${event.eventType}`)
 
-        // Schedule next advance
-        const delay = event.suggestedDelayMs / speedMultiplier
+        // Schedule next advance (use ref for reactive speed changes)
+        const delay = event.suggestedDelayMs / speedMultiplierRef.current
         timerRef.current = window.setTimeout(() => {
           advanceEvent()
         }, delay)
@@ -109,7 +113,7 @@ export function useAnimationQueue(
         return prev
       }
     })
-  }, [events, applyEvent, speedMultiplier])
+  }, [events, applyEvent])
 
   // Play animation from current position (or from playbackStart for new events)
   const play = useCallback(() => {
