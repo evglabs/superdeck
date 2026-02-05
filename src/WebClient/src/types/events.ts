@@ -9,6 +9,8 @@ export interface BattleEventBase {
   sequenceNumber: number
   eventType: string
   suggestedDelayMs: number
+  /** Number of battle log entries when this event was emitted */
+  battleLogLength: number
 }
 
 export interface RoundStartEvent extends BattleEventBase {

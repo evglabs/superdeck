@@ -15,6 +15,8 @@ interface UseAnimationQueueReturn {
   currentEvent: BattleEvent | null
   displayedPlayerHP: number
   displayedOpponentHP: number
+  /** Number of log entries to show (synced with current event) */
+  visibleLogLength: number
   play: () => void
   pause: () => void
   skipToEnd: () => void
@@ -217,6 +219,11 @@ export function useAnimationQueue(
     currentEvent,
   }
 
+  // Calculate visible log length based on current event
+  // If not playing or no current event, show full log
+  const visibleLogLength = currentEvent?.battleLogLength ??
+    (events.length > 0 ? events[events.length - 1]?.battleLogLength ?? Infinity : Infinity)
+
   return {
     animationState,
     isPlaying,
@@ -225,6 +232,7 @@ export function useAnimationQueue(
     currentEvent,
     displayedPlayerHP,
     displayedOpponentHP,
+    visibleLogLength,
     play,
     pause,
     skipToEnd,

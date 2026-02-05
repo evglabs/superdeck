@@ -22,6 +22,11 @@ public abstract class BattleEvent
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public int SequenceNumber { get; set; }
     public int SuggestedDelayMs { get; set; } = 400;
+    /// <summary>
+    /// Number of battle log entries that existed when this event was emitted.
+    /// Used by client to sync log display with event playback.
+    /// </summary>
+    public int BattleLogLength { get; set; }
 }
 
 /// <summary>

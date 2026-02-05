@@ -54,11 +54,12 @@ public class BattleState
 
     /// <summary>
     /// Emits a structured event for client playback.
-    /// Automatically assigns sequence number.
+    /// Automatically assigns sequence number and captures current log length.
     /// </summary>
     public void EmitEvent(BattleEvent evt)
     {
         evt.SequenceNumber = _eventSequence++;
+        evt.BattleLogLength = BattleLog.Count;
         Events.Add(evt);
     }
 

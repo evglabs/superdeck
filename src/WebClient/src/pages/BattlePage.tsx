@@ -40,15 +40,15 @@ export function BattlePage() {
   const displayPlayerHP = isAnimating ? animation.displayedPlayerHP : (state?.player.currentHP ?? 0)
   const displayOpponentHP = isAnimating ? animation.displayedOpponentHP : (state?.opponent.currentHP ?? 0)
 
+  // Filter battle log to show only entries up to current animation point
+  const visibleLogEntries = state?.battleLog.slice(0, animation.visibleLogLength) ?? []
+
   if (!state) {
     return <div className="page"><LoadingSpinner message="Loading battle..." /></div>
   }
 
-  // Navigate to result when battle ends
-  if (state.isComplete || state.phase === 'Ended') {
-    navigate(`/battle/${id}/result`, { replace: true })
-    return null
-  }
+  // Battle is complete - show results button instead of auto-navigating
+  const battleEnded = state.isComplete || state.phase === 'Ended'
 
   const isQueuePhase = state.phase === 'Queue'
   const canQueue = isQueuePhase && !autoBattle && state.playerQueue.length < state.currentPlayerQueueSlots
@@ -134,10 +134,12 @@ export function BattlePage() {
         </div>
       )}
 
-      {/* Battle Log */}
+      {/* Battle Log - synced with animation playback */}
       <div style={{ marginBottom: 12 }}>
-        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>Battle Log</div>
-        <BattleLog entries={state.battleLog} newStartIndex={battle.lastLogIndex} />
+        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+          Battle Log {isAnimating && `(${visibleLogEntries.length}/${state.battleLog.length})`}
+        </div>
+        <BattleLog entries={visibleLogEntries} newStartIndex={battle.lastLogIndex} />
       </div>
 
       {/* Queue Display */}
@@ -234,10 +236,31 @@ export function BattlePage() {
         </div>
       )}
 
-      {!isQueuePhase && !autoBattle && !state.isComplete && !isAnimating && !animation.isPaused && (
+      {!isQueuePhase && !autoBattle && !battleEnded && !isAnimating && !animation.isPaused && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <span className="text-muted" style={{ fontSize: '0.9rem' }}>Resolving...</span>
           <div className="spinner" />
+        </div>
+      )}
+
+      {/* Battle Complete - show results button */}
+      {battleEnded && (
+        <div style={{ marginTop: 16, padding: 16, background: 'var(--color-surface)', borderRadius: 8, textAlign: 'center' }}>
+          <div style={{
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            marginBottom: 8,
+            color: state.winnerId === state.player.id ? '#22c55e' : '#ef4444'
+          }}>
+            {state.winnerId === state.player.id ? 'Victory!' : 'Defeat'}
+          </div>
+          <button
+            className="btn-primary"
+            onClick={() => navigate(`/battle/${id}/result`, { replace: true })}
+            style={{ padding: '8px 24px', fontSize: '1rem' }}
+          >
+            Continue to Results
+          </button>
         </div>
       )}
 
