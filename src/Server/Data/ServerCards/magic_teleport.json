@@ -15,7 +15,7 @@
       "name": "Teleport Suspended",
       "duration": 2,
       "hooks": {
-        "OnPlay": "if (!State.ContainsKey(\"suspended\")) State[\"suspended\"] = 0; if ((int)State[\"suspended\"] < 2 && Card != null) { Battle.SuspendedCards.Add(Card); Card = null; State[\"suspended\"] = (int)State[\"suspended\"] + 1; Log(\"Card suspended by Teleport!\"); if ((int)State[\"suspended\"] >= 2) RemoveStatus(); }"
+        "OnPlay": "if (!State.ContainsKey(\"suspended\")) State[\"suspended\"] = 0; if ((int)State[\"suspended\"] < 2 && Card != null) { Battle.SuspendedCards.Add(Card); PreventQueue = true; State[\"suspended\"] = (int)State[\"suspended\"] + 1; Log(\"Card suspended by Teleport!\"); if ((int)State[\"suspended\"] >= 2) RemoveStatus(); }"
       }
     }
   }

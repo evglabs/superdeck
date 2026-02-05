@@ -15,7 +15,7 @@
       "name": "Pitch in Progress",
       "duration": 1,
       "hooks": {
-        "OnPlay": "if (Card != null && !State.ContainsKey(\"pitched\")) { State[\"pitched\"] = true; State[\"pitchedCard\"] = Card; AddStatus(Player, new Status { Name = \"Pitched Card\", Duration = 2, Hooks = new Dictionary<string, string> { { \"OnBuffExpire\", \"var pitched = State[\\\"pitchedCard\\\"]; Battle.EchoCard = pitched; Battle.EchoEffectiveness = 1.50; Log(\\\"The pitch is greenlit! \\\" + pitched.Name + \\\" echoes at 150%!\\\");\" } } }); Log(\"Pitched \" + Card.Name + \" for future echo!\"); }"
+        "OnPlay": "if (Card != null && !State.ContainsKey(\"pitched\")) { State[\"pitched\"] = true; State[\"pitchedCard\"] = Card; AddStatus(Player, new StatusEffect { Name = \"Pitched Card\", Duration = 2, RemainingDuration = 2, HookScripts = new Dictionary<string, string> { { \"OnBuffExpire\", \"var pitched = State[\\\"pitchedCard\\\"]; Battle.EchoCard = pitched; Battle.EchoEffectiveness = 1.50; Log(\\\"The pitch is greenlit! \\\" + pitched.Name + \\\" echoes at 150%!\\\");\" } } }); Log(\"Pitched \" + Card.Name + \" for future echo!\"); }"
       }
     }
   }

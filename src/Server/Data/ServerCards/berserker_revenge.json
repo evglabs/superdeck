@@ -4,7 +4,7 @@
   "suit": "Berserker",
   "type": "Attack",
   "rarity": "Uncommon",
-  "description": "Deal 10 damage. If you received damage this turn, that damage is added to this attack.",
+  "description": "Deal 10 damage plus bonus damage equal to your missing HP (max 50 bonus).",
   "immediateEffect": {
     "target": "Opponent",
     "script": "int baseDamage = 10; int damageTaken = Player.MaxHP - Player.CurrentHP; int bonusDamage = Math.Min(damageTaken, 50); DealDamage(Opponent, baseDamage + bonusDamage);"

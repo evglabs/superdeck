@@ -11,7 +11,7 @@
       "name": "Hand Restriction",
       "duration": 1,
       "hooks": {
-        "OnDrawPhase": "while (OpponentHand.Count > 3) { var card = OpponentHand[OpponentHand.Count - 1]; OpponentHand.RemoveAt(OpponentHand.Count - 1); OpponentDiscard.Add(card); } Log(PlayerDisplayName + \"'s hand is restricted to 3 cards!\");"
+        "OnDrawPhase": "while (OpponentHand.Count > 3) { var card = OpponentHand[OpponentHand.Count - 1]; OpponentHand.RemoveAt(OpponentHand.Count - 1); OpponentDiscard.Add(card); } Log(\"Hand restricted to 3 cards!\");"
       }
     }
   }

@@ -15,7 +15,7 @@
       "name": "Atlantean Sword Equipped",
       "duration": 999,
       "hooks": {
-        "OnDealDamage": "Amount += 6; if (OpponentStatuses.Count > 0) { var randomBuff = OpponentStatuses[Rng.Next(OpponentStatuses.Count)]; randomBuff.RemainingDuration--; Log(\"Atlantean Sword reduces \" + randomBuff.Name + \" duration!\"); }"
+        "OnDealDamage": "if (Card != null && Card.Type == CardType_Attack) { OutgoingDamage += 6; if (OpponentStatuses.Count > 0) { var randomBuff = OpponentStatuses[Rng.Next(OpponentStatuses.Count)]; randomBuff.RemainingDuration--; Log(\"Atlantean Sword reduces \" + randomBuff.Name + \" duration!\"); } }"
       }
     }
   }

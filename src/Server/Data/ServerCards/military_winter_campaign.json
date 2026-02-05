@@ -15,7 +15,7 @@
       "name": "Winter Campaign",
       "duration": 2,
       "hooks": {
-        "OnTakeDamage": "if (OpponentHand.Count > 0) { int idx = Rng.Next(OpponentHand.Count); var discarded = OpponentHand[idx]; OpponentHand.RemoveAt(idx); OpponentDiscard.Add(discarded); Log(OpponentDisplayName + \" loses \" + discarded.Name + \" to the winter!\"); } var buffs = GetBuffs(Opponent); if (buffs.Count > 0) { var buff = buffs[Rng.Next(buffs.Count)]; buff.Duration -= 1; Log(OpponentDisplayName + \"'s \" + buff.Name + \" weakens in the cold!\"); }"
+        "OnTakeDamage": "if (OpponentHand.Count > 0) { int idx = Rng.Next(OpponentHand.Count); var discarded = OpponentHand[idx]; OpponentHand.RemoveAt(idx); OpponentDiscard.Add(discarded); Log(OpponentDisplayName + \" loses \" + discarded.Name + \" to the winter!\"); } var buffs = GetBuffs(Opponent); if (buffs.Count > 0) { var buff = buffs[Rng.Next(buffs.Count)]; buff.RemainingDuration -= 1; Log(OpponentDisplayName + \"'s \" + buff.Name + \" weakens in the cold!\"); }"
       }
     }
   }

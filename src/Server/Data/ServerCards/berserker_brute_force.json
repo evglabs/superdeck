@@ -11,7 +11,8 @@
       "name": "Brute Force",
       "duration": 999,
       "hooks": {
-        "OnPlay": "if (Card != null && Card.Name == \"Punch\") { if (!State.ContainsKey(\"multiplier\")) State[\"multiplier\"] = 1.0; State[\"multiplier\"] = (double)State[\"multiplier\"] * 1.1; Log(\"Brute Force multiplier: \" + State[\"multiplier\"] + \"x!\"); } else if (Card != null && Card.Name != \"Punch\" && !Card.IsWaitCard) { Status.RemainingDuration = 0; Log(\"Brute Force buff lost!\"); }"
+        "OnPlay": "if (Card != null && Card.Name == \"Punch\") { if (!State.ContainsKey(\"multiplier\")) State[\"multiplier\"] = 1.0; State[\"multiplier\"] = (double)State[\"multiplier\"] * 1.1; Log(\"Brute Force multiplier: \" + State[\"multiplier\"] + \"x!\"); } else if (Card != null && Card.Name != \"Punch\" && !Card.IsWaitCard) { Status.RemainingDuration = 0; Log(\"Brute Force buff lost!\"); }",
+        "OnDealDamage": "if (Card != null && Card.Name == \"Punch\") { double mult = State.ContainsKey(\"multiplier\") ? (double)State[\"multiplier\"] : 1.0; OutgoingDamage = (int)(OutgoingDamage * mult); }"
       }
     }
   }

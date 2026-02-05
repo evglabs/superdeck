@@ -15,7 +15,7 @@
       "name": "Death Touch Mark",
       "duration": 99,
       "hooks": {
-        "OnTakeDamage": "if (!State.ContainsKey(\"hits\")) State[\"hits\"] = 0; State[\"hits\"] = (int)State[\"hits\"] + 1; int remaining = 13 - (int)State[\"hits\"]; Log(\"Death Touch: \" + remaining + \" hits remaining!\"); if ((int)State[\"hits\"] >= 13) { Player.CurrentHP = 0; Log(\"Death Touch activates! \" + PlayerDisplayName + \" dies!\"); }"
+        "OnTakeDamage": "if (Card != null && Card.Type == CardType_Attack) { if (!State.ContainsKey(\"hits\")) State[\"hits\"] = 0; State[\"hits\"] = (int)State[\"hits\"] + 1; int remaining = 13 - (int)State[\"hits\"]; Log(\"Death Touch: \" + remaining + \" hits remaining!\"); if ((int)State[\"hits\"] >= 13) { Player.CurrentHP = 0; Log(\"Death Touch activates! \" + PlayerDisplayName + \" dies!\"); } }"
       }
     }
   }
