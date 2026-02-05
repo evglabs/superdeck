@@ -283,6 +283,7 @@ a {
 /* Hand container with scroll-snap for mobile */
 .hand-container {
   display: flex;
+  justify-content: center;
   gap: var(--card-gap);
   overflow-x: auto;
   padding-bottom: 8px;

@@ -95,7 +95,7 @@ export function BattlePage() {
       {/* Battle Header */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr auto 1fr',
+        gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 100px 1fr',
         gap: isMobile ? 8 : 16,
         alignItems: 'center', marginBottom: isMobile ? 8 : 16,
       }}>
@@ -180,7 +180,7 @@ export function BattlePage() {
       {/* Hand */}
       {isQueuePhase && (
         <div style={{ marginBottom: isMobile ? 6 : 12 }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>Your Hand</div>
+          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4, textAlign: 'center' }}>Your Hand</div>
           <HandDisplay
             cards={state.playerHand}
             onCardClick={i => { if (canQueue) battle.queueCard(i) }}
