@@ -7,6 +7,6 @@
   "description": "Deal 10 damage with a 25% chance to irradiate (3 damage/turn).",
   "immediateEffect": {
     "target": "Opponent",
-    "script": "DealDamage(Opponent, 10); if (Rng.Next(100) < 25) { ApplyIrradiate(Opponent); Log(OpponentDisplayName + \" is irradiated!\"); }"
+    "script": "DealDamage(Opponent, 10); if (Rng.Next(100) < 25) { ApplyDOT(Opponent, \"Irradiated\", 3, 3); Log(OpponentDisplayName + \" is irradiated!\"); }"
   }
 }

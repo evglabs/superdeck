@@ -70,7 +70,7 @@ public class HookRegistry
         return Enum.TryParse<HookType>(normalizedName, ignoreCase: true, out hookType);
     }
 
-    private static ScriptGlobals CreateGlobalsFromContext(HookContext context)
+    private ScriptGlobals CreateGlobalsFromContext(HookContext context)
     {
         return new ScriptGlobals
         {
@@ -87,7 +87,8 @@ public class HookRegistry
             PreventQueue = context.PreventQueue,
             ExpiringStatus = context.ExpiringStatus,
             Rng = context.Rng,
-            This = context.TriggeringCard ?? new Card()
+            This = context.TriggeringCard ?? new Card(),
+            Compiler = _compiler
         };
     }
 }

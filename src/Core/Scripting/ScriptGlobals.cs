@@ -48,6 +48,9 @@ public class ScriptGlobals
     // RNG
     public Random Rng { get; set; } = null!;
 
+    // Script compiler for dynamic status effects
+    public ScriptCompiler? Compiler { get; set; }
+
     // Custom state access for status effects
     public Dictionary<string, object> State => Status?.CustomState ?? new();
 
@@ -220,6 +223,53 @@ public class ScriptGlobals
 
     public void ApplyStatus(Character target, StatusEffect status)
     {
+        // Compile hooks if HookScripts are present but CompiledHooks are empty
+        if (Compiler != null && status.HookScripts.Count > 0 && status.CompiledHooks.Count == 0)
+        {
+            foreach (var (hookName, script) in status.HookScripts)
+            {
+                if (Enum.TryParse<HookType>(hookName, ignoreCase: true, out var hookType))
+                {
+                    try
+                    {
+                        var compiledAction = Compiler.CompileToActionSync(script);
+                        status.CompiledHooks[hookType] = context =>
+                        {
+                            var globals = new ScriptGlobals
+                            {
+                                Player = context.Player,
+                                Opponent = context.Opponent,
+                                Caster = context.Caster,
+                                Target = context.Target,
+                                Battle = context.Battle,
+                                Status = context.Status,
+                                Amount = context.Amount,
+                                IncomingDamage = context.IncomingDamage,
+                                OutgoingDamage = context.OutgoingDamage,
+                                PreventExpire = context.PreventExpire,
+                                PreventQueue = context.PreventQueue,
+                                ExpiringStatus = context.ExpiringStatus,
+                                Rng = context.Rng,
+                                This = context.TriggeringCard ?? new Card(),
+                                Compiler = Compiler
+                            };
+                            compiledAction(globals);
+                            // Copy back modifiable values
+                            context.Amount = globals.Amount;
+                            context.IncomingDamage = globals.IncomingDamage;
+                            context.OutgoingDamage = globals.OutgoingDamage;
+                            context.PreventExpire = globals.PreventExpire;
+                            context.PreventQueue = globals.PreventQueue;
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        Log($"Warning: Failed to compile hook {hookName}: {ex.Message}");
+                    }
+                }
+            }
+        }
+
         var targetStatuses = target == Player ? PlayerStatuses : OpponentStatuses;
         targetStatuses.Add(status);
         Log($"{GetDisplayName(target)} gains {status.Name}!");
@@ -403,29 +453,6 @@ public class ScriptGlobals
             HookScripts = new Dictionary<string, string>
             {
                 { "OnTurnStart", $"Player.CurrentHP -= {damagePerTurn}; Log(PlayerDisplayName + \" suffers {damagePerTurn} {name} damage!\");" }
-            }
-        };
-        ApplyStatus(target, status);
-    }
-
-    // Helper to apply irradiation (used by multiple radiation cards)
-    public void ApplyIrradiate(Character target, int duration = 3)
-    {
-        ApplyDOT(target, "Irradiated", 3, duration);
-    }
-
-    // Helper to apply Hulkerize buff (doubles attack)
-    public void ApplyHulkerize(Character target, int duration = 3)
-    {
-        var status = new StatusEffect
-        {
-            Name = "Hulkerized",
-            Duration = duration,
-            RemainingDuration = duration,
-            IsBuff = true,
-            HookScripts = new Dictionary<string, string>
-            {
-                { "OnCalculateAttack", "AttackMultiplier *= 2.0; Log(PlayerDisplayName + \" SMASH! Attack doubled!\");" }
             }
         };
         ApplyStatus(target, status);
