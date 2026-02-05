@@ -21,7 +21,7 @@ export function SuitSelector({ value, onChange }: SuitSelectorProps) {
             color: suit === value ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
             fontWeight: suit === value ? 600 : 400,
             fontSize: '0.9rem',
-            boxShadow: suit === value ? '0 0 8px rgba(59,130,246,0.3)' : 'none',
+            boxShadow: suit === value ? '0 0 8px var(--color-shadow-accent)' : 'none',
           }}
         >
           {suit}

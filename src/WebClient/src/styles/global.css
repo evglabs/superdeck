@@ -32,12 +32,30 @@
   --color-accent-hover: #2563eb;
   --color-danger: #ef4444;
   --color-success: #22c55e;
+  --color-overlay-bg: rgba(0,0,0,0.6);
+  --color-shadow-accent: rgba(59,130,246,0.3);
+  --color-brand: #eab308;
 
   /* Responsive sizing */
   --card-width: clamp(120px, 10vw + 80px, 180px);
   --card-gap: clamp(6px, 1vw, 12px);
-  --page-padding: clamp(12px, 3vw, 24px);
+  --page-padding: clamp(8px, 3vw, 24px);
   --section-gap: clamp(8px, 2vw, 16px);
+}
+
+[data-theme="light"] {
+  --color-bg-primary: #f8fafc;
+  --color-bg-secondary: #f1f5f9;
+  --color-bg-card: #e2e8f0;
+  --color-bg-input: #ffffff;
+  --color-text-primary: #1e293b;
+  --color-text-secondary: #64748b;
+  --color-border: #cbd5e1;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-overlay-bg: rgba(0,0,0,0.4);
+  --color-shadow-accent: rgba(59,130,246,0.2);
+  --color-brand: #ca8a04;
 }
 
 *, *::before, *::after {
@@ -231,6 +249,10 @@ a {
   display: flex;
   gap: clamp(12px, 2vw, 24px);
   padding: var(--page-padding);
+  max-width: min(1600px, 100%);
+  margin: 0 auto;
+  min-height: 100%;
+  align-items: flex-start;
 }
 
 @media (max-width: 899px) {
@@ -245,8 +267,11 @@ a {
 }
 
 .battle-sidebar {
-  width: clamp(220px, 25vw, 300px);
+  width: clamp(240px, 28vw, 320px);
   flex-shrink: 0;
+  position: sticky;
+  top: 16px;
+  align-self: flex-start;
 }
 
 @media (max-width: 899px) {

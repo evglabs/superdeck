@@ -44,7 +44,7 @@ export function CardDisplay({ card, selected, onClick, compact, responsive }: Ca
         padding: '12px 14px',
         cursor: onClick ? 'pointer' : 'default',
         border: selected ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
-        boxShadow: selected ? '0 0 12px rgba(59,130,246,0.3)' : 'none',
+        boxShadow: selected ? '0 0 12px var(--color-shadow-accent)' : 'none',
         transition: 'transform 0.15s, box-shadow 0.15s',
         width: responsive ? 'var(--card-width)' : 180,
         flexShrink: 0,

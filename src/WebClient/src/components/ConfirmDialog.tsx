@@ -11,7 +11,7 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({ title, message, confirmLabel = 'Confirm', cancelLabel = 'Cancel', danger, onConfirm, onCancel }: ConfirmDialogProps) {
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+      position: 'fixed', inset: 0, background: 'var(--color-overlay-bg)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
     }} onClick={onCancel}>
       <div className="panel" style={{ maxWidth: 400, width: '90%' }} onClick={e => e.stopPropagation()}>

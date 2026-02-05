@@ -10,7 +10,7 @@ export function CardDetailModal({ card, onClose }: CardDetailModalProps) {
   return (
     <div
       style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
+        position: 'fixed', inset: 0, background: 'var(--color-overlay-bg)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100,
       }}
       onClick={onClose}

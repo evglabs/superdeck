@@ -1,10 +1,12 @@
 import { Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useGame } from '../context/GameContext'
+import { useTheme } from '../context/ThemeContext'
 
 export function Layout() {
   const { isAuthenticated, username, logout } = useAuth()
   const { serverOnline } = useGame()
+  const { theme, toggleTheme } = useTheme()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -26,7 +28,7 @@ export function Layout() {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span
-            style={{ fontWeight: 700, fontSize: 'clamp(1rem, 2vw + 0.5rem, 1.25rem)', color: '#eab308', cursor: 'pointer' }}
+            style={{ fontWeight: 700, fontSize: 'clamp(1rem, 2vw + 0.5rem, 1.25rem)', color: 'var(--color-brand)', cursor: 'pointer' }}
             onClick={() => navigate('/menu')}
           >
             SuperDeck
@@ -39,14 +41,24 @@ export function Layout() {
             background: serverOnline ? 'var(--color-success)' : 'var(--color-danger)',
           }} />
         </div>
-        {isAuthenticated && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{username}</span>
-            <button className="btn-secondary" style={{ padding: '4px 12px', fontSize: '0.85rem' }} onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        )}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button
+            className="btn-secondary"
+            onClick={toggleTheme}
+            style={{ padding: '4px 10px', fontSize: '1rem', lineHeight: 1 }}
+            aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          >
+            {theme === 'dark' ? '\u2600' : '\u263E'}
+          </button>
+          {isAuthenticated && (
+            <>
+              <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>{username}</span>
+              <button className="btn-secondary" style={{ padding: '4px 12px', fontSize: '0.85rem' }} onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          )}
+        </div>
       </header>
       <main style={{ flex: 1 }}>
         <Outlet />
