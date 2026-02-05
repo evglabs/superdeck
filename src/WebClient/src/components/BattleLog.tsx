@@ -41,8 +41,8 @@ export function BattleLog({ entries, newStartIndex, collapsible }: BattleLogProp
           borderRadius: 6,
           padding: shouldCollapse && collapsed ? 0 : '8px 12px',
           maxHeight: shouldCollapse && collapsed ? 0 : (isMobile ? 'min(150px, 25vh)' : 'calc(100vh - 200px)'),
-          overflowY: 'auto',
-          overflow: shouldCollapse && collapsed ? 'hidden' : undefined,
+          overflowX: 'hidden',
+          overflowY: shouldCollapse && collapsed ? 'hidden' : 'auto',
           fontSize: '0.85rem',
           lineHeight: 1.6,
         }}

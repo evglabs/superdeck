@@ -137,20 +137,15 @@ export function BattlePage() {
         )}
       </div>
 
-      {/* Status Effects */}
-      {(state.playerStatuses.length > 0 || state.opponentStatuses.length > 0) && (() => {
-        const maxBadges = isMobile ? 3 : 6
-        return (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? 8 : 16, marginBottom: 12, minWidth: 0 }}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, minWidth: 0 }}>
-              {renderStatusBadges(state.playerStatuses, maxBadges)}
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'flex-end', minWidth: 0 }}>
-              {renderStatusBadges(state.opponentStatuses, maxBadges)}
-            </div>
-          </div>
-        )
-      })()}
+      {/* Status Effects - always rendered with minHeight to prevent layout shift */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? 8 : 16, marginBottom: 12, minHeight: 28, minWidth: 0 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, minWidth: 0 }}>
+          {renderStatusBadges(state.playerStatuses, isMobile ? 3 : 6)}
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'flex-end', minWidth: 0 }}>
+          {renderStatusBadges(state.opponentStatuses, isMobile ? 3 : 6)}
+        </div>
+      </div>
 
       {/* Revealed Opponent Info */}
       {state.opponentQueueRevealed && state.opponentQueue.length > 0 && (
@@ -308,8 +303,8 @@ export function BattlePage() {
         </div>
       )}
 
-      {/* Battle Complete - show results button */}
-      {battleEnded && (
+      {/* Battle Complete - show results button only after all events have played */}
+      {battleEnded && animation.isComplete && (
         <div style={{ marginTop: 16, padding: 16, background: 'var(--color-surface)', borderRadius: 8, textAlign: 'center' }}>
           <div style={{
             fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
@@ -331,15 +326,13 @@ export function BattlePage() {
 
       </div>{/* End battle-main */}
 
-      {/* Right column: Battle Log - hidden when battle ends */}
-      {!battleEnded && (
-        <div className="battle-sidebar">
-          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>
-            Battle Log {isAnimating && `(${visibleLogEntries.length}/${state.battleLog.length})`}
-          </div>
-          <BattleLog entries={visibleLogEntries} newStartIndex={battle.lastLogIndex} collapsible />
+      {/* Right column: Battle Log */}
+      <div className="battle-sidebar">
+        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+          Battle Log {isAnimating && `(${visibleLogEntries.length}/${state.battleLog.length})`}
         </div>
-      )}
+        <BattleLog entries={visibleLogEntries} newStartIndex={battle.lastLogIndex} collapsible />
+      </div>
 
       {/* Modals */}
       {battle.detailCard && (
