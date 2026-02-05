@@ -60,6 +60,16 @@ export function useBattle(battleId: string) {
   // Get events from state, defaulting to empty array
   const events: BattleEvent[] = uiState.state?.events ?? []
 
+  // Debug: log when events change
+  useEffect(() => {
+    if (uiState.state) {
+      console.log(`[useBattle] State updated - Phase: ${uiState.state.phase}, Events: ${events.length}`)
+      if (events.length > 0) {
+        console.log('[useBattle] First event:', events[0])
+      }
+    }
+  }, [uiState.state, events.length])
+
   // Animation queue for event playback
   const animation = useAnimationQueue(events, uiState.state, {
     autoPlay: true,

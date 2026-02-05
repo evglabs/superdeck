@@ -35,10 +35,10 @@ export function BattlePage() {
 
   const { state, loading, error, autoBattle, animation } = battle
 
-  // Use animated HP values during resolution, final values otherwise
-  const isResolving = state?.phase === 'Resolution'
-  const displayPlayerHP = isResolving ? animation.displayedPlayerHP : (state?.player.currentHP ?? 0)
-  const displayOpponentHP = isResolving ? animation.displayedOpponentHP : (state?.opponent.currentHP ?? 0)
+  // Use animated HP values when animation is playing back events
+  const isAnimating = animation.isPlaying && !animation.isComplete
+  const displayPlayerHP = isAnimating ? animation.displayedPlayerHP : (state?.player.currentHP ?? 0)
+  const displayOpponentHP = isAnimating ? animation.displayedOpponentHP : (state?.opponent.currentHP ?? 0)
 
   if (!state) {
     return <div className="page"><LoadingSpinner message="Loading battle..." /></div>
@@ -61,7 +61,7 @@ export function BattlePage() {
       {/* Event Toast Display */}
       <BattleEventDisplay
         event={animation.currentEvent}
-        isVisible={animation.isPlaying && isResolving}
+        isVisible={isAnimating}
       />
 
       {/* Battle Header */}
@@ -188,31 +188,18 @@ export function BattlePage() {
         </div>
       )}
 
-      {!isQueuePhase && !autoBattle && !state.isComplete && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <span className="text-muted" style={{ fontSize: '0.9rem' }}>Resolving...</span>
-          <div className="spinner" />
-
-          {/* Playback Controls */}
+      {/* Animation Playback Controls - shown when playing events */}
+      {isAnimating && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+          <span style={{ color: '#06b6d4', fontWeight: 600, fontSize: '0.9rem' }}>Playing events...</span>
           <div style={{ display: 'flex', gap: 8 }}>
-            {animation.isPlaying ? (
-              <button
-                className="btn-secondary"
-                onClick={animation.pause}
-                style={{ padding: '4px 12px', fontSize: '0.85rem' }}
-              >
-                Pause
-              </button>
-            ) : (
-              <button
-                className="btn-secondary"
-                onClick={animation.play}
-                style={{ padding: '4px 12px', fontSize: '0.85rem' }}
-                disabled={animation.isComplete}
-              >
-                Play
-              </button>
-            )}
+            <button
+              className="btn-secondary"
+              onClick={animation.pause}
+              style={{ padding: '4px 12px', fontSize: '0.85rem' }}
+            >
+              Pause
+            </button>
             <button
               className="btn-secondary"
               onClick={animation.skipToEnd}
@@ -221,6 +208,36 @@ export function BattlePage() {
               Skip
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Paused playback controls */}
+      {animation.isPaused && !animation.isComplete && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
+          <span style={{ color: '#eab308', fontWeight: 600, fontSize: '0.9rem' }}>Paused</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="btn-primary"
+              onClick={animation.play}
+              style={{ padding: '4px 12px', fontSize: '0.85rem' }}
+            >
+              Resume
+            </button>
+            <button
+              className="btn-secondary"
+              onClick={animation.skipToEnd}
+              style={{ padding: '4px 12px', fontSize: '0.85rem' }}
+            >
+              Skip
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!isQueuePhase && !autoBattle && !state.isComplete && !isAnimating && !animation.isPaused && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <span className="text-muted" style={{ fontSize: '0.9rem' }}>Resolving...</span>
+          <div className="spinner" />
         </div>
       )}
 

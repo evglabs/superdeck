@@ -168,17 +168,19 @@ export function useAnimationQueue(
 
   // Handle new events arriving (e.g., after resolution)
   useEffect(() => {
-    if (events.length > processedEventsRef.current) {
-      // New events have arrived
-      const newEventsStart = processedEventsRef.current
-      processedEventsRef.current = events.length
+    const prevCount = processedEventsRef.current
+    const newCount = events.length
 
-      // If we have new events and autoPlay is enabled, start playing
-      if (autoPlay && newEventsStart > 0 && !isPlaying && !isPaused) {
-        play()
-      } else if (autoPlay && newEventsStart === 0 && events.length > 0) {
-        // First batch of events
-        play()
+    if (newCount > prevCount) {
+      // New events have arrived
+      console.log(`[AnimationQueue] New events: ${prevCount} -> ${newCount}`)
+      processedEventsRef.current = newCount
+
+      // Auto-play new events if enabled and not already playing
+      if (autoPlay && !isPlaying && !isPaused) {
+        console.log('[AnimationQueue] Auto-playing events')
+        // Small delay to ensure state is settled
+        setTimeout(() => play(), 50)
       }
     }
   }, [events.length, autoPlay, isPlaying, isPaused, play])
