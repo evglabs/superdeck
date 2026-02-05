@@ -28,6 +28,23 @@ function StatValue({ label, base, effective, color }: { label: string; base: num
   )
 }
 
+function SpeedControls({ speedMultiplier, setSpeedMultiplier }: { speedMultiplier: number; setSpeedMultiplier: (speed: number) => void }) {
+  return (
+    <div className="speed-controls">
+      <span className="speed-label">Speed:</span>
+      {[0.5, 1, 2, 4].map(speed => (
+        <button
+          key={speed}
+          className={`speed-btn ${speedMultiplier === speed ? 'btn-primary' : 'btn-secondary'}`}
+          onClick={() => setSpeedMultiplier(speed)}
+        >
+          {speed}x
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function renderStatusBadges(statuses: StatusEffect[], max: number) {
   const visible = statuses.slice(0, max)
   const overflow = statuses.length - max
@@ -35,16 +52,7 @@ function renderStatusBadges(statuses: StatusEffect[], max: number) {
     <>
       {visible.map(s => <StatusEffectBadge key={s.id} effect={s} />)}
       {overflow > 0 && (
-        <span style={{
-          display: 'inline-flex', alignItems: 'center',
-          background: 'rgba(148,163,184,0.15)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 12, padding: '2px 10px',
-          fontSize: '0.8rem', color: 'var(--color-text-secondary)',
-          fontWeight: 600,
-        }}>
-          +{overflow} more
-        </span>
+        <span className="status-badge-overflow">+{overflow} more</span>
       )}
     </>
   )
@@ -83,18 +91,13 @@ export function BattlePage() {
       <div className="battle-main">
 
       {/* Battle Header */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr 100px 1fr',
-        gap: isMobile ? 8 : 16,
-        alignItems: 'center', marginBottom: isMobile ? 8 : 16,
-      }}>
-        <div style={{ order: isMobile ? 1 : undefined }}>
+      <div className={`battle-header ${isMobile ? 'battle-header--mobile' : 'battle-header--desktop'}`}>
+        <div className="battle-combatant" style={{ order: isMobile ? 1 : undefined }}>
           <HpBar current={displayPlayerHP} max={state.player.maxHP} label={state.player.name} tint="#60a5fa" />
-          <div style={{ fontSize: '0.8rem', marginTop: 4, color: state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
+          <div style={{ fontSize: '0.8rem', marginTop: 'var(--space-xs)', color: state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
             {state.playerGoesFirst ? 'FIRST' : 'second'}
           </div>
-          <div style={{ fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)', marginTop: 4, display: 'flex', gap: isMobile ? 4 : 8, flexWrap: 'wrap', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div className={`battle-combatant-stats ${isMobile ? 'battle-combatant-stats--mobile' : ''}`}>
             <span style={{ color: 'var(--color-text-secondary)' }}>Lv.{state.player.level}</span>
             <StatValue label="ATK" base={state.player.attack} effective={state.playerEffectiveStats?.attack} color="#ef4444" />
             <StatValue label="DEF" base={state.player.defense} effective={state.playerEffectiveStats?.defense} color="#3b82f6" />
@@ -102,17 +105,17 @@ export function BattlePage() {
           </div>
         </div>
         {!isMobile && (
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Round {state.round}</div>
-            <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{state.phase}</div>
+          <div className="battle-phase-indicator">
+            <div className="battle-phase-round">Round {state.round}</div>
+            <div className="battle-phase-name">{state.phase}</div>
           </div>
         )}
-        <div style={{ order: isMobile ? 2 : undefined }}>
+        <div className="battle-combatant" style={{ order: isMobile ? 2 : undefined }}>
           <HpBar current={displayOpponentHP} max={state.opponent.maxHP} label={state.opponent.name} tint="#f87171" />
-          <div style={{ fontSize: '0.8rem', marginTop: 4, textAlign: 'right', color: !state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
+          <div style={{ fontSize: '0.8rem', marginTop: 'var(--space-xs)', textAlign: 'right', color: !state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
             {!state.playerGoesFirst ? 'FIRST' : 'second'}
           </div>
-          <div style={{ fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)', marginTop: 4, display: 'flex', gap: isMobile ? 4 : 8, justifyContent: 'flex-end', flexWrap: 'wrap', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <div className={`battle-combatant-stats battle-combatant-stats--right ${isMobile ? 'battle-combatant-stats--mobile' : ''}`}>
             <span style={{ color: 'var(--color-text-secondary)' }}>Lv.{state.opponent.level}</span>
             <StatValue label="ATK" base={state.opponent.attack} effective={state.opponentEffectiveStats?.attack} color="#ef4444" />
             <StatValue label="DEF" base={state.opponent.defense} effective={state.opponentEffectiveStats?.defense} color="#3b82f6" />
@@ -120,19 +123,19 @@ export function BattlePage() {
           </div>
         </div>
         {isMobile && (
-          <div style={{ gridColumn: '1 / -1', textAlign: 'center', order: 3 }}>
-            <span style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>Round {state.round}</span>
-            <span style={{ fontSize: '0.9rem', fontWeight: 600, marginLeft: 8 }}>{state.phase}</span>
+          <div className="battle-phase-mobile">
+            <span className="battle-phase-round">Round {state.round}</span>
+            <span className="battle-phase-name" style={{ marginLeft: 'var(--space-sm)' }}>{state.phase}</span>
           </div>
         )}
       </div>
 
       {/* Status Effects - always rendered with minHeight to prevent layout shift */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? 8 : 16, marginBottom: 12, minHeight: 28, minWidth: 0 }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, minWidth: 0 }}>
+      <div className={`battle-status-row ${isMobile ? 'battle-status-row--mobile' : ''}`}>
+        <div className="battle-status-group">
           {renderStatusBadges(state.playerStatuses, isMobile ? 3 : 6)}
         </div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'flex-end', minWidth: 0 }}>
+        <div className="battle-status-group battle-status-group--right">
           {renderStatusBadges(state.opponentStatuses, isMobile ? 3 : 6)}
         </div>
       </div>
@@ -162,15 +165,15 @@ export function BattlePage() {
 
       {/* Queue Display */}
       {isQueuePhase && (
-        <div style={{ marginBottom: isMobile ? 6 : 12 }}>
+        <div style={{ marginBottom: 'var(--space-md)' }}>
           <QueueDisplay queue={state.playerQueue} maxSlots={state.currentPlayerQueueSlots} />
         </div>
       )}
 
       {/* Hand */}
       {isQueuePhase && (
-        <div style={{ marginBottom: isMobile ? 6 : 12 }}>
-          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4, textAlign: 'center' }}>Your Hand</div>
+        <div style={{ marginBottom: 'var(--space-md)' }}>
+          <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-xs)', textAlign: 'center' }}>Your Hand</div>
           <HandDisplay
             cards={state.playerHand}
             onCardClick={i => { if (canQueue) battle.queueCard(i) }}
@@ -181,144 +184,94 @@ export function BattlePage() {
       )}
 
       {/* Error */}
-      {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.9rem', marginBottom: 8 }}>{error}</div>}
+      {error && <div style={{ color: 'var(--color-danger)', fontSize: '0.9rem', marginBottom: 'var(--space-sm)' }}>{error}</div>}
 
-      {/* Action Buttons */}
-      {isQueuePhase && !autoBattle && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          <button className="btn-primary" onClick={battle.confirmQueue} disabled={loading}>
-            Confirm Queue
-          </button>
-          <button className="btn-secondary" onClick={battle.toggleAutoBattle}>
-            Auto-Battle
-          </button>
-          <button className="btn-danger" onClick={() => setShowForfeit(true)}>
-            Forfeit
-          </button>
-        </div>
-      )}
+      {/* Unified Controls Container */}
+      <div className="battle-controls">
+        {/* Queue phase buttons */}
+        {isQueuePhase && !autoBattle && (
+          <>
+            <button className="btn-primary" onClick={battle.confirmQueue} disabled={loading}>
+              Confirm Queue
+            </button>
+            <button className="btn-secondary" onClick={battle.toggleAutoBattle}>
+              Auto-Battle
+            </button>
+            <button className="btn-danger" onClick={() => setShowForfeit(true)}>
+              Forfeit
+            </button>
+          </>
+        )}
 
-      {autoBattle && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <span style={{ color: '#06b6d4', fontWeight: 600, fontSize: '0.9rem' }}>AUTO-BATTLE</span>
-          <div className="spinner" />
-          <button className="btn-secondary" onClick={battle.toggleAutoBattle}>
-            Manual Mode
-          </button>
-        </div>
-      )}
+        {/* Auto-battle indicator */}
+        {autoBattle && (
+          <>
+            <span className="auto-battle-indicator">AUTO-BATTLE</span>
+            <div className="spinner" />
+            <button className="btn-secondary" onClick={battle.toggleAutoBattle}>
+              Manual Mode
+            </button>
+          </>
+        )}
 
-      {/* Animation Playback Controls - shown when playing events */}
-      {isAnimating && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-          <span style={{ color: '#06b6d4', fontWeight: 600, fontSize: '0.9rem' }}>Playing events...</span>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              className="btn-secondary"
-              onClick={animation.pause}
-            >
+        {/* Animation playback controls */}
+        {isAnimating && (
+          <>
+            <span className="playback-status playback-status--playing">Playing events...</span>
+            <button className="btn-secondary" onClick={animation.pause}>
               Pause
             </button>
-            <button
-              className="btn-secondary"
-              onClick={animation.skipToEnd}
-            >
+            <button className="btn-secondary" onClick={animation.skipToEnd}>
               Skip
             </button>
-          </div>
-          {/* Speed Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>Speed:</span>
-            {[0.5, 1, 2, 4].map(speed => (
-              <button
-                key={speed}
-                className={speedMultiplier === speed ? 'btn-primary' : 'btn-secondary'}
-                onClick={() => setSpeedMultiplier(speed)}
-                style={{
-                  padding: '2px 8px',
-                  fontSize: '0.75rem',
-                  minWidth: 36,
-                }}
-              >
-                {speed}x
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+            <SpeedControls speedMultiplier={speedMultiplier} setSpeedMultiplier={setSpeedMultiplier} />
+          </>
+        )}
 
-      {/* Paused playback controls */}
-      {animation.isPaused && !animation.isComplete && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 12 }}>
-          <span style={{ color: '#eab308', fontWeight: 600, fontSize: '0.9rem' }}>Paused</span>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button
-              className="btn-primary"
-              onClick={animation.play}
-            >
+        {/* Paused playback controls */}
+        {animation.isPaused && !animation.isComplete && (
+          <>
+            <span className="playback-status playback-status--paused">Paused</span>
+            <button className="btn-primary" onClick={animation.play}>
               Resume
             </button>
-            <button
-              className="btn-secondary"
-              onClick={animation.skipToEnd}
-            >
+            <button className="btn-secondary" onClick={animation.skipToEnd}>
               Skip
             </button>
-          </div>
-          {/* Speed Controls */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>Speed:</span>
-            {[0.5, 1, 2, 4].map(speed => (
-              <button
-                key={speed}
-                className={speedMultiplier === speed ? 'btn-primary' : 'btn-secondary'}
-                onClick={() => setSpeedMultiplier(speed)}
-                style={{
-                  padding: '2px 8px',
-                  fontSize: '0.75rem',
-                  minWidth: 36,
-                }}
-              >
-                {speed}x
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+            <SpeedControls speedMultiplier={speedMultiplier} setSpeedMultiplier={setSpeedMultiplier} />
+          </>
+        )}
 
-      {!isQueuePhase && !autoBattle && !battleEnded && !isAnimating && !animation.isPaused && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <span className="text-muted" style={{ fontSize: '0.9rem' }}>Resolving...</span>
-          <div className="spinner" />
-        </div>
-      )}
+        {/* Resolving spinner */}
+        {!isQueuePhase && !autoBattle && !battleEnded && !isAnimating && !animation.isPaused && (
+          <>
+            <span className="text-muted" style={{ fontSize: '0.9rem' }}>Resolving...</span>
+            <div className="spinner" />
+          </>
+        )}
 
-      {/* Battle Complete - show results button only after all events have played */}
-      {battleEnded && animation.isComplete && (
-        <div style={{ marginTop: 16, padding: 16, background: 'var(--color-surface)', borderRadius: 8, textAlign: 'center' }}>
-          <div style={{
-            fontSize: 'clamp(1.25rem, 4vw, 1.5rem)',
-            fontWeight: 700,
-            marginBottom: 8,
-            color: state.winnerId === state.player.id ? '#22c55e' : '#ef4444'
-          }}>
-            {state.winnerId === state.player.id ? 'Victory!' : 'Defeat'}
+        {/* Battle complete - show results button */}
+        {battleEnded && animation.isComplete && (
+          <div className="battle-complete-panel">
+            <div className={`battle-complete-title ${state.winnerId === state.player.id ? 'battle-complete-title--victory' : 'battle-complete-title--defeat'}`}>
+              {state.winnerId === state.player.id ? 'Victory!' : 'Defeat'}
+            </div>
+            <button
+              className="btn-primary"
+              onClick={() => navigate(`/battle/${id}/result`, { replace: true })}
+              style={{ padding: '8px 24px', fontSize: '1rem' }}
+            >
+              Continue to Results
+            </button>
           </div>
-          <button
-            className="btn-primary"
-            onClick={() => navigate(`/battle/${id}/result`, { replace: true })}
-            style={{ padding: '8px 24px', fontSize: '1rem' }}
-          >
-            Continue to Results
-          </button>
-        </div>
-      )}
+        )}
+      </div>
 
       </div>{/* End battle-main */}
 
       {/* Right column: Battle Log */}
       <div className="battle-sidebar">
-        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-xs)' }}>
           Battle Log {isAnimating && `(${visibleLogEntries.length}/${state.battleLog.length})`}
         </div>
         <BattleLog entries={visibleLogEntries} newStartIndex={battle.lastLogIndex} collapsible />
