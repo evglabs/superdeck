@@ -270,14 +270,14 @@ public class ScriptGlobals
             }
         }
 
-        var targetStatuses = target == Player ? PlayerStatuses : OpponentStatuses;
+        var targetStatuses = target == Battle.Player ? Battle.PlayerStatuses : Battle.OpponentStatuses;
         targetStatuses.Add(status);
         Log($"{GetDisplayName(target)} gains {status.Name}!");
     }
 
     public void RemoveStatus(Character target, string statusName)
     {
-        var targetStatuses = target == Player ? PlayerStatuses : OpponentStatuses;
+        var targetStatuses = target == Battle.Player ? Battle.PlayerStatuses : Battle.OpponentStatuses;
         var toRemove = targetStatuses.FirstOrDefault(s => s.Name == statusName);
         if (toRemove != null)
         {
@@ -288,9 +288,9 @@ public class ScriptGlobals
 
     public void DrawCards(Character character, int count)
     {
-        var (deck, hand, discard) = character == Player
-            ? (PlayerDeck, PlayerHand, PlayerDiscard)
-            : (OpponentDeck, OpponentHand, OpponentDiscard);
+        var (deck, hand, discard) = character == Battle.Player
+            ? (Battle.PlayerDeck, Battle.PlayerHand, Battle.PlayerDiscard)
+            : (Battle.OpponentDeck, Battle.OpponentHand, Battle.OpponentDiscard);
 
         for (int i = 0; i < count; i++)
         {
@@ -314,9 +314,9 @@ public class ScriptGlobals
 
     public void DiscardCards(Character character, int count)
     {
-        var (hand, discard) = character == Player
-            ? (PlayerHand, PlayerDiscard)
-            : (OpponentHand, OpponentDiscard);
+        var (hand, discard) = character == Battle.Player
+            ? (Battle.PlayerHand, Battle.PlayerDiscard)
+            : (Battle.OpponentHand, Battle.OpponentDiscard);
 
         for (int i = 0; i < count && hand.Count > 0; i++)
         {
@@ -359,20 +359,20 @@ public class ScriptGlobals
     // Get all statuses for a character
     public List<StatusEffect> GetStatuses(Character target)
     {
-        return target == Player ? PlayerStatuses : OpponentStatuses;
+        return target == Battle.Player ? Battle.PlayerStatuses : Battle.OpponentStatuses;
     }
 
     // Get statuses by name
     public List<StatusEffect> GetStatuses(Character target, string statusName)
     {
-        var statuses = target == Player ? PlayerStatuses : OpponentStatuses;
+        var statuses = target == Battle.Player ? Battle.PlayerStatuses : Battle.OpponentStatuses;
         return statuses.Where(s => s.Name == statusName).ToList();
     }
 
     // Get only buffs
     public List<StatusEffect> GetBuffs(Character target)
     {
-        var statuses = target == Player ? PlayerStatuses : OpponentStatuses;
+        var statuses = target == Battle.Player ? Battle.PlayerStatuses : Battle.OpponentStatuses;
         return statuses.Where(s => s.IsBuff).ToList();
     }
 
