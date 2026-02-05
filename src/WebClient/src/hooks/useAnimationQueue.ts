@@ -28,8 +28,8 @@ export function useAnimationQueue(
 ): UseAnimationQueueReturn {
   const { autoPlay = true, speedMultiplier = 1 } = options
 
-  // Track which events we've already processed (by their starting sequence)
-  const processedEventsRef = useRef<number>(0)
+  // Track the index we should start playing from (last fully processed)
+  const playbackStartRef = useRef<number>(0)
 
   // Animation state
   const [currentEventIndex, setCurrentEventIndex] = useState(-1)
@@ -47,7 +47,7 @@ export function useAnimationQueue(
   // Timer ref for cleanup
   const timerRef = useRef<number | null>(null)
 
-  // Check if playback is complete
+  // Check if playback is complete (caught up to all events)
   const isComplete = currentEventIndex >= events.length - 1
 
   // Get current event
@@ -90,6 +90,7 @@ export function useAnimationQueue(
       if (nextIndex < events.length) {
         const event = events[nextIndex]
         applyEvent(event)
+        console.log(`[AnimationQueue] Playing event ${nextIndex}: ${event.eventType}`)
 
         // Schedule next advance
         const delay = event.suggestedDelayMs / speedMultiplier
@@ -99,24 +100,31 @@ export function useAnimationQueue(
 
         return nextIndex
       } else {
-        // Playback complete
+        // Playback complete - update start ref for next batch
+        console.log('[AnimationQueue] Playback complete')
         setIsPlaying(false)
+        playbackStartRef.current = events.length
         return prev
       }
     })
   }, [events, applyEvent, speedMultiplier])
 
-  // Play animation
+  // Play animation from current position (or from playbackStart for new events)
   const play = useCallback(() => {
     if (events.length === 0) return
-    if (isComplete) {
-      // If complete, restart from beginning
-      setCurrentEventIndex(-1)
-    }
+
     setIsPlaying(true)
     setIsPaused(false)
-    advanceEvent()
-  }, [events.length, isComplete, advanceEvent])
+
+    // If we haven't started yet or we're caught up, start from playbackStart
+    setCurrentEventIndex(prev => {
+      const startFrom = prev < playbackStartRef.current ? playbackStartRef.current - 1 : prev
+      return startFrom
+    })
+
+    // Small delay then advance
+    setTimeout(() => advanceEvent(), 50)
+  }, [events.length, advanceEvent])
 
   // Pause animation
   const pause = useCallback(() => {
@@ -128,7 +136,7 @@ export function useAnimationQueue(
     }
   }, [])
 
-  // Skip to end
+  // Skip to end - jump to final state
   const skipToEnd = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current)
@@ -137,12 +145,13 @@ export function useAnimationQueue(
     setIsPlaying(false)
     setIsPaused(false)
 
-    // Apply all events and jump to final state
+    // Apply final state
     if (finalState) {
       setDisplayedPlayerHP(finalState.player.currentHP)
       setDisplayedOpponentHP(finalState.opponent.currentHP)
     }
     setCurrentEventIndex(events.length - 1)
+    playbackStartRef.current = events.length
   }, [events.length, finalState])
 
   // Reset to initial state
@@ -154,6 +163,7 @@ export function useAnimationQueue(
     setCurrentEventIndex(-1)
     setIsPlaying(false)
     setIsPaused(false)
+    playbackStartRef.current = 0
 
     // Reset to initial HP (from first round_start event or final state)
     const firstRoundStart = events.find(e => e.eventType === 'round_start')
@@ -166,21 +176,18 @@ export function useAnimationQueue(
     }
   }, [events, finalState])
 
-  // Handle new events arriving (e.g., after resolution)
+  // Handle new events arriving - auto-play only the NEW events
   useEffect(() => {
-    const prevCount = processedEventsRef.current
     const newCount = events.length
+    const lastProcessed = playbackStartRef.current
 
-    if (newCount > prevCount) {
-      // New events have arrived
-      console.log(`[AnimationQueue] New events: ${prevCount} -> ${newCount}`)
-      processedEventsRef.current = newCount
+    if (newCount > lastProcessed && !isPlaying && !isPaused) {
+      const newEventCount = newCount - lastProcessed
+      console.log(`[AnimationQueue] ${newEventCount} new events (${lastProcessed} -> ${newCount})`)
 
-      // Auto-play new events if enabled and not already playing
-      if (autoPlay && !isPlaying && !isPaused) {
-        console.log('[AnimationQueue] Auto-playing events')
-        // Small delay to ensure state is settled
-        setTimeout(() => play(), 50)
+      if (autoPlay) {
+        console.log('[AnimationQueue] Auto-playing new events')
+        setTimeout(() => play(), 100)
       }
     }
   }, [events.length, autoPlay, isPlaying, isPaused, play])
@@ -194,9 +201,9 @@ export function useAnimationQueue(
     }
   }, [])
 
-  // Initialize HP from final state when it first arrives
+  // Initialize HP from final state when battle first loads (before any events)
   useEffect(() => {
-    if (finalState && events.length === 0) {
+    if (finalState && events.length === 0 && playbackStartRef.current === 0) {
       setDisplayedPlayerHP(finalState.player.currentHP)
       setDisplayedOpponentHP(finalState.opponent.currentHP)
     }
