@@ -15,7 +15,7 @@
       "name": "Radioactive",
       "duration": 3,
       "hooks": {
-        "OnTurnStart": "ApplyDOT(Opponent, \"Irradiated\", 3, 3); Log(\"Radiation spreads to \" + OpponentDisplayName + \"!\");"
+        "OnTurnStart": "ApplyDOT(Player, \"Irradiated\", 3, 3); Log(\"Radiation spreads to \" + OpponentDisplayName + \"!\");"
       }
     }
   }
