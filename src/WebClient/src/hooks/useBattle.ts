@@ -1,6 +1,8 @@
 import { useReducer, useEffect, useCallback, useRef } from 'react'
 import { api } from '../api/client'
 import type { BattleState, Card } from '../types'
+import type { BattleEvent } from '../types/events'
+import { useAnimationQueue } from './useAnimationQueue'
 
 interface BattleUIState {
   state: BattleState | null
@@ -9,6 +11,7 @@ interface BattleUIState {
   autoBattle: boolean
   lastLogIndex: number
   detailCard: Card | null
+  lastProcessedEventIndex: number
 }
 
 type BattleAction =
@@ -18,6 +21,7 @@ type BattleAction =
   | { type: 'SET_AUTO_BATTLE'; payload: boolean }
   | { type: 'UPDATE_LOG_INDEX'; payload: number }
   | { type: 'SET_DETAIL_CARD'; payload: Card | null }
+  | { type: 'SET_LAST_EVENT_INDEX'; payload: number }
 
 function reducer(state: BattleUIState, action: BattleAction): BattleUIState {
   switch (action.type) {
@@ -33,6 +37,8 @@ function reducer(state: BattleUIState, action: BattleAction): BattleUIState {
       return { ...state, lastLogIndex: action.payload }
     case 'SET_DETAIL_CARD':
       return { ...state, detailCard: action.payload }
+    case 'SET_LAST_EVENT_INDEX':
+      return { ...state, lastProcessedEventIndex: action.payload }
     default:
       return state
   }
@@ -46,9 +52,19 @@ export function useBattle(battleId: string) {
     autoBattle: false,
     lastLogIndex: 0,
     detailCard: null,
+    lastProcessedEventIndex: -1,
   })
 
   const pollingRef = useRef(false)
+
+  // Get events from state, defaulting to empty array
+  const events: BattleEvent[] = uiState.state?.events ?? []
+
+  // Animation queue for event playback
+  const animation = useAnimationQueue(events, uiState.state, {
+    autoPlay: true,
+    speedMultiplier: 1,
+  })
 
   // Initial load
   useEffect(() => {
@@ -166,5 +182,7 @@ export function useBattle(battleId: string) {
     toggleAutoBattle,
     setDetailCard,
     updateLogIndex,
+    // Animation controls
+    animation,
   }
 }

@@ -122,6 +122,7 @@ export interface BattleState {
   startingHandSize: number
   cardsDrawnPerTurn: number
   battleLog: string[]
+  events: import('./events').BattleEvent[]
   winnerId: string | null
   isComplete: boolean
   bothWin: boolean

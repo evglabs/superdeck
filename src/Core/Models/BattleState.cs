@@ -1,4 +1,5 @@
 using SuperDeck.Core.Models.Enums;
+using SuperDeck.Core.Models.Events;
 
 namespace SuperDeck.Core.Models;
 
@@ -44,8 +45,22 @@ public class BattleState
     public int StartingHandSize { get; set; } = 5;
     public int CardsDrawnPerTurn { get; set; } = 3;
 
-    // Battle log
+    // Battle log (string-based, kept for backwards compatibility)
     public List<string> BattleLog { get; set; } = new();
+
+    // Structured events for animated playback
+    public List<BattleEvent> Events { get; set; } = new();
+    private int _eventSequence = 0;
+
+    /// <summary>
+    /// Emits a structured event for client playback.
+    /// Automatically assigns sequence number.
+    /// </summary>
+    public void EmitEvent(BattleEvent evt)
+    {
+        evt.SequenceNumber = _eventSequence++;
+        Events.Add(evt);
+    }
 
     // Result
     public string? WinnerId { get; set; }

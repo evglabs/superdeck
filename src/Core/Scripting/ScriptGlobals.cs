@@ -1,5 +1,6 @@
 using SuperDeck.Core.Models;
 using SuperDeck.Core.Models.Enums;
+using SuperDeck.Core.Models.Events;
 
 namespace SuperDeck.Core.Scripting;
 
@@ -153,7 +154,9 @@ public class ScriptGlobals
         }
 
         finalDamage = Math.Max(0, finalDamage);
+        int hpBefore = target.CurrentHP;
         target.CurrentHP -= finalDamage;
+        int hpAfter = target.CurrentHP;
 
         var displayName = GetDisplayName(target);
         if (finalDamage != damageAfterDefense)
@@ -168,6 +171,19 @@ public class ScriptGlobals
         {
             Log($"{displayName} takes {finalDamage} damage!");
         }
+
+        // Emit damage dealt event
+        Battle.EmitEvent(new DamageDealtEvent
+        {
+            Amount = amount,
+            BaseDamage = boostedAmount,
+            FinalDamage = finalDamage,
+            TargetIsPlayer = IsHumanPlayer(target),
+            TargetName = displayName,
+            SourceName = GetDisplayName(attacker),
+            TargetHPBefore = hpBefore,
+            TargetHPAfter = hpAfter
+        });
     }
 
     public void DealRawDamage(Character target, int amount)
@@ -206,8 +222,24 @@ public class ScriptGlobals
         }
 
         finalDamage = Math.Max(0, finalDamage);
+        int hpBefore = target.CurrentHP;
         target.CurrentHP -= finalDamage;
-        Log($"{GetDisplayName(target)} takes {finalDamage} raw damage!");
+        int hpAfter = target.CurrentHP;
+        var displayName = GetDisplayName(target);
+        Log($"{displayName} takes {finalDamage} raw damage!");
+
+        // Emit damage dealt event for raw damage
+        Battle.EmitEvent(new DamageDealtEvent
+        {
+            Amount = amount,
+            BaseDamage = amount,
+            FinalDamage = finalDamage,
+            TargetIsPlayer = IsHumanPlayer(target),
+            TargetName = displayName,
+            SourceName = "Raw damage",
+            TargetHPBefore = hpBefore,
+            TargetHPAfter = hpAfter
+        });
     }
 
     public void Heal(Character target, int amount)
@@ -217,7 +249,18 @@ public class ScriptGlobals
         int actualHeal = target.CurrentHP - oldHP;
         if (actualHeal > 0)
         {
-            Log($"{GetDisplayName(target)} heals for {actualHeal} HP!");
+            var displayName = GetDisplayName(target);
+            Log($"{displayName} heals for {actualHeal} HP!");
+
+            // Emit healing event
+            Battle.EmitEvent(new HealingEvent
+            {
+                Amount = actualHeal,
+                TargetIsPlayer = IsHumanPlayer(target),
+                TargetName = displayName,
+                TargetHPBefore = oldHP,
+                TargetHPAfter = target.CurrentHP
+            });
         }
     }
 
@@ -272,7 +315,19 @@ public class ScriptGlobals
 
         var targetStatuses = target == Battle.Player ? Battle.PlayerStatuses : Battle.OpponentStatuses;
         targetStatuses.Add(status);
-        Log($"{GetDisplayName(target)} gains {status.Name}!");
+        var displayName = GetDisplayName(target);
+        Log($"{displayName} gains {status.Name}!");
+
+        // Emit status gained event
+        Battle.EmitEvent(new StatusGainedEvent
+        {
+            StatusName = status.Name,
+            Duration = status.Duration,
+            IsBuff = status.IsBuff,
+            TargetIsPlayer = IsHumanPlayer(target),
+            TargetName = displayName,
+            SourceCardName = This?.Name ?? "Effect"
+        });
     }
 
     public void RemoveStatus(Character target, string statusName)

@@ -3,6 +3,7 @@ using System.Text.Json;
 using SuperDeck.Core.Data.Repositories;
 using SuperDeck.Core.Models;
 using SuperDeck.Core.Models.Enums;
+using SuperDeck.Core.Models.Events;
 using SuperDeck.Core.Scripting;
 using SuperDeck.Core.Services;
 using SuperDeck.Core.Settings;
@@ -204,6 +205,14 @@ public class BattleService
 
         battle.Log($"--- Round {battle.Round} ---");
 
+        // Emit round start event
+        battle.EmitEvent(new RoundStartEvent
+        {
+            RoundNumber = battle.Round,
+            PlayerHP = battle.Player.CurrentHP,
+            OpponentHP = battle.Opponent.CurrentHP
+        });
+
         // Execute onTurnStart hooks
         _hookExecutor.ExecuteHooks(HookType.OnTurnStart, battle, battle.Player, battle.Opponent, session.Rng);
         _hookExecutor.ExecuteHooks(HookType.OnTurnStart, battle, battle.Opponent, battle.Player, session.Rng);
@@ -344,6 +353,16 @@ public class BattleService
         battle.Log($"Speed roll: You ({playerSpeed}) vs {battle.Opponent.Name} ({opponentSpeed})");
         battle.Log($"{(battle.PlayerGoesFirst ? "You go" : battle.Opponent.Name + " goes")} first!");
 
+        // Emit speed roll event
+        battle.EmitEvent(new SpeedRollEvent
+        {
+            PlayerSpeed = playerSpeed,
+            OpponentSpeed = opponentSpeed,
+            PlayerGoesFirst = battle.PlayerGoesFirst,
+            PlayerName = "You",
+            OpponentName = battle.Opponent.Name
+        });
+
         // Execute all cards
         await ResolveAllCardsAsync(session);
     }
@@ -392,13 +411,30 @@ public class BattleService
         var battle = session.State;
 
         var casterDisplayName = GetDisplayName(battle, caster);
+        var casterIsPlayer = ReferenceEquals(caster, battle.Player);
+
         if (card.IsWaitCard)
         {
             battle.Log($"{casterDisplayName} waits...");
+            battle.EmitEvent(new MessageEvent
+            {
+                Message = $"{casterDisplayName} waits...",
+                Category = "wait"
+            });
             return;
         }
 
         battle.Log($"{casterDisplayName} plays {card.Name}!");
+
+        // Emit card played event
+        battle.EmitEvent(new CardPlayedEvent
+        {
+            CasterName = casterDisplayName,
+            CasterIsPlayer = casterIsPlayer,
+            Card = card,
+            TargetName = GetDisplayName(battle, target),
+            TargetIsPlayer = ReferenceEquals(target, battle.Player)
+        });
 
         // Execute onOpponentPlay hooks (before card resolves)
         _hookExecutor.ExecuteHooks(HookType.OnOpponentPlay, battle, target, caster, session.Rng, card);
@@ -441,6 +477,17 @@ public class BattleService
             var targetStatuses = statusTarget == battle.Player ? battle.PlayerStatuses : battle.OpponentStatuses;
             targetStatuses.Add(compiledStatus);
             battle.Log($"{GetDisplayName(battle, statusTarget)} gains {compiledStatus.Name}!");
+
+            // Emit status gained event
+            battle.EmitEvent(new StatusGainedEvent
+            {
+                StatusName = compiledStatus.Name,
+                Duration = compiledStatus.Duration,
+                IsBuff = compiledStatus.IsBuff,
+                TargetIsPlayer = ReferenceEquals(statusTarget, battle.Player),
+                TargetName = GetDisplayName(battle, statusTarget),
+                SourceCardName = card.Name
+            });
         }
 
         // Execute onPlay hooks
@@ -552,6 +599,14 @@ public class BattleService
         {
             statuses.Remove(status);
             battle.Log($"{status.Name} has expired!");
+
+            // Emit status expired event
+            battle.EmitEvent(new StatusExpiredEvent
+            {
+                StatusName = status.Name,
+                WasOnPlayer = statuses == battle.PlayerStatuses,
+                TargetName = statuses == battle.PlayerStatuses ? "You" : battle.Opponent.Name
+            });
         }
     }
 
@@ -578,11 +633,30 @@ public class BattleService
         {
             battle.Phase = BattlePhase.Ended;
             var winner = battle.WinnerId == battle.Player.Id ? battle.Player : battle.Opponent;
+            var playerWon = battle.WinnerId == battle.Player.Id;
             battle.Log($"Battle ended! {GetDisplayName(battle, winner)} wins!");
 
             // Execute onBattleEnd hooks
             _hookExecutor.ExecuteHooks(HookType.OnBattleEnd, battle, battle.Player, battle.Opponent, new Random());
             _hookExecutor.ExecuteHooks(HookType.OnBattleEnd, battle, battle.Opponent, battle.Player, new Random());
+
+            // Emit battle end event
+            string reason = playerDead && opponentDead
+                ? "Simultaneous KO - last to act wins"
+                : playerDead
+                    ? "Player defeated"
+                    : "Opponent defeated";
+
+            battle.EmitEvent(new BattleEndEvent
+            {
+                WinnerId = battle.WinnerId,
+                WinnerName = GetDisplayName(battle, winner),
+                PlayerWon = playerWon,
+                PlayerFinalHP = Math.Max(0, battle.Player.CurrentHP),
+                OpponentFinalHP = Math.Max(0, battle.Opponent.CurrentHP),
+                OverkillDamage = battle.OverkillDamage,
+                Reason = reason
+            });
         }
 
         return battle.IsComplete;
@@ -637,6 +711,18 @@ public class BattleService
         battle.WinnerId = battle.Opponent.Id;
         battle.Phase = BattlePhase.Ended;
         battle.Log($"You forfeit! {battle.Opponent.Name} wins!");
+
+        // Emit battle end event for forfeit
+        battle.EmitEvent(new BattleEndEvent
+        {
+            WinnerId = battle.Opponent.Id,
+            WinnerName = battle.Opponent.Name,
+            PlayerWon = false,
+            PlayerFinalHP = battle.Player.CurrentHP,
+            OpponentFinalHP = battle.Opponent.CurrentHP,
+            Reason = "Player forfeited"
+        });
+
         return (true, null, battle);
     }
 

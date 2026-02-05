@@ -10,6 +10,7 @@ import { QueueDisplay } from '../components/QueueDisplay'
 import { CardDetailModal } from '../components/CardDetailModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { CardDisplay } from '../components/CardDisplay'
+import { BattleEventDisplay, eventAnimationStyles } from '../components/BattleEventDisplay'
 
 function StatValue({ label, base, effective, color }: { label: string; base: number; effective?: number; color: string }) {
   const value = effective ?? base
@@ -32,7 +33,12 @@ export function BattlePage() {
   const battle = useBattle(id!)
   const [showForfeit, setShowForfeit] = useState(false)
 
-  const { state, loading, error, autoBattle } = battle
+  const { state, loading, error, autoBattle, animation } = battle
+
+  // Use animated HP values during resolution, final values otherwise
+  const isResolving = state?.phase === 'Resolution'
+  const displayPlayerHP = isResolving ? animation.displayedPlayerHP : (state?.player.currentHP ?? 0)
+  const displayOpponentHP = isResolving ? animation.displayedOpponentHP : (state?.opponent.currentHP ?? 0)
 
   if (!state) {
     return <div className="page"><LoadingSpinner message="Loading battle..." /></div>
@@ -49,13 +55,22 @@ export function BattlePage() {
 
   return (
     <div style={{ maxWidth: 900, margin: '0 auto', padding: '16px 24px' }}>
+      {/* Animation styles */}
+      <style>{eventAnimationStyles}</style>
+
+      {/* Event Toast Display */}
+      <BattleEventDisplay
+        event={animation.currentEvent}
+        isVisible={animation.isPlaying && isResolving}
+      />
+
       {/* Battle Header */}
       <div style={{
         display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 16,
         alignItems: 'center', marginBottom: 16,
       }}>
         <div>
-          <HpBar current={state.player.currentHP} max={state.player.maxHP} label={state.player.name} tint="#60a5fa" />
+          <HpBar current={displayPlayerHP} max={state.player.maxHP} label={state.player.name} tint="#60a5fa" />
           <div style={{ fontSize: '0.8rem', marginTop: 4, color: state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
             {state.playerGoesFirst ? 'FIRST' : 'second'}
           </div>
@@ -71,7 +86,7 @@ export function BattlePage() {
           <div style={{ fontSize: '0.9rem', fontWeight: 600 }}>{state.phase}</div>
         </div>
         <div>
-          <HpBar current={state.opponent.currentHP} max={state.opponent.maxHP} label={state.opponent.name} tint="#f87171" />
+          <HpBar current={displayOpponentHP} max={state.opponent.maxHP} label={state.opponent.name} tint="#f87171" />
           <div style={{ fontSize: '0.8rem', marginTop: 4, textAlign: 'right', color: !state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
             {!state.playerGoesFirst ? 'FIRST' : 'second'}
           </div>
@@ -174,9 +189,38 @@ export function BattlePage() {
       )}
 
       {!isQueuePhase && !autoBattle && !state.isComplete && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
           <span className="text-muted" style={{ fontSize: '0.9rem' }}>Resolving...</span>
           <div className="spinner" />
+
+          {/* Playback Controls */}
+          <div style={{ display: 'flex', gap: 8 }}>
+            {animation.isPlaying ? (
+              <button
+                className="btn-secondary"
+                onClick={animation.pause}
+                style={{ padding: '4px 12px', fontSize: '0.85rem' }}
+              >
+                Pause
+              </button>
+            ) : (
+              <button
+                className="btn-secondary"
+                onClick={animation.play}
+                style={{ padding: '4px 12px', fontSize: '0.85rem' }}
+                disabled={animation.isComplete}
+              >
+                Play
+              </button>
+            )}
+            <button
+              className="btn-secondary"
+              onClick={animation.skipToEnd}
+              style={{ padding: '4px 12px', fontSize: '0.85rem' }}
+            >
+              Skip
+            </button>
+          </div>
         </div>
       )}
 
