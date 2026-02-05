@@ -9,15 +9,15 @@ interface BattleLogProps {
 }
 
 export function BattleLog({ entries, newStartIndex, collapsible }: BattleLogProps) {
-  const endRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(isMobile)
 
   const shouldCollapse = collapsible && isMobile
 
   useEffect(() => {
-    if (!collapsed) {
-      endRef.current?.scrollIntoView({ behavior: 'smooth' })
+    if (!collapsed && containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight
     }
   }, [entries.length, collapsed])
 
@@ -33,13 +33,14 @@ export function BattleLog({ entries, newStartIndex, collapsible }: BattleLogProp
         </button>
       )}
       <div
+        ref={containerRef}
         className={`battle-log-content${shouldCollapse && collapsed ? ' collapsed' : ''}`}
         style={{
           background: 'var(--color-bg-primary)',
           border: shouldCollapse && collapsed ? 'none' : '1px solid var(--color-border)',
           borderRadius: 6,
           padding: shouldCollapse && collapsed ? 0 : '8px 12px',
-          maxHeight: shouldCollapse && collapsed ? 0 : 240,
+          maxHeight: shouldCollapse && collapsed ? 0 : (isMobile ? 'min(150px, 25vh)' : 'calc(100vh - 200px)'),
           overflowY: 'auto',
           overflow: shouldCollapse && collapsed ? 'hidden' : undefined,
           fontSize: '0.85rem',
@@ -62,7 +63,6 @@ export function BattleLog({ entries, newStartIndex, collapsible }: BattleLogProp
             </div>
           )
         })}
-        <div ref={endRef} />
       </div>
     </div>
   )

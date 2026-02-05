@@ -5,6 +5,7 @@ import { useIsMobile } from '../hooks/useMediaQuery'
 import { LoadingSpinner } from '../components/LoadingSpinner'
 import { HpBar } from '../components/HpBar'
 import { StatusEffectBadge } from '../components/StatusEffectBadge'
+import type { StatusEffect } from '../types'
 import { BattleLog } from '../components/BattleLog'
 import { HandDisplay } from '../components/HandDisplay'
 import { QueueDisplay } from '../components/QueueDisplay'
@@ -25,6 +26,28 @@ function StatValue({ label, base, effective, color }: { label: string; base: num
       {hasBuff && <span style={{ color: '#22c55e', fontSize: '0.65rem' }}> +{diff}</span>}
       {hasDebuff && <span style={{ color: '#ef4444', fontSize: '0.65rem' }}> {diff}</span>}
     </span>
+  )
+}
+
+function renderStatusBadges(statuses: StatusEffect[], max: number) {
+  const visible = statuses.slice(0, max)
+  const overflow = statuses.length - max
+  return (
+    <>
+      {visible.map(s => <StatusEffectBadge key={s.id} effect={s} />)}
+      {overflow > 0 && (
+        <span style={{
+          display: 'inline-flex', alignItems: 'center',
+          background: 'rgba(148,163,184,0.15)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 12, padding: '2px 10px',
+          fontSize: '0.8rem', color: 'var(--color-text-secondary)',
+          fontWeight: 600,
+        }}>
+          +{overflow} more
+        </span>
+      )}
+    </>
   )
 }
 
@@ -56,7 +79,7 @@ export function BattlePage() {
   const canQueue = isQueuePhase && !autoBattle && state.playerQueue.length < state.currentPlayerQueueSlots
 
   return (
-    <div className="battle-layout" style={{ maxWidth: 1200, margin: '0 auto' }}>
+    <div className="battle-layout">
       {/* Animation styles */}
       <style>{eventAnimationStyles}</style>
 
@@ -74,14 +97,14 @@ export function BattlePage() {
         display: 'grid',
         gridTemplateColumns: isMobile ? '1fr 1fr' : '1fr auto 1fr',
         gap: isMobile ? 8 : 16,
-        alignItems: 'center', marginBottom: 16,
+        alignItems: 'center', marginBottom: isMobile ? 8 : 16,
       }}>
         <div style={{ order: isMobile ? 1 : undefined }}>
           <HpBar current={displayPlayerHP} max={state.player.maxHP} label={state.player.name} tint="#60a5fa" />
           <div style={{ fontSize: '0.8rem', marginTop: 4, color: state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
             {state.playerGoesFirst ? 'FIRST' : 'second'}
           </div>
-          <div style={{ fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)', marginTop: 4, display: 'flex', gap: isMobile ? 4 : 8, flexWrap: 'wrap' }}>
+          <div style={{ fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)', marginTop: 4, display: 'flex', gap: isMobile ? 4 : 8, flexWrap: 'wrap', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
             <span style={{ color: 'var(--color-text-secondary)' }}>Lv.{state.player.level}</span>
             <StatValue label="ATK" base={state.player.attack} effective={state.playerEffectiveStats?.attack} color="#ef4444" />
             <StatValue label="DEF" base={state.player.defense} effective={state.playerEffectiveStats?.defense} color="#3b82f6" />
@@ -99,7 +122,7 @@ export function BattlePage() {
           <div style={{ fontSize: '0.8rem', marginTop: 4, textAlign: 'right', color: !state.playerGoesFirst ? '#22c55e' : 'var(--color-text-secondary)' }}>
             {!state.playerGoesFirst ? 'FIRST' : 'second'}
           </div>
-          <div style={{ fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)', marginTop: 4, display: 'flex', gap: isMobile ? 4 : 8, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+          <div style={{ fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)', marginTop: 4, display: 'flex', gap: isMobile ? 4 : 8, justifyContent: 'flex-end', flexWrap: 'wrap', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
             <span style={{ color: 'var(--color-text-secondary)' }}>Lv.{state.opponent.level}</span>
             <StatValue label="ATK" base={state.opponent.attack} effective={state.opponentEffectiveStats?.attack} color="#ef4444" />
             <StatValue label="DEF" base={state.opponent.defense} effective={state.opponentEffectiveStats?.defense} color="#3b82f6" />
@@ -115,16 +138,19 @@ export function BattlePage() {
       </div>
 
       {/* Status Effects */}
-      {(state.playerStatuses.length > 0 || state.opponentStatuses.length > 0) && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? 8 : 16, marginBottom: 12 }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-            {state.playerStatuses.map(s => <StatusEffectBadge key={s.id} effect={s} />)}
+      {(state.playerStatuses.length > 0 || state.opponentStatuses.length > 0) && (() => {
+        const maxBadges = isMobile ? 3 : 6
+        return (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: isMobile ? 8 : 16, marginBottom: 12, minWidth: 0 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, minWidth: 0 }}>
+              {renderStatusBadges(state.playerStatuses, maxBadges)}
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'flex-end', minWidth: 0 }}>
+              {renderStatusBadges(state.opponentStatuses, maxBadges)}
+            </div>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, justifyContent: 'flex-end' }}>
-            {state.opponentStatuses.map(s => <StatusEffectBadge key={s.id} effect={s} />)}
-          </div>
-        </div>
-      )}
+        )
+      })()}
 
       {/* Revealed Opponent Info */}
       {state.opponentQueueRevealed && state.opponentQueue.length > 0 && (
@@ -151,14 +177,14 @@ export function BattlePage() {
 
       {/* Queue Display */}
       {isQueuePhase && (
-        <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: isMobile ? 6 : 12 }}>
           <QueueDisplay queue={state.playerQueue} maxSlots={state.currentPlayerQueueSlots} />
         </div>
       )}
 
       {/* Hand */}
       {isQueuePhase && (
-        <div style={{ marginBottom: 12 }}>
+        <div style={{ marginBottom: isMobile ? 6 : 12 }}>
           <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>Your Hand</div>
           <HandDisplay
             cards={state.playerHand}
