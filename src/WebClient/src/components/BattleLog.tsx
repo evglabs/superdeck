@@ -13,27 +13,23 @@ export function BattleLog({ entries, newStartIndex }: BattleLogProps) {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [entries.length])
 
-  const visible = entries.slice(-30)
-  const offset = Math.max(0, entries.length - 30)
-
   return (
     <div style={{
       background: 'var(--color-bg-primary)',
       border: '1px solid var(--color-border)',
       borderRadius: 6,
       padding: '8px 12px',
-      maxHeight: 180,
+      maxHeight: 240,
       overflowY: 'auto',
       fontSize: '0.85rem',
       lineHeight: 1.6,
     }}>
-      {visible.length === 0 && <span className="text-muted">No battle log entries yet.</span>}
-      {visible.map((entry, i) => {
-        const globalIndex = offset + i
-        const isNew = globalIndex >= newStartIndex
+      {entries.length === 0 && <span className="text-muted">No battle log entries yet.</span>}
+      {entries.map((entry, i) => {
+        const isNew = i >= newStartIndex
         return (
           <div
-            key={globalIndex}
+            key={i}
             style={{
               color: logEntryColor(entry),
               fontWeight: isNew ? 600 : 400,
