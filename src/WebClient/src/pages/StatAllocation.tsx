@@ -54,7 +54,7 @@ export function StatAllocation() {
   }
 
   return (
-    <div className="page" style={{ maxWidth: 500 }}>
+    <div className="page" style={{ maxWidth: 'min(500px, 100%)' }}>
       <h1 className="page-title">Allocate Stats</h1>
 
       <div className="panel" style={{ marginBottom: 16 }}>

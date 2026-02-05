@@ -32,6 +32,12 @@
   --color-accent-hover: #2563eb;
   --color-danger: #ef4444;
   --color-success: #22c55e;
+
+  /* Responsive sizing */
+  --card-width: clamp(120px, 10vw + 80px, 180px);
+  --card-gap: clamp(6px, 1vw, 12px);
+  --page-padding: clamp(12px, 3vw, 24px);
+  --section-gap: clamp(8px, 2vw, 16px);
 }
 
 *, *::before, *::after {
@@ -129,13 +135,13 @@ a {
 }
 
 .page {
-  max-width: 900px;
+  max-width: min(900px, 100% - 2 * var(--page-padding));
   margin: 0 auto;
-  padding: 24px;
+  padding: var(--page-padding);
 }
 
 .page-title {
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
   font-weight: 700;
   margin-bottom: 20px;
   color: var(--color-text-primary);
@@ -145,7 +151,7 @@ a {
   background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  padding: 20px;
+  padding: clamp(12px, 2vw, 20px);
   margin-bottom: 16px;
 }
 
@@ -173,8 +179,8 @@ a {
 
 .grid-2 {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--section-gap);
 }
 
 /* Scrollbar */
@@ -202,4 +208,117 @@ a {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* Responsive utilities */
+@media (max-width: 767px) {
+  .hide-mobile { display: none !important; }
+}
+@media (min-width: 768px) {
+  .hide-desktop { display: none !important; }
+}
+
+/* Touch-friendly buttons on mobile */
+@media (max-width: 767px) {
+  button, .btn-primary, .btn-secondary, .btn-danger, .btn-success {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+}
+
+/* Battle layout */
+.battle-layout {
+  display: flex;
+  gap: clamp(12px, 2vw, 24px);
+  padding: var(--page-padding);
+}
+
+@media (max-width: 899px) {
+  .battle-layout {
+    flex-direction: column;
+  }
+}
+
+.battle-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.battle-sidebar {
+  width: clamp(220px, 25vw, 300px);
+  flex-shrink: 0;
+}
+
+@media (max-width: 899px) {
+  .battle-sidebar {
+    width: 100%;
+  }
+}
+
+/* Hand container with scroll-snap for mobile */
+.hand-container {
+  display: flex;
+  gap: var(--card-gap);
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.hand-container > * {
+  scroll-snap-align: start;
+}
+
+/* Responsive card */
+.card-responsive {
+  width: var(--card-width);
+}
+
+/* Stats grid - responsive key-value pairs */
+.stats-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px clamp(16px, 3vw, 32px);
+}
+
+
+/* Queue display wrap */
+.queue-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Battle log collapsible */
+.battle-log-toggle {
+  display: none;
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 767px) {
+  .battle-log-toggle {
+    display: block;
+  }
+}
+
+.battle-log-content {
+  transition: max-height 0.3s ease;
+}
+
+@media (max-width: 767px) {
+  .battle-log-content.collapsed {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    border: none;
+  }
 }

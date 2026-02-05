@@ -19,7 +19,7 @@ export function StatStepper({ label, value, displayValue, color, onIncrement, on
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
           className="btn-secondary"
-          style={{ width: 32, height: 32, padding: 0, fontSize: '1.1rem', lineHeight: 1 }}
+          style={{ width: 44, height: 44, padding: 0, fontSize: '1.1rem', lineHeight: 1 }}
           onClick={onDecrement}
           disabled={!canDecrement}
         >
@@ -30,7 +30,7 @@ export function StatStepper({ label, value, displayValue, color, onIncrement, on
         </span>
         <button
           className="btn-secondary"
-          style={{ width: 32, height: 32, padding: 0, fontSize: '1.1rem', lineHeight: 1 }}
+          style={{ width: 44, height: 44, padding: 0, fontSize: '1.1rem', lineHeight: 1 }}
           onClick={onIncrement}
           disabled={!canIncrement}
         >

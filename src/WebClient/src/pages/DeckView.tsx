@@ -59,7 +59,7 @@ export function DeckView() {
 
   return (
     <div className="page">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
         <h1 className="page-title" style={{ marginBottom: 0 }}>Deck ({deckCards.length} cards)</h1>
         <button className="btn-secondary" onClick={() => navigate(`/character/${id}`)}>Back</button>
       </div>

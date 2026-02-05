@@ -33,7 +33,7 @@ export function MainMenu() {
 
   if (mode === 'login' || mode === 'register') {
     return (
-      <div className="page" style={{ maxWidth: 400 }}>
+      <div className="page" style={{ maxWidth: 'min(400px, 100%)' }}>
         <h1 className="page-title">{mode === 'login' ? 'Login' : 'Register'}</h1>
         <form onSubmit={handleSubmit} className="panel flex flex-col gap-3">
           <input
@@ -63,9 +63,9 @@ export function MainMenu() {
   }
 
   return (
-    <div className="page" style={{ maxWidth: 400 }}>
+    <div className="page" style={{ maxWidth: 'min(400px, 100%)' }}>
       <div style={{ textAlign: 'center', marginBottom: 32, marginTop: 40 }}>
-        <h1 style={{ fontSize: '2.5rem', color: '#eab308', fontWeight: 800, marginBottom: 4 }}>SuperDeck</h1>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.5rem)', color: '#eab308', fontWeight: 800, marginBottom: 4 }}>SuperDeck</h1>
         <p className="text-muted">A Deck-Building Card Game</p>
       </div>
 

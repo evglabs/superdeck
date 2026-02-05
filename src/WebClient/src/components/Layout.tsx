@@ -17,14 +17,16 @@ export function Layout() {
       <header style={{
         background: 'var(--color-bg-secondary)',
         borderBottom: '1px solid var(--color-border)',
-        padding: '10px 24px',
+        padding: 'clamp(8px, 2vw, 10px) clamp(12px, 3vw, 24px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 8,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span
-            style={{ fontWeight: 700, fontSize: '1.2rem', color: '#eab308', cursor: 'pointer' }}
+            style={{ fontWeight: 700, fontSize: 'clamp(1rem, 2vw + 0.5rem, 1.25rem)', color: '#eab308', cursor: 'pointer' }}
             onClick={() => navigate('/menu')}
           >
             SuperDeck

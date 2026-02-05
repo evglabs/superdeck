@@ -17,7 +17,7 @@ export function QueueDisplay({ queue, maxSlots }: QueueDisplayProps) {
       <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 6 }}>
         Queue: {queue.length}/{maxSlots}
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+      <div className="queue-container">
         {slots.map((card, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             {i > 0 && <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem' }}>&rarr;</span>}

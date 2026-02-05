@@ -6,9 +6,10 @@ interface CardDisplayProps {
   selected?: boolean
   onClick?: () => void
   compact?: boolean
+  responsive?: boolean
 }
 
-export function CardDisplay({ card, selected, onClick, compact }: CardDisplayProps) {
+export function CardDisplay({ card, selected, onClick, compact, responsive }: CardDisplayProps) {
   const borderColor = typeColors[card.type]
   const nameColor = rarityColors[card.rarity]
 
@@ -45,7 +46,7 @@ export function CardDisplay({ card, selected, onClick, compact }: CardDisplayPro
         border: selected ? '2px solid var(--color-accent)' : '1px solid var(--color-border)',
         boxShadow: selected ? '0 0 12px rgba(59,130,246,0.3)' : 'none',
         transition: 'transform 0.15s, box-shadow 0.15s',
-        width: 180,
+        width: responsive ? 'var(--card-width)' : 180,
         flexShrink: 0,
       }}
       onMouseEnter={e => { if (onClick) e.currentTarget.style.transform = 'translateY(-4px)' }}

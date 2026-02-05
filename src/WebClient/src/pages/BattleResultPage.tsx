@@ -44,10 +44,10 @@ export function BattleResultPage() {
   }
 
   return (
-    <div className="page" style={{ maxWidth: 500 }}>
+    <div className="page" style={{ maxWidth: 'min(500px, 100%)' }}>
       <div style={{ textAlign: 'center', marginBottom: 32, marginTop: 20 }}>
         <h1 style={{
-          fontSize: '2.5rem',
+          fontSize: 'clamp(2rem, 5vw, 2.5rem)',
           fontWeight: 800,
           color: result.playerWon ? '#22c55e' : '#ef4444',
         }}>
@@ -56,7 +56,7 @@ export function BattleResultPage() {
       </div>
 
       <div className="panel">
-        <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px 24px', fontSize: '0.95rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px clamp(12px, 3vw, 24px)', fontSize: '0.95rem' }}>
           <span className="text-muted">XP Gained</span>
           <span style={{ color: '#06b6d4', fontWeight: 600 }}>+{result.xpGained}</span>
 

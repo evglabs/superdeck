@@ -64,7 +64,7 @@ export function CharacterHub() {
       {error && <div className="panel" style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}>{error}</div>}
 
       <div className="panel">
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 32px', fontSize: '0.95rem' }}>
+        <div className="stats-grid" style={{ fontSize: '0.95rem' }}>
           <StatRow label="Level" value={`${character.level} / ${settings.maxLevel}`} />
           <StatRow label="XP" value={`${character.xp}`} />
           <StatRow

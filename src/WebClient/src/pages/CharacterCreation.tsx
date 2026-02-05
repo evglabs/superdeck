@@ -85,7 +85,7 @@ export function CharacterCreation() {
       {error && <div className="panel" style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)', marginBottom: 16 }}>{error}</div>}
 
       {step === 'name' && (
-        <form onSubmit={handleNameSubmit} className="panel flex flex-col gap-3" style={{ maxWidth: 400 }}>
+        <form onSubmit={handleNameSubmit} className="panel flex flex-col gap-3" style={{ maxWidth: 'min(400px, 100%)' }}>
           <label style={{ fontWeight: 600 }}>Character Name</label>
           <input
             value={name}
@@ -119,13 +119,14 @@ export function CharacterCreation() {
           {starterCards.length === 0 ? (
             <p className="text-muted">No starter cards available for {suit}.</p>
           ) : (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 16 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--card-gap)', marginBottom: 16 }}>
               {starterCards.map((card, i) => (
                 <CardDisplay
                   key={`${card.id}-${i}`}
                   card={card}
                   selected={selectedIndices.has(i)}
                   onClick={() => toggleCard(i)}
+                  responsive
                 />
               ))}
             </div>

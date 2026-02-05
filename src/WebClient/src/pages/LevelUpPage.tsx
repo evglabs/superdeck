@@ -176,7 +176,7 @@ export function LevelUpPage() {
     const remaining = Math.max(0, totalAllowed - totalUsed)
 
     return (
-      <div className="page" style={{ maxWidth: 500 }}>
+      <div className="page" style={{ maxWidth: 'min(500px, 100%)' }}>
         <h1 className="page-title" style={{ color: '#eab308' }}>Stat Points!</h1>
         <p style={{ marginBottom: 16 }}>You have <strong style={{ color: 'var(--color-success)' }}>{remaining}</strong> point(s) to allocate.</p>
 
@@ -228,13 +228,14 @@ export function LevelUpPage() {
       {/* Pack Cards */}
       <div className="panel">
         <div style={{ fontWeight: 600, marginBottom: 8 }}>Pack Cards</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--card-gap)' }}>
           {sortedPackCards.map((card, i) => (
             <CardDisplay
               key={`${card.id}-${i}`}
               card={card}
               selected={addIndices.has(i)}
               onClick={() => toggleAddCard(i)}
+              responsive
             />
           ))}
         </div>

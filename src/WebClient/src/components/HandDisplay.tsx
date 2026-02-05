@@ -14,12 +14,13 @@ export function HandDisplay({ cards, onCardClick, onCardDetail, disabled }: Hand
   }
 
   return (
-    <div style={{ display: 'flex', gap: 10, overflowX: 'auto', padding: '4px 0' }}>
+    <div className="hand-container" style={{ padding: '4px 0' }}>
       {cards.map((card, i) => (
         <div key={i} style={{ position: 'relative', flexShrink: 0 }}>
           <CardDisplay
             card={card}
             onClick={disabled ? undefined : () => onCardClick(i)}
+            responsive
           />
           {onCardDetail && (
             <button
