@@ -12,7 +12,6 @@ import { QueueDisplay } from '../components/QueueDisplay'
 import { CardDetailModal } from '../components/CardDetailModal'
 import { ConfirmDialog } from '../components/ConfirmDialog'
 import { CardDisplay } from '../components/CardDisplay'
-import { BattleEventDisplay, eventAnimationStyles } from '../components/BattleEventDisplay'
 
 function StatValue({ label, base, effective, color }: { label: string; base: number; effective?: number; color: string }) {
   const value = effective ?? base
@@ -80,15 +79,6 @@ export function BattlePage() {
 
   return (
     <div className="battle-layout">
-      {/* Animation styles */}
-      <style>{eventAnimationStyles}</style>
-
-      {/* Event Toast Display */}
-      <BattleEventDisplay
-        event={animation.currentEvent}
-        isVisible={isAnimating}
-      />
-
       {/* Main layout: content left, battle log right */}
       <div className="battle-main">
 
