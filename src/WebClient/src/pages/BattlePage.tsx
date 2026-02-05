@@ -54,7 +54,7 @@ export function BattlePage() {
   const canQueue = isQueuePhase && !autoBattle && state.playerQueue.length < state.currentPlayerQueueSlots
 
   return (
-    <div style={{ maxWidth: 900, margin: '0 auto', padding: '16px 24px' }}>
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '16px 24px' }}>
       {/* Animation styles */}
       <style>{eventAnimationStyles}</style>
 
@@ -63,6 +63,11 @@ export function BattlePage() {
         event={animation.currentEvent}
         isVisible={isAnimating}
       />
+
+      {/* Main layout: content left, battle log right */}
+      <div style={{ display: 'flex', gap: 24 }}>
+        {/* Left column: main battle content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
 
       {/* Battle Header */}
       <div style={{
@@ -133,14 +138,6 @@ export function BattlePage() {
           </span>
         </div>
       )}
-
-      {/* Battle Log - synced with animation playback */}
-      <div style={{ marginBottom: 12 }}>
-        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>
-          Battle Log {isAnimating && `(${visibleLogEntries.length}/${state.battleLog.length})`}
-        </div>
-        <BattleLog entries={visibleLogEntries} newStartIndex={battle.lastLogIndex} />
-      </div>
 
       {/* Queue Display */}
       {isQueuePhase && (
@@ -299,6 +296,20 @@ export function BattlePage() {
           </button>
         </div>
       )}
+
+        </div>{/* End left column */}
+
+        {/* Right column: Battle Log - hidden when battle ends */}
+        {!battleEnded && (
+          <div style={{ width: 280, flexShrink: 0 }}>
+            <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)', marginBottom: 4 }}>
+              Battle Log {isAnimating && `(${visibleLogEntries.length}/${state.battleLog.length})`}
+            </div>
+            <BattleLog entries={visibleLogEntries} newStartIndex={battle.lastLogIndex} />
+          </div>
+        )}
+
+      </div>{/* End flex container */}
 
       {/* Modals */}
       {battle.detailCard && (
