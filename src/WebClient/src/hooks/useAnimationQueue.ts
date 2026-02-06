@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import type { BattleState } from '../types'
+import type { BattleState, StatusEffect } from '../types'
 import type { BattleEvent, AnimationState } from '../types/events'
 
 interface UseAnimationQueueOptions {
@@ -15,6 +15,8 @@ interface UseAnimationQueueReturn {
   currentEvent: BattleEvent | null
   displayedPlayerHP: number
   displayedOpponentHP: number
+  displayedPlayerStatuses: StatusEffect[]
+  displayedOpponentStatuses: StatusEffect[]
   /** Number of log entries to show (synced with current event) */
   visibleLogLength: number
   play: () => void
@@ -50,8 +52,15 @@ export function useAnimationQueue(
     finalState?.opponent.currentHP ?? 100
   )
 
+  // Displayed status effects (animated)
+  const [displayedPlayerStatuses, setDisplayedPlayerStatuses] = useState<StatusEffect[]>([])
+  const [displayedOpponentStatuses, setDisplayedOpponentStatuses] = useState<StatusEffect[]>([])
+
   // Timer ref for cleanup
   const timerRef = useRef<number | null>(null)
+
+  // Counter for generating unique status IDs during animation
+  const statusIdCounter = useRef(0)
 
   // Check if playback is complete (caught up to all events)
   const isComplete = currentEventIndex >= events.length - 1
@@ -86,6 +95,50 @@ export function useAnimationQueue(
         setDisplayedPlayerHP(event.playerFinalHP)
         setDisplayedOpponentHP(event.opponentFinalHP)
         break
+      case 'status_gained': {
+        // Create a new status effect from the event
+        const newStatus: StatusEffect = {
+          id: `anim-status-${statusIdCounter.current++}`,
+          name: event.statusName,
+          duration: event.duration,
+          remainingDuration: event.duration,
+          sourceCardId: '',
+          isBuff: event.isBuff,
+          hookScripts: {},
+          appliedAt: new Date().toISOString(),
+        }
+        if (event.targetIsPlayer) {
+          setDisplayedPlayerStatuses(prev => [...prev, newStatus])
+        } else {
+          setDisplayedOpponentStatuses(prev => [...prev, newStatus])
+        }
+        break
+      }
+      case 'status_expired': {
+        // Remove one instance of the status by name
+        if (event.wasOnPlayer) {
+          setDisplayedPlayerStatuses(prev => {
+            const idx = prev.findIndex(s => s.name === event.statusName)
+            if (idx >= 0) {
+              const copy = [...prev]
+              copy.splice(idx, 1)
+              return copy
+            }
+            return prev
+          })
+        } else {
+          setDisplayedOpponentStatuses(prev => {
+            const idx = prev.findIndex(s => s.name === event.statusName)
+            if (idx >= 0) {
+              const copy = [...prev]
+              copy.splice(idx, 1)
+              return copy
+            }
+            return prev
+          })
+        }
+        break
+      }
     }
   }, [])
 
@@ -155,6 +208,8 @@ export function useAnimationQueue(
     if (finalState) {
       setDisplayedPlayerHP(finalState.player.currentHP)
       setDisplayedOpponentHP(finalState.opponent.currentHP)
+      setDisplayedPlayerStatuses(finalState.playerStatuses)
+      setDisplayedOpponentStatuses(finalState.opponentStatuses)
     }
     setCurrentEventIndex(events.length - 1)
     playbackStartRef.current = events.length
@@ -180,6 +235,10 @@ export function useAnimationQueue(
       setDisplayedPlayerHP(finalState.player.maxHP)
       setDisplayedOpponentHP(finalState.opponent.maxHP)
     }
+    // Reset statuses to empty (no statuses at battle start)
+    setDisplayedPlayerStatuses([])
+    setDisplayedOpponentStatuses([])
+    statusIdCounter.current = 0
   }, [events, finalState])
 
   // Handle new events arriving - auto-play only the NEW events
@@ -207,11 +266,13 @@ export function useAnimationQueue(
     }
   }, [])
 
-  // Initialize HP from final state when battle first loads (before any events)
+  // Initialize HP and statuses from final state when battle first loads (before any events)
   useEffect(() => {
     if (finalState && events.length === 0 && playbackStartRef.current === 0) {
       setDisplayedPlayerHP(finalState.player.currentHP)
       setDisplayedOpponentHP(finalState.opponent.currentHP)
+      setDisplayedPlayerStatuses(finalState.playerStatuses)
+      setDisplayedOpponentStatuses(finalState.opponentStatuses)
     }
   }, [finalState, events.length])
 
@@ -236,6 +297,8 @@ export function useAnimationQueue(
     currentEvent,
     displayedPlayerHP,
     displayedOpponentHP,
+    displayedPlayerStatuses,
+    displayedOpponentStatuses,
     visibleLogLength,
     play,
     pause,

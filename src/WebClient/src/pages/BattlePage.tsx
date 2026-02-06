@@ -97,10 +97,18 @@ export function BattlePage() {
 
   const { state, loading, error, autoBattle, animation, speedMultiplier, setSpeedMultiplier } = battle
 
-  // Use animated HP values when animation is playing back events
+  // Use animated values when animation is playing back events
   const isAnimating = animation.isPlaying && !animation.isComplete
   const displayPlayerHP = isAnimating ? animation.displayedPlayerHP : (state?.player.currentHP ?? 0)
   const displayOpponentHP = isAnimating ? animation.displayedOpponentHP : (state?.opponent.currentHP ?? 0)
+
+  // Use animated statuses during playback, final statuses otherwise
+  const displayPlayerStatuses = isAnimating || animation.isPaused
+    ? animation.displayedPlayerStatuses
+    : (state?.playerStatuses ?? [])
+  const displayOpponentStatuses = isAnimating || animation.isPaused
+    ? animation.displayedOpponentStatuses
+    : (state?.opponentStatuses ?? [])
 
   // Filter battle log to show only entries up to current animation point
   const visibleLogEntries = state?.battleLog.slice(0, animation.visibleLogLength) ?? []
@@ -163,10 +171,10 @@ export function BattlePage() {
       {/* Status Effects - always rendered with minHeight to prevent layout shift */}
       <div className={`battle-status-row ${isMobile ? 'battle-status-row--mobile' : ''}`}>
         <div className="battle-status-group">
-          {renderStatusBadges(state.playerStatuses, isMobile ? 3 : 6)}
+          {renderStatusBadges(displayPlayerStatuses, isMobile ? 3 : 6)}
         </div>
         <div className="battle-status-group battle-status-group--right">
-          {renderStatusBadges(state.opponentStatuses, isMobile ? 3 : 6)}
+          {renderStatusBadges(displayOpponentStatuses, isMobile ? 3 : 6)}
         </div>
       </div>
 
