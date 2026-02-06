@@ -198,17 +198,15 @@ dotnet publish src/Server -c Release -o /opt/superdeck
 
 See [Deployment Guide](docs/DEPLOYMENT.md) for complete instructions.
 
-## Contributing
+## Issues & Feedback
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests
-5. Submit a pull request
+This repository is public to allow friends and collaborators to submit issues and feedback. Pull requests are not accepted.
 
 ## License
 
-[Add your license here]
+Copyright © 2026 SuperDeck Team. All rights reserved.
+
+This project is **not open source**. The source code is made publicly visible for transparency and issue tracking purposes only. You may not copy, modify, distribute, or use this code without explicit written permission.
 
 ## Acknowledgments
 
