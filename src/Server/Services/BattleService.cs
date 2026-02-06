@@ -19,6 +19,7 @@ public class BattleService
     private readonly HookRegistry _hookRegistry;
     private readonly ICharacterRepository _characterRepository;
     private readonly IGhostRepository _ghostRepository;
+    private readonly IPlayerRepository _playerRepository;
     private readonly CharacterService _characterService;
     private readonly GameSettings _settings;
     private readonly EloCalculator? _eloCalculator;
@@ -31,6 +32,7 @@ public class BattleService
         HookRegistry hookRegistry,
         ICharacterRepository characterRepo,
         IGhostRepository ghostRepo,
+        IPlayerRepository playerRepo,
         CharacterService characterService,
         GameSettings settings,
         AIBehaviorService? aiBehaviorService = null)
@@ -41,6 +43,7 @@ public class BattleService
         _hookRegistry = hookRegistry;
         _characterRepository = characterRepo;
         _ghostRepository = ghostRepo;
+        _playerRepository = playerRepo;
         _characterService = characterService;
         _settings = settings;
         _aiBehaviorService = aiBehaviorService;
@@ -1000,6 +1003,22 @@ public class BattleService
 
             character.MMR = Math.Max(_settings.MMR.MinimumMMR, character.MMR + mmrChange);
             await _characterRepository.UpdateAsync(character);
+
+            // Update player stats
+            var player = await _playerRepository.GetByIdAsync(session.PlayerId);
+            if (player != null)
+            {
+                player.TotalBattles++;
+                if (playerWon)
+                    player.TotalWins++;
+                else
+                    player.TotalLosses++;
+
+                if (character.MMR > player.HighestMMR)
+                    player.HighestMMR = character.MMR;
+
+                await _playerRepository.UpdateAsync(player);
+            }
 
             // Add XP through CharacterService to trigger level-up logic
             var updatedCharacter = await _characterService.AddXPAsync(session.CharacterId, xpGain);
