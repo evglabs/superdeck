@@ -137,6 +137,7 @@ public class BattleService
         var session = new BattleSession
         {
             BattleId = battle.BattleId,
+            PlayerId = character.OwnerPlayerId ?? string.Empty,
             CharacterId = characterId,
             GhostId = ghostId,
             AIProfileId = ghost?.AIProfileId ?? "default",
