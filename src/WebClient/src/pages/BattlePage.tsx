@@ -45,12 +45,32 @@ function SpeedControls({ speedMultiplier, setSpeedMultiplier }: { speedMultiplie
   )
 }
 
+interface GroupedStatus {
+  effect: StatusEffect
+  count: number
+}
+
+function groupStatuses(statuses: StatusEffect[]): GroupedStatus[] {
+  const groups = new Map<string, GroupedStatus>()
+  for (const status of statuses) {
+    const key = `${status.name}-${status.remainingDuration}`
+    const existing = groups.get(key)
+    if (existing) {
+      existing.count++
+    } else {
+      groups.set(key, { effect: status, count: 1 })
+    }
+  }
+  return Array.from(groups.values())
+}
+
 function renderStatusBadges(statuses: StatusEffect[], max: number) {
-  const visible = statuses.slice(0, max)
-  const overflow = statuses.length - max
+  const grouped = groupStatuses(statuses)
+  const visible = grouped.slice(0, max)
+  const overflow = grouped.length - max
   return (
     <>
-      {visible.map(s => <StatusEffectBadge key={s.id} effect={s} />)}
+      {visible.map(g => <StatusEffectBadge key={`${g.effect.name}-${g.effect.remainingDuration}`} effect={g.effect} count={g.count} />)}
       {overflow > 0 && (
         <span className="status-badge-overflow">+{overflow} more</span>
       )}

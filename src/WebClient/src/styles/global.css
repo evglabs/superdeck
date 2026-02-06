@@ -74,6 +74,8 @@
 html, body, #root {
   height: 100%;
   width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 body {
@@ -280,17 +282,22 @@ a {
   margin: 0 auto;
   min-height: 100%;
   align-items: flex-start;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 @media (max-width: 899px) {
   .battle-layout {
     flex-direction: column;
+    width: 100%;
+    max-width: 100vw;
   }
 }
 
 .battle-main {
   flex: 1;
   min-width: 0;
+  max-width: 100%;
 }
 
 .battle-sidebar {
