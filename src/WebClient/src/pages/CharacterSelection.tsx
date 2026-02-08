@@ -48,7 +48,22 @@ export function CharacterSelection() {
               onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--color-border)')}
             >
               <div>
-                <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>{c.name}</div>
+                <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>
+                  {c.name}
+                  {c.isRetired && (
+                    <span style={{
+                      marginLeft: 8,
+                      fontSize: '0.75rem',
+                      color: '#a855f7',
+                      background: 'rgba(168, 85, 247, 0.2)',
+                      padding: '2px 8px',
+                      borderRadius: 4,
+                      verticalAlign: 'middle'
+                    }}>
+                      RETIRED
+                    </span>
+                  )}
+                </div>
                 <div className="text-muted" style={{ fontSize: '0.9rem' }}>
                   Level {c.level} &middot; MMR {c.mmr} &middot; {c.wins}W / {c.losses}L
                 </div>

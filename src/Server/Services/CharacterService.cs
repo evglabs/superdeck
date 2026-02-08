@@ -125,12 +125,16 @@ public class CharacterService
         return await _characterRepository.DeleteAsync(id);
     }
 
-    public async Task<Character?> AddXPAsync(string characterId, int xp)
+    public async Task<(Character? character, bool retired)> AddXPAsync(string characterId, int xp)
     {
         var character = await _characterRepository.GetByIdAsync(characterId);
-        if (character == null) return null;
+        if (character == null) return (null, false);
+
+        // Don't add XP to retired characters
+        if (character.IsRetired) return (character, false);
 
         character.XP += xp;
+        bool justRetired = false;
 
         // Check for level up
         while (character.Level < _settings.Character.MaxLevel && character.XP >= GetXPForNextLevel(character.Level))
@@ -138,12 +142,24 @@ public class CharacterService
             character.XP -= GetXPForNextLevel(character.Level);
             character.Level++;
 
+            // Check if this is the retirement level
+            bool isRetirementLevel = character.Level == _settings.Character.MaxLevel;
+
             // Create ghost snapshot on level up
-            await CreateGhostSnapshotAsync(character);
+            await CreateGhostSnapshotAsync(character, isRetirementLevel);
+
+            // AUTO-RETIRE at max level
+            if (isRetirementLevel)
+            {
+                character.IsRetired = true;
+                character.RetiredAt = DateTime.UtcNow;
+                character.XP = 0; // Clear excess XP
+                justRetired = true;
+            }
         }
 
         character.LastModified = DateTime.UtcNow;
-        return await _characterRepository.UpdateAsync(character);
+        return (await _characterRepository.UpdateAsync(character), justRetired);
     }
 
     public int GetXPForNextLevel(int currentLevel)
@@ -159,16 +175,23 @@ public class CharacterService
         return totalAllowed - totalUsed;
     }
 
-    private async Task CreateGhostSnapshotAsync(Character character)
+    private async Task CreateGhostSnapshotAsync(Character character, bool isRetirementGhost = false)
     {
         var ghost = new GhostSnapshot
         {
             SourceCharacterId = character.Id,
             SerializedCharacterState = JsonSerializer.Serialize(character),
             GhostMMR = character.MMR,
-            AIProfileId = "default"
+            AIProfileId = "default",
+            IsRetirementGhost = isRetirementGhost
         };
 
         await _ghostRepository.CreateAsync(ghost);
+    }
+
+    public async Task<IEnumerable<Character>> GetRetiredCharactersAsync(string? playerId = null)
+    {
+        var characters = await _characterRepository.GetByPlayerIdAsync(playerId);
+        return characters.Where(c => c.IsRetired);
     }
 }

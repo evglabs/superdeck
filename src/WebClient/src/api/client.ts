@@ -13,6 +13,7 @@ import type {
   HealthResponse,
   PlayerAction,
   Suit,
+  CareerSummaryResponse,
 } from '../types'
 
 interface AppConfig {
@@ -143,6 +144,15 @@ class ApiClient {
     })
   }
 
+  async getRetiredCharacters(playerId?: string): Promise<Character[]> {
+    const q = playerId ? `?playerId=${playerId}` : ''
+    return this.request<Character[]>(`/api/characters/retired${q}`)
+  }
+
+  async getCareerSummary(characterId: string): Promise<CareerSummaryResponse> {
+    return this.request<CareerSummaryResponse>(`/api/characters/${characterId}/career`)
+  }
+
   // Cards
   async getCards(): Promise<Card[]> {
     return this.request<Card[]>('/api/cards')
@@ -161,10 +171,24 @@ class ApiClient {
   }
 
   // Battle
-  async startBattle(characterId: string, autoBattle = false, autoBattleMode = 'Watch', aiProfileId?: string): Promise<StartBattleResponse> {
+  async startBattle(
+    characterId: string,
+    options?: {
+      autoBattle?: boolean
+      autoBattleMode?: string
+      aiProfileId?: string
+      battleType?: 'normal' | 'uber'
+    }
+  ): Promise<StartBattleResponse> {
     return this.request<StartBattleResponse>('/api/battle/start', {
       method: 'POST',
-      body: JSON.stringify({ characterId, autoBattle, autoBattleMode, aiProfileId }),
+      body: JSON.stringify({
+        characterId,
+        autoBattle: options?.autoBattle ?? false,
+        autoBattleMode: options?.autoBattleMode ?? 'Watch',
+        aiProfileId: options?.aiProfileId,
+        battleType: options?.battleType ?? 'normal',
+      }),
     })
   }
 

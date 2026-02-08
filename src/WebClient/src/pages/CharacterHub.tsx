@@ -34,11 +34,11 @@ export function CharacterHub() {
   const atkPercent = character.attack * settings.attackPercentPerPoint
   const defPercent = character.defense * settings.defensePercentPerPoint
 
-  const handleStartBattle = async () => {
+  const handleStartBattle = async (battleType: 'normal' | 'uber' = 'normal') => {
     setBattleLoading(true)
     setError(null)
     try {
-      const res = await api.startBattle(character.id)
+      const res = await api.startBattle(character.id, { battleType })
       navigate(`/battle/${res.battleId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start battle')
@@ -93,20 +93,60 @@ export function CharacterHub() {
         </div>
       </div>
 
-      {availablePoints > 0 && (
+      {/* Retired champion panel */}
+      {character.isRetired && (
+        <div className="panel" style={{
+          background: 'rgba(168, 85, 247, 0.1)',
+          borderColor: '#a855f7',
+          textAlign: 'center'
+        }}>
+          <span style={{ fontSize: '2rem' }}>&#127942;</span>
+          <h3 style={{ color: '#a855f7', margin: '8px 0' }}>RETIRED CHAMPION</h3>
+          <p className="text-muted" style={{ margin: 0 }}>This character has completed their journey.</p>
+        </div>
+      )}
+
+      {availablePoints > 0 && !character.isRetired && (
         <div className="panel" style={{ borderColor: 'var(--color-success)', background: 'rgba(34,197,94,0.05)' }}>
           <span style={{ color: 'var(--color-success)', fontWeight: 600 }}>+{availablePoints} stat point(s) available!</span>
         </div>
       )}
 
       <div className="flex flex-col gap-2 mt-4">
-        <button className="btn-primary" style={{ padding: 12 }} onClick={handleStartBattle} disabled={battleLoading}>
-          {battleLoading ? 'Starting Battle...' : 'Start Battle'}
-        </button>
+        {/* Retired: Show UBER challenge + career summary */}
+        {character.isRetired ? (
+          <>
+            <button
+              className="btn-secondary"
+              style={{ padding: 12 }}
+              onClick={() => navigate(`/character/${character.id}/retired`)}
+            >
+              View Career Summary
+            </button>
+            <button
+              className="btn-primary"
+              style={{ padding: 12, background: '#ef4444' }}
+              onClick={() => handleStartBattle('uber')}
+              disabled={battleLoading}
+            >
+              {battleLoading ? 'Starting...' : 'Challenge the UBER Boss'}
+            </button>
+            <p className="text-muted text-center" style={{ fontSize: '0.8rem', margin: 0 }}>
+              Fight the Ultimate Challenger for glory (no rewards)
+            </p>
+          </>
+        ) : (
+          <>
+            <button className="btn-primary" style={{ padding: 12 }} onClick={() => handleStartBattle('normal')} disabled={battleLoading}>
+              {battleLoading ? 'Starting Battle...' : 'Start Battle'}
+            </button>
+          </>
+        )}
+
         <button className="btn-secondary" style={{ padding: 12 }} onClick={() => navigate(`/character/${character.id}/deck`)}>
           View Deck
         </button>
-        {availablePoints > 0 && (
+        {availablePoints > 0 && !character.isRetired && (
           <button className="btn-success" style={{ padding: 12 }} onClick={() => navigate(`/character/${character.id}/stats`)}>
             Allocate Stats (+{availablePoints})
           </button>

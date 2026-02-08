@@ -48,6 +48,12 @@ public class MariaDBCharacterRepository : ICharacterRepository
         // Migration: add BonusHP column if missing
         try { connection.Execute("ALTER TABLE Characters ADD COLUMN BonusHP INT DEFAULT 0 AFTER Speed"); }
         catch { /* column already exists */ }
+
+        // Migration: add retirement columns
+        try { connection.Execute("ALTER TABLE Characters ADD COLUMN IsRetired TINYINT(1) DEFAULT 0"); }
+        catch { /* column already exists */ }
+        try { connection.Execute("ALTER TABLE Characters ADD COLUMN RetiredAt DATETIME"); }
+        catch { /* column already exists */ }
     }
 
     public async Task<Character?> GetByIdAsync(string id)
@@ -92,8 +98,8 @@ public class MariaDBCharacterRepository : ICharacterRepository
         var row = new MariaDBCharacterRow(character);
 
         await connection.ExecuteAsync(@"
-            INSERT INTO Characters (Id, Name, Level, XP, Attack, Defense, Speed, BonusHP, DeckCardIds, Wins, Losses, MMR, IsGhost, IsPublished, OwnerPlayerId, CreatedAt, LastModified)
-            VALUES (@Id, @Name, @Level, @XP, @Attack, @Defense, @Speed, @BonusHP, @DeckCardIds, @Wins, @Losses, @MMR, @IsGhost, @IsPublished, @OwnerPlayerId, @CreatedAt, @LastModified)",
+            INSERT INTO Characters (Id, Name, Level, XP, Attack, Defense, Speed, BonusHP, DeckCardIds, Wins, Losses, MMR, IsGhost, IsPublished, OwnerPlayerId, CreatedAt, LastModified, IsRetired, RetiredAt)
+            VALUES (@Id, @Name, @Level, @XP, @Attack, @Defense, @Speed, @BonusHP, @DeckCardIds, @Wins, @Losses, @MMR, @IsGhost, @IsPublished, @OwnerPlayerId, @CreatedAt, @LastModified, @IsRetired, @RetiredAt)",
             row);
 
         return character;
@@ -110,7 +116,7 @@ public class MariaDBCharacterRepository : ICharacterRepository
                 Attack = @Attack, Defense = @Defense, Speed = @Speed, BonusHP = @BonusHP,
                 DeckCardIds = @DeckCardIds, Wins = @Wins, Losses = @Losses,
                 MMR = @MMR, IsGhost = @IsGhost, IsPublished = @IsPublished,
-                LastModified = @LastModified
+                LastModified = @LastModified, IsRetired = @IsRetired, RetiredAt = @RetiredAt
             WHERE Id = @Id",
             row);
 
@@ -166,6 +172,8 @@ internal class MariaDBCharacterRow
     public string? OwnerPlayerId { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? LastModified { get; set; }
+    public bool IsRetired { get; set; }
+    public DateTime? RetiredAt { get; set; }
 
     public MariaDBCharacterRow() { }
 
@@ -188,6 +196,8 @@ internal class MariaDBCharacterRow
         OwnerPlayerId = c.OwnerPlayerId;
         CreatedAt = c.CreatedAt;
         LastModified = c.LastModified;
+        IsRetired = c.IsRetired;
+        RetiredAt = c.RetiredAt;
     }
 
     public Character ToCharacter() => new()
@@ -210,6 +220,8 @@ internal class MariaDBCharacterRow
         IsPublished = IsPublished,
         OwnerPlayerId = OwnerPlayerId,
         CreatedAt = CreatedAt ?? DateTime.UtcNow,
-        LastModified = LastModified ?? DateTime.UtcNow
+        LastModified = LastModified ?? DateTime.UtcNow,
+        IsRetired = IsRetired,
+        RetiredAt = RetiredAt
     };
 }

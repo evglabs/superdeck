@@ -40,6 +40,10 @@ public class MariaDBGhostRepository : IGhostRepository
         // Widen columns on existing tables that were created with VARCHAR(36)
         connection.Execute("ALTER TABLE GhostSnapshots MODIFY Id VARCHAR(128)");
         connection.Execute("ALTER TABLE GhostSnapshots MODIFY SourceCharacterId VARCHAR(128)");
+
+        // Migration: add IsRetirementGhost column
+        try { connection.Execute("ALTER TABLE GhostSnapshots ADD COLUMN IsRetirementGhost TINYINT(1) DEFAULT 0"); }
+        catch { /* column already exists */ }
     }
 
     public async Task<GhostSnapshot?> GetByIdAsync(string id)
@@ -69,8 +73,8 @@ public class MariaDBGhostRepository : IGhostRepository
         var row = new MariaDBGhostRow(ghost);
 
         await connection.ExecuteAsync(@"
-            INSERT INTO GhostSnapshots (Id, SourceCharacterId, SerializedCharacterState, GhostMMR, Wins, Losses, TimesUsed, AIProfileId, DownloadedAt, CreatedAt)
-            VALUES (@Id, @SourceCharacterId, @SerializedCharacterState, @GhostMMR, @Wins, @Losses, @TimesUsed, @AIProfileId, @DownloadedAt, @CreatedAt)",
+            INSERT INTO GhostSnapshots (Id, SourceCharacterId, SerializedCharacterState, GhostMMR, Wins, Losses, TimesUsed, AIProfileId, DownloadedAt, CreatedAt, IsRetirementGhost)
+            VALUES (@Id, @SourceCharacterId, @SerializedCharacterState, @GhostMMR, @Wins, @Losses, @TimesUsed, @AIProfileId, @DownloadedAt, @CreatedAt, @IsRetirementGhost)",
             row);
 
         return ghost;
@@ -112,6 +116,7 @@ internal class MariaDBGhostRow
     public string AIProfileId { get; set; } = string.Empty;
     public DateTime? DownloadedAt { get; set; }
     public DateTime? CreatedAt { get; set; }
+    public bool IsRetirementGhost { get; set; }
 
     public MariaDBGhostRow() { }
 
@@ -127,6 +132,7 @@ internal class MariaDBGhostRow
         AIProfileId = g.AIProfileId;
         DownloadedAt = g.DownloadedAt;
         CreatedAt = g.CreatedAt;
+        IsRetirementGhost = g.IsRetirementGhost;
     }
 
     public GhostSnapshot ToGhostSnapshot() => new()
@@ -140,6 +146,7 @@ internal class MariaDBGhostRow
         TimesUsed = TimesUsed,
         AIProfileId = AIProfileId,
         DownloadedAt = DownloadedAt,
-        CreatedAt = CreatedAt ?? DateTime.UtcNow
+        CreatedAt = CreatedAt ?? DateTime.UtcNow,
+        IsRetirementGhost = IsRetirementGhost
     };
 }

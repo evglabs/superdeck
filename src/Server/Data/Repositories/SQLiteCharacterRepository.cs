@@ -63,6 +63,12 @@ public class SQLiteCharacterRepository : ICharacterRepository
         // Migration: add BonusHP column if missing
         try { connection.Execute("ALTER TABLE Characters ADD COLUMN BonusHP INTEGER DEFAULT 0"); }
         catch { /* column already exists */ }
+
+        // Migration: add retirement columns
+        try { connection.Execute("ALTER TABLE Characters ADD COLUMN IsRetired INTEGER DEFAULT 0"); }
+        catch { /* column already exists */ }
+        try { connection.Execute("ALTER TABLE Characters ADD COLUMN RetiredAt TEXT"); }
+        catch { /* column already exists */ }
     }
 
     public async Task<Character?> GetByIdAsync(string id)
@@ -107,8 +113,8 @@ public class SQLiteCharacterRepository : ICharacterRepository
         var row = new CharacterRow(character);
 
         await connection.ExecuteAsync(@"
-            INSERT INTO Characters (Id, Name, Level, XP, Attack, Defense, Speed, BonusHP, DeckCardIds, Wins, Losses, MMR, IsGhost, IsPublished, OwnerPlayerId, CreatedAt, LastModified)
-            VALUES (@Id, @Name, @Level, @XP, @Attack, @Defense, @Speed, @BonusHP, @DeckCardIds, @Wins, @Losses, @MMR, @IsGhost, @IsPublished, @OwnerPlayerId, @CreatedAt, @LastModified)",
+            INSERT INTO Characters (Id, Name, Level, XP, Attack, Defense, Speed, BonusHP, DeckCardIds, Wins, Losses, MMR, IsGhost, IsPublished, OwnerPlayerId, CreatedAt, LastModified, IsRetired, RetiredAt)
+            VALUES (@Id, @Name, @Level, @XP, @Attack, @Defense, @Speed, @BonusHP, @DeckCardIds, @Wins, @Losses, @MMR, @IsGhost, @IsPublished, @OwnerPlayerId, @CreatedAt, @LastModified, @IsRetired, @RetiredAt)",
             row);
 
         return character;
@@ -125,7 +131,7 @@ public class SQLiteCharacterRepository : ICharacterRepository
                 Attack = @Attack, Defense = @Defense, Speed = @Speed, BonusHP = @BonusHP,
                 DeckCardIds = @DeckCardIds, Wins = @Wins, Losses = @Losses,
                 MMR = @MMR, IsGhost = @IsGhost, IsPublished = @IsPublished,
-                LastModified = @LastModified
+                LastModified = @LastModified, IsRetired = @IsRetired, RetiredAt = @RetiredAt
             WHERE Id = @Id",
             row);
 
@@ -181,6 +187,8 @@ internal class CharacterRow
     public string? OwnerPlayerId { get; set; }
     public string? CreatedAt { get; set; }
     public string? LastModified { get; set; }
+    public int IsRetired { get; set; }
+    public string? RetiredAt { get; set; }
 
     public CharacterRow() { }
 
@@ -203,6 +211,8 @@ internal class CharacterRow
         OwnerPlayerId = c.OwnerPlayerId;
         CreatedAt = c.CreatedAt.ToString("o");
         LastModified = c.LastModified.ToString("o");
+        IsRetired = c.IsRetired ? 1 : 0;
+        RetiredAt = c.RetiredAt?.ToString("o");
     }
 
     public Character ToCharacter() => new()
@@ -225,6 +235,8 @@ internal class CharacterRow
         IsPublished = IsPublished == 1,
         OwnerPlayerId = OwnerPlayerId,
         CreatedAt = DateTime.TryParse(CreatedAt, out var created) ? created : DateTime.UtcNow,
-        LastModified = DateTime.TryParse(LastModified, out var modified) ? modified : DateTime.UtcNow
+        LastModified = DateTime.TryParse(LastModified, out var modified) ? modified : DateTime.UtcNow,
+        IsRetired = IsRetired == 1,
+        RetiredAt = string.IsNullOrEmpty(RetiredAt) ? null : DateTime.TryParse(RetiredAt, out var retired) ? retired : null
     };
 }

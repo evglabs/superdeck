@@ -26,6 +26,10 @@ public class BattleSession
     public string? PlayerAIProfileId { get; set; }
     public BehaviorRules? PlayerBehaviorRules { get; set; }
 
+    // Battle type and rewards
+    public string BattleType { get; set; } = "normal"; // "normal", "uber"
+    public bool GrantsRewards { get; set; } = true;
+
     public void UpdateActivity()
     {
         LastActivity = DateTime.UtcNow;

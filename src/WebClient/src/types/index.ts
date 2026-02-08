@@ -87,6 +87,8 @@ export interface Character {
   turnsWithoutDamage: number
   hasPriority: boolean
   lastTurnPlayedCards: Card[]
+  isRetired: boolean
+  retiredAt: string | null
 }
 
 export interface EffectiveStats {
@@ -120,6 +122,7 @@ export interface BattleState {
   currentPlayerQueueSlots: number
   currentOpponentQueueSlots: number
   startingHandSize: number
+  opponentStartingHandSize: number
   cardsDrawnPerTurn: number
   battleLog: string[]
   events: import('./events').BattleEvent[]
@@ -229,6 +232,41 @@ export interface BattleResult {
   levelsGained: number
   newLevel: number
   battleLog: string[]
+  characterRetired: boolean
+  careerSummary: CareerSummary | null
+  wasUberBattle: boolean
+}
+
+export interface CareerSummary {
+  totalBattles: number
+  wins: number
+  losses: number
+  winRate: number
+  finalMMR: number
+  finalLevel: number
+  finalAttack: number
+  finalDefense: number
+  finalSpeed: number
+  finalBonusHP: number
+  createdAt: string
+  retiredAt: string
+}
+
+export interface CareerSummaryResponse {
+  totalBattles: number
+  wins: number
+  losses: number
+  winRate: number
+  finalMMR: number
+  finalLevel: number
+  finalStats: {
+    attack: number
+    defense: number
+    speed: number
+    bonusHP: number
+  }
+  createdAt: string
+  retiredAt: string | null
 }
 
 export interface InstantBattleResponse {

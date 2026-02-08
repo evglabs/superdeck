@@ -12,6 +12,7 @@ public class GameSettings
     public AuthSettings Auth { get; set; } = new();
     public RateLimitSettings RateLimit { get; set; } = new();
     public AutoBattleSettings AutoBattle { get; set; } = new();
+    public UberBossSettings UberBoss { get; set; } = new();
 }
 
 public class RateLimitSettings
@@ -142,4 +143,16 @@ public class AutoBattleSettings
     public bool Enabled { get; set; } = true;
     public int WatchModeDelayMs { get; set; } = 500;
     public bool AllowMidBattleToggle { get; set; } = true;
+}
+
+public class UberBossSettings
+{
+    public string Name { get; set; } = "Ultimatum";
+    public int HandSizeMultiplier { get; set; } = 3;  // Multiplier for starting hand size
+    public double StatMultiplier { get; set; } = 1.5;  // Multiplier for player's stats
+    public int BonusAttack { get; set; } = 5;
+    public int BonusDefense { get; set; } = 5;
+    public int BonusSpeed { get; set; } = 2;
+    public int BonusHP { get; set; } = 20;
+    public int BonusMMR { get; set; } = 200;
 }

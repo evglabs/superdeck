@@ -59,41 +59,67 @@ public class BattleService
         int? seed = null,
         bool autoBattle = false,
         AutoBattleMode autoBattleMode = AutoBattleMode.Watch,
-        string? playerAIProfileId = null)
+        string? playerAIProfileId = null,
+        string battleType = "normal")
     {
         var character = await _characterRepository.GetByIdAsync(characterId)
             ?? throw new ArgumentException("Character not found");
+
+        // Retired characters can ONLY fight UBER (no regular battles)
+        if (character.IsRetired && battleType != "uber")
+        {
+            throw new InvalidOperationException("Retired characters can only fight the UBER boss");
+        }
+
+        // Only retired characters can fight UBER
+        if (battleType == "uber" && !character.IsRetired)
+        {
+            throw new InvalidOperationException("Only retired characters can challenge the UBER boss");
+        }
 
         // Find opponent ghost by MMR
         Character opponent;
         string ghostId;
 
-        var ghosts = await _ghostRepository.GetByMMRRangeAsync(
-            character.MMR - _settings.Battle.GhostSearchRange,
-            character.MMR + _settings.Battle.GhostSearchRange,
-            count: _settings.Battle.GhostCandidateCount
-        );
-
-        // Filter out player's own ghost to prevent self-matching
-        var eligibleGhosts = ghosts.Where(g => g.SourceCharacterId != characterId);
-        var ghost = eligibleGhosts.OrderBy(_ => Guid.NewGuid()).FirstOrDefault();
-
-        if (ghost != null)
+        if (battleType == "uber")
         {
-            opponent = JsonSerializer.Deserialize<Character>(ghost.SerializedCharacterState)
-                ?? CreateDefaultOpponent(character.Level);
-            // Assign unique battle ID to prevent ID collision with player
-            opponent.Id = Guid.NewGuid().ToString();
-            ghostId = ghost.Id;
+            opponent = CreateUberBoss(character);
+            ghostId = "uber_boss";
         }
         else
         {
-            // Create a default opponent if no ghosts available
-            opponent = CreateDefaultOpponent(character.Level);
-            ghostId = "default_ghost";
+            var ghosts = await _ghostRepository.GetByMMRRangeAsync(
+                character.MMR - _settings.Battle.GhostSearchRange,
+                character.MMR + _settings.Battle.GhostSearchRange,
+                count: _settings.Battle.GhostCandidateCount
+            );
+
+            // Filter out player's own ghost to prevent self-matching
+            var eligibleGhosts = ghosts.Where(g => g.SourceCharacterId != characterId);
+            var ghost = eligibleGhosts.OrderBy(_ => Guid.NewGuid()).FirstOrDefault();
+
+            if (ghost != null)
+            {
+                opponent = JsonSerializer.Deserialize<Character>(ghost.SerializedCharacterState)
+                    ?? CreateDefaultOpponent(character.Level);
+                // Assign unique battle ID to prevent ID collision with player
+                opponent.Id = Guid.NewGuid().ToString();
+                ghostId = ghost.Id;
+            }
+            else
+            {
+                // Create a default opponent if no ghosts available
+                opponent = CreateDefaultOpponent(character.Level);
+                ghostId = "default_ghost";
+            }
         }
 
         var rng = seed.HasValue ? new Random(seed.Value) : new Random();
+
+        // Calculate opponent starting hand size (UBER boss gets multiplied hand size)
+        int opponentHandSize = battleType == "uber"
+            ? _settings.Battle.StartingHandSize * _settings.UberBoss.HandSizeMultiplier
+            : _settings.Battle.StartingHandSize;
 
         var battle = new BattleState
         {
@@ -104,6 +130,7 @@ public class BattleService
             BaseQueueSlots = _settings.Battle.BaseQueueSlots,
             MaxQueueSlots = _settings.Battle.MaxQueueSlots,
             StartingHandSize = _settings.Battle.StartingHandSize,
+            OpponentStartingHandSize = opponentHandSize,
             CardsDrawnPerTurn = _settings.Battle.CardsDrawnPerTurn
         };
 
@@ -140,14 +167,16 @@ public class BattleService
             PlayerId = character.OwnerPlayerId ?? string.Empty,
             CharacterId = characterId,
             GhostId = ghostId,
-            AIProfileId = ghost?.AIProfileId ?? "default",
+            AIProfileId = "default",
             PlayerMMRAtStart = character.MMR,
             OpponentMMRAtStart = opponent.MMR,
             State = battle,
             Rng = rng,
             AutoBattleEnabled = autoBattle,
             AutoBattleMode = autoBattleMode,
-            PlayerAIProfileId = playerAIProfileId
+            PlayerAIProfileId = playerAIProfileId,
+            BattleType = battleType,
+            GrantsRewards = battleType == "normal" && !character.IsRetired
         };
 
         // Load player AI behavior rules if auto-battle is enabled
@@ -201,6 +230,34 @@ public class BattleService
         return opponent;
     }
 
+    private Character CreateUberBoss(Character playerCharacter)
+    {
+        var uberSettings = _settings.UberBoss;
+
+        var uber = new Character
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = uberSettings.Name,
+            Level = _settings.Character.MaxLevel,
+            IsGhost = true,
+
+            // Enhanced stats: configurable multiplier of player's stats + bonuses
+            Attack = (int)(playerCharacter.Attack * uberSettings.StatMultiplier) + uberSettings.BonusAttack,
+            Defense = (int)(playerCharacter.Defense * uberSettings.StatMultiplier) + uberSettings.BonusDefense,
+            Speed = (int)(playerCharacter.Speed * uberSettings.StatMultiplier) + uberSettings.BonusSpeed,
+            BonusHP = (int)(playerCharacter.BonusHP * uberSettings.StatMultiplier) + uberSettings.BonusHP,
+
+            // Strong MMR
+            MMR = playerCharacter.MMR + uberSettings.BonusMMR,
+        };
+
+        // Give uber boss EVERY card in the game
+        var allCards = _cardService.GetAllCards().ToList();
+        uber.DeckCardIds = allCards.Select(c => c.Id).ToList();
+
+        return uber;
+    }
+
     public async Task<BattleState> StartNewRoundAsync(BattleSession session)
     {
         var battle = session.State;
@@ -226,9 +283,10 @@ public class BattleService
         _hookExecutor.ExecuteHooks(HookType.OnDrawPhase, battle, battle.Opponent, battle.Player, session.Rng);
 
         // Draw cards - starting hand on round 1, normal draw on subsequent rounds
-        int cardsToDraw = battle.Round == 1 ? battle.StartingHandSize : battle.CardsDrawnPerTurn;
-        DrawCards(battle, battle.Player, cardsToDraw, session.Rng);
-        DrawCards(battle, battle.Opponent, cardsToDraw, session.Rng);
+        int playerCardsToDraw = battle.Round == 1 ? battle.StartingHandSize : battle.CardsDrawnPerTurn;
+        int opponentCardsToDraw = battle.Round == 1 ? battle.OpponentStartingHandSize : battle.CardsDrawnPerTurn;
+        DrawCards(battle, battle.Player, playerCardsToDraw, session.Rng);
+        DrawCards(battle, battle.Opponent, opponentCardsToDraw, session.Rng);
 
         // Reset queue slots
         battle.CurrentPlayerQueueSlots = battle.BaseQueueSlots;
@@ -962,16 +1020,18 @@ public class BattleService
         }
 
         bool playerWon = battle.WinnerId == battle.Player.Id;
-
-        // Update character stats
-        var character = await _characterRepository.GetByIdAsync(session.CharacterId);
         int xpGain = 0;
         int mmrChange = 0;
         int ghostMmrChange = 0;
         int levelsGained = 0;
         int newLevel = 0;
+        bool justRetired = false;
+        CareerSummary? careerSummary = null;
 
-        if (character != null)
+        var character = await _characterRepository.GetByIdAsync(session.CharacterId);
+
+        // Normal battle with rewards (triggers retirement if hitting max level)
+        if (session.GrantsRewards && character != null)
         {
             int oldLevel = character.Level;
 
@@ -1021,19 +1081,31 @@ public class BattleService
                 await _playerRepository.UpdateAsync(player);
             }
 
-            // Add XP through CharacterService to trigger level-up logic
-            var updatedCharacter = await _characterService.AddXPAsync(session.CharacterId, xpGain);
+            // Add XP through CharacterService to trigger level-up logic (may trigger retirement)
+            var (updatedCharacter, retired) = await _characterService.AddXPAsync(session.CharacterId, xpGain);
             if (updatedCharacter != null)
             {
                 newLevel = updatedCharacter.Level;
                 levelsGained = newLevel - oldLevel;
+                justRetired = retired;
+
+                if (retired)
+                {
+                    careerSummary = BuildCareerSummary(updatedCharacter);
+                }
+            }
+
+            // Update ghost stats with Elo-calculated MMR change
+            if (session.GhostId != "default_ghost")
+            {
+                await _ghostRepository.UpdateStatsAsync(session.GhostId, !playerWon, ghostMmrChange);
             }
         }
-
-        // Update ghost stats with Elo-calculated MMR change
-        if (session.GhostId != "default_ghost")
+        // UBER battle: no rewards, just for fun
+        else if (session.BattleType == "uber")
         {
-            await _ghostRepository.UpdateStatsAsync(session.GhostId, !playerWon, ghostMmrChange);
+            newLevel = character?.Level ?? _settings.Character.MaxLevel;
+            // No XP, no MMR, no win/loss updates
         }
 
         return new BattleResult
@@ -1045,7 +1117,30 @@ public class BattleService
             MMRChange = mmrChange,
             LevelsGained = levelsGained,
             NewLevel = newLevel,
-            BattleLog = battle.BattleLog
+            BattleLog = battle.BattleLog,
+            CharacterRetired = justRetired,
+            CareerSummary = careerSummary,
+            WasUberBattle = session.BattleType == "uber"
+        };
+    }
+
+    private CareerSummary BuildCareerSummary(Character c)
+    {
+        return new CareerSummary
+        {
+            TotalBattles = c.Wins + c.Losses,
+            Wins = c.Wins,
+            Losses = c.Losses,
+            WinRate = (c.Wins + c.Losses) > 0
+                ? Math.Round((double)c.Wins / (c.Wins + c.Losses) * 100, 1) : 0,
+            FinalMMR = c.MMR,
+            FinalLevel = c.Level,
+            FinalAttack = c.Attack,
+            FinalDefense = c.Defense,
+            FinalSpeed = c.Speed,
+            FinalBonusHP = c.BonusHP,
+            CreatedAt = c.CreatedAt,
+            RetiredAt = c.RetiredAt ?? DateTime.UtcNow
         };
     }
 }
@@ -1060,4 +1155,23 @@ public class BattleResult
     public int LevelsGained { get; set; }
     public int NewLevel { get; set; }
     public List<string> BattleLog { get; set; } = new();
+    public bool CharacterRetired { get; set; } = false;
+    public CareerSummary? CareerSummary { get; set; }
+    public bool WasUberBattle { get; set; } = false;
+}
+
+public class CareerSummary
+{
+    public int TotalBattles { get; set; }
+    public int Wins { get; set; }
+    public int Losses { get; set; }
+    public double WinRate { get; set; }
+    public int FinalMMR { get; set; }
+    public int FinalLevel { get; set; }
+    public int FinalAttack { get; set; }
+    public int FinalDefense { get; set; }
+    public int FinalSpeed { get; set; }
+    public int FinalBonusHP { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime RetiredAt { get; set; }
 }

@@ -268,6 +268,42 @@ app.MapDelete("/api/characters/{id}/cards", async (CharacterService characterSer
 .WithName("RemoveCardsFromDeck")
 .WithTags("Characters");
 
+// GET /api/characters/retired - List retired characters
+app.MapGet("/api/characters/retired", async (CharacterService svc, string? playerId) =>
+    Results.Ok(await svc.GetRetiredCharactersAsync(playerId)))
+.WithName("GetRetiredCharacters")
+.WithTags("Characters");
+
+// GET /api/characters/{id}/career - Get career summary
+app.MapGet("/api/characters/{id}/career", async (ICharacterRepository repo, string id) =>
+{
+    var character = await repo.GetByIdAsync(id);
+    if (character == null) return Results.NotFound();
+    if (!character.IsRetired) return Results.BadRequest(new { error = "Character is not retired" });
+
+    return Results.Ok(new CareerSummaryResponse
+    {
+        TotalBattles = character.Wins + character.Losses,
+        Wins = character.Wins,
+        Losses = character.Losses,
+        WinRate = (character.Wins + character.Losses) > 0
+            ? Math.Round((double)character.Wins / (character.Wins + character.Losses) * 100, 1) : 0,
+        FinalMMR = character.MMR,
+        FinalLevel = character.Level,
+        FinalStats = new FinalStatsResponse
+        {
+            Attack = character.Attack,
+            Defense = character.Defense,
+            Speed = character.Speed,
+            BonusHP = character.BonusHP
+        },
+        CreatedAt = character.CreatedAt,
+        RetiredAt = character.RetiredAt
+    });
+})
+.WithName("GetCareerSummary")
+.WithTags("Characters");
+
 // ========================================
 // Card Endpoints
 // ========================================
@@ -317,7 +353,8 @@ var battleStartEndpoint = app.MapPost("/api/battle/start", async (BattleService 
             request.Seed,
             request.AutoBattle,
             autoBattleMode,
-            request.AIProfileId);
+            request.AIProfileId,
+            request.BattleType);
 
         var response = new StartBattleResponse
         {
@@ -638,7 +675,8 @@ public record StartBattleRequest(
     int? Seed = null,
     bool AutoBattle = false,
     string AutoBattleMode = "Watch",
-    string? AIProfileId = null);
+    string? AIProfileId = null,
+    string BattleType = "normal");
 
 public record ToggleAutoBattleRequest(bool Enabled, string? AIProfileId = null);
 
@@ -683,4 +721,25 @@ public class ActionResponse
     public bool Valid { get; set; }
     public string? Message { get; set; }
     public BattleState BattleState { get; set; } = new();
+}
+
+public class CareerSummaryResponse
+{
+    public int TotalBattles { get; set; }
+    public int Wins { get; set; }
+    public int Losses { get; set; }
+    public double WinRate { get; set; }
+    public int FinalMMR { get; set; }
+    public int FinalLevel { get; set; }
+    public FinalStatsResponse FinalStats { get; set; } = new();
+    public DateTime CreatedAt { get; set; }
+    public DateTime? RetiredAt { get; set; }
+}
+
+public class FinalStatsResponse
+{
+    public int Attack { get; set; }
+    public int Defense { get; set; }
+    public int Speed { get; set; }
+    public int BonusHP { get; set; }
 }

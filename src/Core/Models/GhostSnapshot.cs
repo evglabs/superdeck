@@ -12,4 +12,5 @@ public class GhostSnapshot
     public string AIProfileId { get; set; } = string.Empty;
     public DateTime? DownloadedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public bool IsRetirementGhost { get; set; } = false;
 }

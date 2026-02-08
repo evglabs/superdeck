@@ -43,6 +43,7 @@ public class BattleState
     public int CurrentPlayerQueueSlots { get; set; } = 3;
     public int CurrentOpponentQueueSlots { get; set; } = 3;
     public int StartingHandSize { get; set; } = 5;
+    public int OpponentStartingHandSize { get; set; } = 5;  // Can differ for UBER boss
     public int CardsDrawnPerTurn { get; set; } = 3;
 
     // Battle log (string-based, kept for backwards compatibility)

@@ -36,6 +36,10 @@ public class SQLiteGhostRepository : IGhostRepository
             );
             CREATE INDEX IF NOT EXISTS idx_ghosts_mmr ON GhostSnapshots(GhostMMR);
         ");
+
+        // Migration: add IsRetirementGhost column
+        try { connection.Execute("ALTER TABLE GhostSnapshots ADD COLUMN IsRetirementGhost INTEGER DEFAULT 0"); }
+        catch { /* column already exists */ }
     }
 
     public async Task<GhostSnapshot?> GetByIdAsync(string id)
@@ -65,8 +69,8 @@ public class SQLiteGhostRepository : IGhostRepository
         var row = new GhostRow(ghost);
 
         await connection.ExecuteAsync(@"
-            INSERT INTO GhostSnapshots (Id, SourceCharacterId, SerializedCharacterState, GhostMMR, Wins, Losses, TimesUsed, AIProfileId, DownloadedAt, CreatedAt)
-            VALUES (@Id, @SourceCharacterId, @SerializedCharacterState, @GhostMMR, @Wins, @Losses, @TimesUsed, @AIProfileId, @DownloadedAt, @CreatedAt)",
+            INSERT INTO GhostSnapshots (Id, SourceCharacterId, SerializedCharacterState, GhostMMR, Wins, Losses, TimesUsed, AIProfileId, DownloadedAt, CreatedAt, IsRetirementGhost)
+            VALUES (@Id, @SourceCharacterId, @SerializedCharacterState, @GhostMMR, @Wins, @Losses, @TimesUsed, @AIProfileId, @DownloadedAt, @CreatedAt, @IsRetirementGhost)",
             row);
 
         return ghost;
@@ -108,6 +112,7 @@ internal class GhostRow
     public string AIProfileId { get; set; } = string.Empty;
     public string? DownloadedAt { get; set; }
     public string? CreatedAt { get; set; }
+    public int IsRetirementGhost { get; set; }
 
     public GhostRow() { }
 
@@ -123,6 +128,7 @@ internal class GhostRow
         AIProfileId = g.AIProfileId;
         DownloadedAt = g.DownloadedAt?.ToString("o");
         CreatedAt = g.CreatedAt.ToString("o");
+        IsRetirementGhost = g.IsRetirementGhost ? 1 : 0;
     }
 
     public GhostSnapshot ToGhostSnapshot() => new()
@@ -136,6 +142,7 @@ internal class GhostRow
         TimesUsed = TimesUsed,
         AIProfileId = AIProfileId,
         DownloadedAt = string.IsNullOrEmpty(DownloadedAt) ? null : DateTime.Parse(DownloadedAt),
-        CreatedAt = DateTime.TryParse(CreatedAt, out var created) ? created : DateTime.UtcNow
+        CreatedAt = DateTime.TryParse(CreatedAt, out var created) ? created : DateTime.UtcNow,
+        IsRetirementGhost = IsRetirementGhost == 1
     };
 }

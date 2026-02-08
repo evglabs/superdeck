@@ -37,6 +37,10 @@ public class Character
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime LastModified { get; set; } = DateTime.UtcNow;
 
+    // Retirement status
+    public bool IsRetired { get; set; } = false;
+    public DateTime? RetiredAt { get; set; }
+
     // Status tracking (populated during battle)
     public List<StatusEffect> ActiveStatuses { get; set; } = new();
 

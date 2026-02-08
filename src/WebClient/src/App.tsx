@@ -9,6 +9,7 @@ import { StatAllocation } from './pages/StatAllocation'
 import { BattlePage } from './pages/BattlePage'
 import { BattleResultPage } from './pages/BattleResultPage'
 import { LevelUpPage } from './pages/LevelUpPage'
+import { RetirementPage } from './pages/RetirementPage'
 
 export function App() {
   return (
@@ -23,6 +24,7 @@ export function App() {
         <Route path="/battle/:id" element={<BattlePage />} />
         <Route path="/battle/:id/result" element={<BattleResultPage />} />
         <Route path="/battle/:id/levelup" element={<LevelUpPage />} />
+        <Route path="/character/:id/retired" element={<RetirementPage />} />
         <Route path="*" element={<Navigate to="/menu" replace />} />
       </Route>
     </Routes>
