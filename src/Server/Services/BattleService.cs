@@ -153,6 +153,7 @@ public class BattleService
         };
 
         // Load deck cards
+        // TODO: Remove UBER battle debug logging once issue is confirmed resolved
         // DEBUG: Log deck card IDs for UBER battles
         if (battleType == "uber")
         {
@@ -300,6 +301,7 @@ public class BattleService
         DrawCards(battle, battle.Player, playerCardsToDraw, session.Rng);
         DrawCards(battle, battle.Opponent, opponentCardsToDraw, session.Rng);
 
+        // TODO: Remove this debug logging (see TODO above)
         // DEBUG: Log hands after drawing for UBER battles (Round 1 only)
         if (session.BattleType == "uber" && battle.Round == 1)
         {
