@@ -153,8 +153,20 @@ public class BattleService
         };
 
         // Load deck cards
+        // DEBUG: Log deck card IDs for UBER battles
+        if (battleType == "uber")
+        {
+            Console.WriteLine($"=== UBER BATTLE DEBUG ===");
+            Console.WriteLine($"Player DeckCardIds ({battle.Player.DeckCardIds.Count}): {string.Join(", ", battle.Player.DeckCardIds.Take(10))}...");
+            Console.WriteLine($"Opponent DeckCardIds ({battle.Opponent.DeckCardIds.Count}): {string.Join(", ", battle.Opponent.DeckCardIds.Take(10))}...");
+        }
         battle.PlayerDeck = LoadDeck(battle.Player.DeckCardIds, rng);
         battle.OpponentDeck = LoadDeck(battle.Opponent.DeckCardIds, rng);
+        if (battleType == "uber")
+        {
+            Console.WriteLine($"PlayerDeck loaded ({battle.PlayerDeck.Count}): {string.Join(", ", battle.PlayerDeck.Take(5).Select(c => c.Id))}...");
+            Console.WriteLine($"OpponentDeck loaded ({battle.OpponentDeck.Count}): {string.Join(", ", battle.OpponentDeck.Take(5).Select(c => c.Id))}...");
+        }
 
         // Shuffle decks
         Shuffle(battle.PlayerDeck, rng);
@@ -287,6 +299,14 @@ public class BattleService
         int opponentCardsToDraw = battle.Round == 1 ? battle.OpponentStartingHandSize : battle.CardsDrawnPerTurn;
         DrawCards(battle, battle.Player, playerCardsToDraw, session.Rng);
         DrawCards(battle, battle.Opponent, opponentCardsToDraw, session.Rng);
+
+        // DEBUG: Log hands after drawing for UBER battles (Round 1 only)
+        if (session.BattleType == "uber" && battle.Round == 1)
+        {
+            Console.WriteLine($"=== UBER BATTLE HANDS (Round {battle.Round}) ===");
+            Console.WriteLine($"PlayerHand ({battle.PlayerHand.Count}): {string.Join(", ", battle.PlayerHand.Select(c => c.Id))}");
+            Console.WriteLine($"OpponentHand ({battle.OpponentHand.Count}): {string.Join(", ", battle.OpponentHand.Select(c => c.Id))}");
+        }
 
         // Reset queue slots
         battle.CurrentPlayerQueueSlots = battle.BaseQueueSlots;
